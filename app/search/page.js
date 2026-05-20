@@ -26,9 +26,9 @@ const BUSINESSES = [
 ]
 
 const TX = {
-  en: { dir: 'ltr', searchPh: 'Lawyers, doctors, accountants…', filters: 'Filters', clearAll: 'Clear all', apply: 'Apply', results: 'results', openNow: 'Open Now', closed: 'Closed', verified: '✓ Verified', kurdishSp: 'Kurdish Speaking', topRated: 'Top Rated', anyRating: 'Any Rating', above4: '4+ Stars', above45: '4.5+ Stars', fiveOnly: '5 Stars', viewProfile: 'View Profile →', home: 'Home', search: 'Search', saved: 'Saved', messages: 'Messages', profile: 'Profile' },
-  ku: { dir: 'rtl', searchPh: 'پارێزەر، دکتۆر، ژمێریار…', filters: 'فلتەر', clearAll: 'پاككردنەوە', apply: 'جێبەجێکردن', results: 'ئەنجام', openNow: 'ئێستا کراوەیە', closed: 'داخراوە', verified: '✓ دڵنیاکراوە', kurdishSp: 'کوردی قسەدەکات', topRated: 'باشترین', anyRating: 'هەر نرخاندنێک', above4: '٤+ ئەستێرە', above45: '٤.٥+ ئەستێرە', fiveOnly: '٥ ئەستێرە', viewProfile: '→ پرۆفایل ببینە', home: 'سەرەکی', search: 'گەڕان', saved: 'پاشەکەوت', messages: 'نامە', profile: 'پرۆفایل' },
-  ar: { dir: 'rtl', searchPh: 'محامون، أطباء، محاسبون…', filters: 'الفلاتر', clearAll: 'مسح الكل', apply: 'تطبيق', results: 'نتيجة', openNow: 'مفتوح الآن', closed: 'مغلق', verified: '✓ موثق', kurdishSp: 'يتحدث الكردية', topRated: 'الأعلى تقييماً', anyRating: 'أي تقييم', above4: '+٤ نجوم', above45: '+٤.٥ نجوم', fiveOnly: '٥ نجوم', viewProfile: '→ عرض الملف', home: 'الرئيسية', search: 'بحث', saved: 'المحفوظة', messages: 'الرسائل', profile: 'الملف' },
+  en: { dir: 'ltr', searchPh: 'Lawyers, doctors, accountants…', filters: 'Filters', clearAll: 'Clear all', apply: 'Apply', results: 'results', openNow: 'Open Now', closed: 'Closed', verified: '✓ Verified', kurdishSp: 'Kurdish Speaking', anyRating: 'Any Rating', above4: '4+ Stars', above45: '4.5+ Stars', fiveOnly: '5 Stars', viewProfile: 'View Profile →', home: 'Home', search: 'Search', saved: 'Saved', messages: 'Messages', profile: 'Profile' },
+  ku: { dir: 'rtl', searchPh: 'پارێزەر، دکتۆر، ژمێریار…', filters: 'فلتەر', clearAll: 'پاككردنەوە', apply: 'جێبەجێکردن', results: 'ئەنجام', openNow: 'ئێستا کراوەیە', closed: 'داخراوە', verified: '✓ دڵنیاکراوە', kurdishSp: 'کوردی قسەدەکات', anyRating: 'هەر نرخاندنێک', above4: '٤+ ئەستێرە', above45: '٤.٥+ ئەستێرە', fiveOnly: '٥ ئەستێرە', viewProfile: '→ پرۆفایل ببینە', home: 'سەرەکی', search: 'گەڕان', saved: 'پاشەکەوت', messages: 'نامە', profile: 'پرۆفایل' },
+  ar: { dir: 'rtl', searchPh: 'محامون، أطباء، محاسبون…', filters: 'الفلاتر', clearAll: 'مسح الكل', apply: 'تطبيق', results: 'نتيجة', openNow: 'مفتوح الآن', closed: 'مغلق', verified: '✓ موثق', kurdishSp: 'يتحدث الكردية', anyRating: 'أي تقييم', above4: '+٤ نجوم', above45: '+٤.٥ نجوم', fiveOnly: '٥ نجوم', viewProfile: '→ عرض الملف', home: 'الرئيسية', search: 'بحث', saved: 'المحفوظة', messages: 'الرسائل', profile: 'الملف' },
 }
 
 const stars = (n) => '★'.repeat(Math.floor(n)) + '☆'.repeat(5 - Math.floor(n))
@@ -45,7 +45,6 @@ export default function Search() {
   const [activeCategory, setActiveCategory] = useState(null)
   const t = TX[lang]
   const isRtl = t.dir === 'rtl'
-
   const toggleSave = (id) => setSaved(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
 
   const filtered = BUSINESSES.filter(b => {
@@ -67,9 +66,8 @@ export default function Search() {
 
   return (
     <div style={{ maxWidth: '480px', margin: '0 auto', minHeight: '100vh', background: '#F5F5F7', fontFamily: isRtl ? "'Noto Sans Arabic', sans-serif" : "'DM Sans', sans-serif", direction: t.dir }}>
-      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&family=Noto+Sans+Arabic:wght@400;600;700;800&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=DM+Sans:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;600;700;800&display=swap" rel="stylesheet" />
 
-      {/* TOP BAR */}
       <div style={{ background: '#fff', padding: '0 16px', height: '58px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(0,0,0,.07)', position: 'sticky', top: 0, zIndex: 50 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'linear-gradient(135deg,#FF6B35,#FF8C61)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -84,7 +82,6 @@ export default function Search() {
         </div>
       </div>
 
-      {/* SEARCH BAR */}
       <div style={{ background: '#fff', padding: '11px 16px', borderBottom: '1px solid rgba(0,0,0,.06)' }}>
         <div style={{ background: '#F5F5F7', borderRadius: '13px', padding: '10px 13px', display: 'flex', alignItems: 'center', gap: '8px', border: '2px solid #FF6B35' }}>
           <span style={{ fontSize: '15px', color: '#AEAEB2', flexShrink: 0 }}>🔍</span>
@@ -93,7 +90,6 @@ export default function Search() {
         </div>
       </div>
 
-      {/* CATEGORY PILLS */}
       <div style={{ background: '#fff', borderBottom: '1px solid rgba(0,0,0,.05)', padding: '10px 16px' }}>
         <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', scrollbarWidth: 'none' }}>
           <button onClick={() => setActiveCategory(null)} style={{ flexShrink: 0, padding: '6px 13px', borderRadius: '50px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '12px', fontWeight: 600, background: activeCategory === null ? '#FF6B35' : '#F5F5F7', color: activeCategory === null ? '#fff' : '#636366' }}>All</button>
@@ -105,7 +101,6 @@ export default function Search() {
         </div>
       </div>
 
-      {/* FILTER BAR */}
       <div style={{ background: '#fff', padding: '9px 16px', borderBottom: '1px solid rgba(0,0,0,.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
         <div style={{ display: 'flex', gap: '7px' }}>
           <button onClick={() => setFilterOpen(true)} style={{ padding: '7px 13px', borderRadius: '50px', border: `1.5px solid ${activeFilters > 0 ? '#FF6B35' : 'rgba(0,0,0,.1)'}`, background: activeFilters > 0 ? '#FF6B35' : '#fff', color: activeFilters > 0 ? '#fff' : '#1C1C1E', cursor: 'pointer', fontFamily: 'inherit', fontSize: '12px', fontWeight: 700 }}>⚙ {t.filters}{activeFilters > 0 ? ` (${activeFilters})` : ''}</button>
@@ -114,12 +109,9 @@ export default function Search() {
         <span style={{ fontSize: '12px', color: '#8E8E93', flexShrink: 0 }}>{filtered.length} {t.results}</span>
       </div>
 
-      {/* RESULTS */}
       <div style={{ padding: '12px 16px 80px' }}>
         {filtered.map(b => (
           <div key={b.id} style={{ background: '#fff', borderRadius: '18px', padding: '17px', boxShadow: '0 2px 12px rgba(0,0,0,.05)', marginBottom: '12px', cursor: 'pointer', border: '2px solid transparent', transition: 'border-color .2s', position: 'relative', overflow: 'hidden' }}
-            onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(255,107,53,.2)'}
-            onMouseLeave={e => e.currentTarget.style.borderColor = 'transparent'}
             onClick={() => router.push(`/business/${b.id}`)}>
             <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: `linear-gradient(180deg,${b.color},${b.color}44)` }} />
             <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
@@ -128,7 +120,7 @@ export default function Search() {
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '3px' }}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexWrap: 'wrap', marginBottom: '2px' }}>
-                      <span style={{ fontFamily: HEADING, fontWeight: 800, fontSize: '14px', color: '#1C1C1E' }}>{b.name[lang]}</span>
+                      <span style={{ fontFamily: HEADING, fontWeight: 700, fontSize: '14px', color: '#1C1C1E' }}>{b.name[lang]}</span>
                       {b.verified && <span style={{ background: '#E6F9F5', color: '#1DB87A', fontSize: '10px', fontWeight: 700, padding: '2px 7px', borderRadius: '50px' }}>{t.verified}</span>}
                     </div>
                     <div style={{ fontSize: '11px', color: '#8E8E93' }}>
@@ -161,14 +153,13 @@ export default function Search() {
         {filtered.length === 0 && (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
             <div style={{ fontSize: '40px', marginBottom: '12px' }}>🔍</div>
-            <p style={{ fontWeight: 700, color: '#1C1C1E', fontSize: '16px', marginBottom: '6px' }}>No results found</p>
+            <p style={{ fontFamily: HEADING, fontWeight: 700, color: '#1C1C1E', fontSize: '16px', marginBottom: '6px' }}>No results found</p>
             <p style={{ color: '#8E8E93', fontSize: '13px' }}>Try a different search or clear your filters</p>
             <button onClick={() => { setQuery(''); setMinRating(0); setOnlyOpen(false); setOnlyVerified(false); setActiveCategory(null) }} style={{ marginTop: '16px', padding: '11px 22px', background: 'linear-gradient(135deg,#FF6B35,#FF8C61)', border: 'none', borderRadius: '13px', fontSize: '13px', fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: 'inherit' }}>Clear all filters</button>
           </div>
         )}
       </div>
 
-      {/* FILTER DRAWER */}
       {filterOpen && (
         <div onClick={() => setFilterOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.6)', zIndex: 999, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
           <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: '22px 22px 0 0', padding: '22px 22px 38px', width: '100%', maxWidth: '480px' }}>
@@ -177,7 +168,6 @@ export default function Search() {
               <span style={{ fontFamily: HEADING, fontSize: '17px', fontWeight: 800, color: '#1C1C1E' }}>{t.filters}</span>
               <span onClick={() => { setMinRating(0); setOnlyOpen(false); setOnlyVerified(false) }} style={{ fontSize: '12px', color: '#FF6B35', fontWeight: 700, cursor: 'pointer' }}>{t.clearAll}</span>
             </div>
-            <p style={{ fontSize: '11px', fontWeight: 700, color: '#AEAEB2', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: '9px' }}>Rating</p>
             <div style={{ display: 'flex', gap: '7px', flexWrap: 'wrap', marginBottom: '16px' }}>
               {[[0, t.anyRating], [4, t.above4], [4.5, t.above45], [5, t.fiveOnly]].map(([v, l]) => (
                 <button key={v} onClick={() => setMinRating(v)} style={{ padding: '7px 13px', borderRadius: '50px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '12px', fontWeight: 600, background: minRating === v ? '#FF6B35' : '#F5F5F7', color: minRating === v ? '#fff' : '#636366' }}>{l}</button>
@@ -196,7 +186,6 @@ export default function Search() {
         </div>
       )}
 
-      {/* BOTTOM NAV */}
       <div style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: '480px', background: 'rgba(255,255,255,.97)', borderTop: '1px solid rgba(0,0,0,.07)', display: 'flex', zIndex: 50 }}>
         {[
           { id: 'home', icon: '⊞', label: t.home, path: '/' },
