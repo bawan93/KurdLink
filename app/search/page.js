@@ -1,5 +1,5 @@
-const HEADING = "'Plus Jakarta Sans', sans-serif"
 'use client'
+const HEADING = "'Plus Jakarta Sans', sans-serif"
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
