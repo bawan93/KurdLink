@@ -1,3 +1,4 @@
+const HEADING = "'Plus Jakarta Sans', sans-serif"
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -74,7 +75,7 @@ export default function Search() {
           <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'linear-gradient(135deg,#FF6B35,#FF8C61)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 4L11 12L5 20H9L15 12L9 4H5Z" fill="white" /><path d="M14 8L17 12L14 16H18L21 12L18 8H14Z" fill="white" opacity=".55" /></svg>
           </div>
-          <span style={{ fontFamily: 'Syne, sans-serif', fontSize: '18px', fontWeight: 800, color: '#1C1C1E' }}>Kurd<span style={{ color: '#FF6B35' }}>Link</span></span>
+          <span style={{ fontFamily: HEADING, fontSize: '18px', fontWeight: 800, color: '#1C1C1E' }}>Kurd<span style={{ color: '#FF6B35' }}>Link</span></span>
         </div>
         <div style={{ display: 'flex', gap: '6px' }}>
           {['en', 'ku', 'ar'].map(l => (
@@ -127,7 +128,7 @@ export default function Search() {
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '3px' }}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexWrap: 'wrap', marginBottom: '2px' }}>
-                      <span style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: '14px', color: '#1C1C1E' }}>{b.name[lang]}</span>
+                      <span style={{ fontFamily: HEADING, fontWeight: 800, fontSize: '14px', color: '#1C1C1E' }}>{b.name[lang]}</span>
                       {b.verified && <span style={{ background: '#E6F9F5', color: '#1DB87A', fontSize: '10px', fontWeight: 700, padding: '2px 7px', borderRadius: '50px' }}>{t.verified}</span>}
                     </div>
                     <div style={{ fontSize: '11px', color: '#8E8E93' }}>
@@ -173,7 +174,7 @@ export default function Search() {
           <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: '22px 22px 0 0', padding: '22px 22px 38px', width: '100%', maxWidth: '480px' }}>
             <div style={{ width: '38px', height: '4px', background: '#E0E0E0', borderRadius: '2px', margin: '0 auto 18px' }} />
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <span style={{ fontFamily: 'Syne, sans-serif', fontSize: '17px', fontWeight: 800, color: '#1C1C1E' }}>{t.filters}</span>
+              <span style={{ fontFamily: HEADING, fontSize: '17px', fontWeight: 800, color: '#1C1C1E' }}>{t.filters}</span>
               <span onClick={() => { setMinRating(0); setOnlyOpen(false); setOnlyVerified(false) }} style={{ fontSize: '12px', color: '#FF6B35', fontWeight: 700, cursor: 'pointer' }}>{t.clearAll}</span>
             </div>
             <p style={{ fontSize: '11px', fontWeight: 700, color: '#AEAEB2', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: '9px' }}>Rating</p>
