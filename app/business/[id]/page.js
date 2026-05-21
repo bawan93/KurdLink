@@ -1,8 +1,7 @@
 'use client'
-export const dynamic = 'force-dynamic'
 const HEADING = "'Plus Jakarta Sans', sans-serif"
-import { useState, use } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { useRouter, useParams } from 'next/navigation'
 
 const BUSINESSES = [
   { id: 1, av: 'A', color: '#FF6B35', type: 0, rating: 4.9, rc: 128, verified: true, open: true, phone: '+44 20 7946 0958', whatsapp: '+447700900123', address: '47 Commercial Rd, London E1 1LN', website: 'ahmadlaw.co.uk', kurdish: true, name: { en: 'Ahmad & Co Law', ku: 'ئەحمەد و هاوکارەکانی', ar: 'أحمد ومشاركوه' }, btype: { en: 'Immigration Lawyer', ku: 'پارێزەری کۆچبەری', ar: 'محامي هجرة' }, about: { en: 'A specialist immigration and asylum law firm based in London, serving the Kurdish community across the UK for over 12 years. Fully Kurdish-speaking team.', ku: 'فەرمی تایبەت بە یاسای کۆچبەری و پەناگەرایەتی لە لەندەن، بۆ مەودای ١٢ ساڵ خزمەت بە کۆمەڵگای کوردی دەکات.', ar: 'شركة قانونية متخصصة في الهجرة واللجوء مقرها لندن، تخدم المجتمع الكردي منذ أكثر من ١٢ عامًا.' }, services: { en: ['Asylum & Refugee Claims', 'Family Reunification', 'Visa Appeals', 'ILR Applications', 'Naturalisation'], ku: ['داواکاری پەناگەرایەتی', 'یەکخستنەوەی خێزان', 'پێداچوونەوەبەی ڤیزا', 'داواکاری ILR', 'تابعیەت'], ar: ['طلبات اللجوء', 'لمّ شمل الأسرة', 'استئنافات التأشيرة', 'طلبات ILR', 'التجنيس'] }, reviews: [{ name: 'Shilan M.', rating: 5, av: 'S', color: '#FF6B35', text: { en: 'Ahmad helped my family through an incredibly difficult asylum process. Highly recommend.', ku: 'ئەحمەد یارمەتیی خێزانم دا لە پرۆسەی پەناگەرایەتی. زۆر پێشنیازی دەکەم.', ar: 'ساعد أحمد عائلتي في عملية اللجوء الصعبة. أوصي به بشدة.' } }, { name: 'Karwan B.', rating: 5, av: 'K', color: '#4ECDC4', text: { en: 'Professional and honest. Got my ILR approved after two rejections.', ku: 'پیشەیی و راستگۆ. ILRم پاش دوو ڕەتکردنەوە پەسەند کرا.', ar: 'محترف وصادق. تمت الموافقة على ILR بعد رفضين.' } }, { name: 'Dilan H.', rating: 4, av: 'D', color: '#C77DFF', text: { en: 'Very knowledgeable. The result was positive.', ku: 'زۆر زانابوو. ئەنجامەکە ئەرێنی بوو.', ar: 'على دراية واسعة. كانت النتيجة إيجابية.' } }], stats: { yearsExp: 12, cases: 500, success: 98 }, hours: { en: 'Mon–Fri, 9am–6pm', ku: 'دووشەممە-هەینی، ٩ب–٦ئێ', ar: 'الاثنين–الجمعة، ٩ص–٦م' }, langs: { en: ['Kurdish', 'Arabic', 'English'], ku: ['کوردی', 'عەرەبی', 'ئینگلیزی'], ar: ['الكردية', 'العربية', 'الإنجليزية'] } },
@@ -21,7 +20,7 @@ const TX = {
 
 const stars = (n) => '★'.repeat(Math.floor(n)) + '☆'.repeat(5 - Math.floor(n))
 
-export default function BusinessProfile({ params }) {
+export default function BusinessProfile() {
   const router = useRouter()
   const [lang, setLang] = useState('en')
   const [activeTab, setActiveTab] = useState(0)
@@ -30,7 +29,8 @@ export default function BusinessProfile({ params }) {
   const t = TX[lang]
   const isRtl = t.dir === 'rtl'
 
-  const id = parseInt(params?.id || '1')
+  const urlParams = useParams()
+  const id = parseInt(urlParams.id)
   const biz = BUSINESSES.find(b => b.id === id) || BUSINESSES[0]
 
   const tabs = [t.about, t.services, t.reviewsTab, t.contact]
