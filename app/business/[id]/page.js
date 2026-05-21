@@ -1,4 +1,5 @@
 'use client'
+export const dynamic = 'force-dynamic'
 const HEADING = "'Plus Jakarta Sans', sans-serif"
 import { useState, use } from 'react'
 import { useRouter } from 'next/navigation'
