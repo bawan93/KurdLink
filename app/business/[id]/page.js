@@ -1,6 +1,6 @@
 'use client'
 const HEADING = "'Plus Jakarta Sans', sans-serif"
-import { useState } from 'react'
+import { useState, use } from 'react'
 import { useRouter } from 'next/navigation'
 
 const BUSINESSES = [
@@ -29,7 +29,7 @@ export default function BusinessProfile({ params }) {
   const t = TX[lang]
   const isRtl = t.dir === 'rtl'
 
-  const id = parseInt(params?.id)
+  const id = parseInt(params?.id || '1')
   const biz = BUSINESSES.find(b => b.id === id) || BUSINESSES[0]
 
   const tabs = [t.about, t.services, t.reviewsTab, t.contact]
