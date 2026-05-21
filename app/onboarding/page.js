@@ -1,9 +1,8 @@
 'use client'
-export const dynamic = 'force-dynamic'
 const HEADING = "'Plus Jakarta Sans', sans-serif"
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '../lib/supabase'
+import { createBrowserClient } from '@supabase/ssr'
 
 const CITIES = ['London','Birmingham','Manchester','Leeds','Sheffield','Glasgow','Bristol','Leicester','Nottingham','Liverpool','Newcastle','Cardiff','Edinburgh','Coventry','Bradford']
 
@@ -191,6 +190,13 @@ const TX = {
   }
 }
 
+function getSupabase() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  )
+}
+
 export default function Onboarding() {
   const router = useRouter()
   const [lang, setLang] = useState('en')
@@ -217,7 +223,7 @@ export default function Onboarding() {
 
   const t = TX[lang]
   const isRtl = t.dir === 'rtl'
-  const supabase = createClient()
+  
 
   const inp = (value, onChange, placeholder, type = 'text', extraStyle = {}) => (
     <input
@@ -252,7 +258,7 @@ export default function Onboarding() {
         if (password.length < 8) { setError(t.passShort); return }
         setLoading(true)
         try {
-          const { data, error: signUpError } = await supabase.auth.signUp({
+          const { data, error: signUpError } = await getSupabase().auth.signUp({
             email,
             password,
             options: { data: { full_name: name, city, user_type: 'user' } }
@@ -281,7 +287,7 @@ export default function Onboarding() {
       } else if (step === 3) {
         setLoading(true)
         try {
-          const { data, error: signUpError } = await supabase.auth.signUp({
+          const { data, error: signUpError } = await getSupabase().auth.signUp({
             email,
             password,
             options: { data: { full_name: name, user_type: 'business' } }
@@ -291,7 +297,7 @@ export default function Onboarding() {
             setError(t.emailExists); setLoading(false); return
           }
           if (data?.user) {
-            await supabase.from('businesses').insert({
+            await getSupabase().from('businesses').insert({
               name: bizName,
               category: bizCategory,
               phone: bizPhone,
