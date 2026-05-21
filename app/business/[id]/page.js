@@ -29,7 +29,7 @@ export default function BusinessProfile({ params }) {
   const t = TX[lang]
   const isRtl = t.dir === 'rtl'
 
-  const id = parseInt(params?.id || '1')
+  const id = parseInt(params?.id)
   const biz = BUSINESSES.find(b => b.id === id) || BUSINESSES[0]
 
   const tabs = [t.about, t.services, t.reviewsTab, t.contact]
