@@ -6,8 +6,6 @@ import { createBrowserClient } from '@supabase/ssr'
 const FONT = "'Plus Jakarta Sans', 'Sora', sans-serif"
 const ORANGE = 'linear-gradient(135deg, #FF6B35, #FF8C61)'
 const NAVY = '#1A2B5F'
-const CITIES = ['London','Birmingham','Manchester','Leeds','Sheffield','Glasgow','Bristol','Leicester','Nottingham','Liverpool','Newcastle','Cardiff','Edinburgh','Coventry','Bradford']
-const MAKES = ['BMW','Mercedes','Audi','Toyota','Ford','Volkswagen','Honda','Nissan','Hyundai','Kia','Vauxhall','Peugeot','Renault','Skoda','Seat','Other']
 const CONDITIONS = ['Excellent','Good','Fair','Needs Work']
 
 function getSupabase() {
@@ -21,27 +19,43 @@ function SellCarInner() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [submitted, setSubmitted] = useState(false)
-  const [form, setForm] = useState({ make: '', model: '', year: '', mileage: '', price: '', condition: '', description: '', phone: '', email: '', city: '' })
+  const [images, setImages] = useState([])
+  const [form, setForm] = useState({ make: '', model: '', year: '', mileage: '', price: '', condition: '', description: '', phone: '', email: '', city: '', postcode: '' })
 
   const isRtl = lang === 'ku'
   const T = {
-    en: { title: 'Sell Your Car', subtitle: 'Fill in your car details and we\'ll review within 24 hours', make: 'Make', model: 'Model', modelPh: 'e.g. 3 Series, C-Class', year: 'Year', yearPh: 'e.g. 2019', mileage: 'Mileage', mileagePh: 'e.g. 45000', price: 'Asking Price (£)', pricePh: 'e.g. 12500', condition: 'Condition', city: 'Location', description: 'Description', descriptionPh: 'Describe the car, service history, any extras…', phone: 'Phone Number', phonePh: '+44 7700 900000', email: 'Email Address', emailPh: 'you@example.com', submit: 'Submit for Review', submitting: 'Submitting…', back: '← Back', successTitle: 'Submitted! 🎉', successMsg: 'Your car listing is under review. We\'ll notify you within 24 hours.', backHome: 'Back to Home', errFill: 'Please fill in all required fields' },
-    ku: { title: 'ئۆتۆمبێلەکەت بفرۆشە', subtitle: 'زانیاریەکان پڕ بکەوە، ئێمەش لە ٢٤ کاتژمێردا پێداچوونەوەی دەکەین', make: 'مارکا', model: 'مۆدێل', modelPh: 'وەک: 3 Series', year: 'ساڵ', yearPh: 'وەک: ٢٠١٩', mileage: 'میلیج', mileagePh: 'وەک: ٤٥٠٠٠', price: 'نرخی داواکراو (£)', pricePh: 'وەک: ١٢٥٠٠', condition: 'حاڵەت', city: 'شوێن', description: 'وەسف', descriptionPh: 'ئۆتۆمبێلەکە وەسف بکە…', phone: 'ژمارەی تەلەفۆن', phonePh: '+44 7700 900000', email: 'ئیمەیڵ', emailPh: 'you@example.com', submit: 'بنێرە بۆ پێداچوونەوە', submitting: 'دەنێردرێت…', back: '→ گەڕانەوە', successTitle: '!دانرا 🎉', successMsg: 'ئۆتۆمبێلەکەت تەماشا دەکرێت. لە ٢٤ کاتژمێردا ئاگادارت دەکەینەوە.', backHome: 'گەڕانەوە بۆ ماڵەوە', errFill: 'تکایە هەموو خانەکان پڕ بکەوە' }
+    en: { title: 'Sell Your Car', subtitle: 'Fill in your car details and we\'ll review within 24 hours', make: 'Make', makePh: 'e.g. BMW, Toyota, Ford', model: 'Model', modelPh: 'e.g. 3 Series, Corolla', year: 'Year', yearPh: 'e.g. 2019', mileage: 'Mileage', mileagePh: 'e.g. 45000', price: 'Asking Price (£)', pricePh: 'e.g. 12500', condition: 'Condition', city: 'City', cityPh: 'e.g. Manchester', postcode: 'Postcode', postcodePh: 'e.g. M1 1AE', description: 'Description', descriptionPh: 'Describe the car, service history, any extras…', phone: 'Phone Number', phonePh: '+44 7700 900000', email: 'Email Address', emailPh: 'you@example.com', images: 'Car Photos', imagesDesc: 'Upload up to 5 photos of your car', submit: 'Submit for Review', submitting: 'Submitting…', back: '← Back', successTitle: 'Submitted! 🎉', successMsg: 'Your car listing is under review. We\'ll notify you within 24 hours.', backHome: 'Back to Home', errFill: 'Please fill in all required fields' },
+    ku: { title: 'ئۆتۆمبێلەکەت بفرۆشە', subtitle: 'زانیاریەکان پڕ بکەوە، ئێمەش لە ٢٤ کاتژمێردا پێداچوونەوەی دەکەین', make: 'مارکا', makePh: 'وەک: BMW، تۆیۆتا', model: 'مۆدێل', modelPh: 'وەک: 3 Series', year: 'ساڵ', yearPh: 'وەک: ٢٠١٩', mileage: 'میلیج', mileagePh: 'وەک: ٤٥٠٠٠', price: 'نرخی داواکراو (£)', pricePh: 'وەک: ١٢٥٠٠', condition: 'حاڵەت', city: 'شار', cityPh: 'وەک: مانچستەر', postcode: 'پۆستکۆد', postcodePh: 'وەک: M1 1AE', description: 'وەسف', descriptionPh: 'ئۆتۆمبێلەکە وەسف بکە…', phone: 'ژمارەی تەلەفۆن', phonePh: '+44 7700 900000', email: 'ئیمەیڵ', emailPh: 'you@example.com', images: 'وێنەی ئۆتۆمبێل', imagesDesc: 'تا ٥ وێنە بار بکە', submit: 'بنێرە بۆ پێداچوونەوە', submitting: 'دەنێردرێت…', back: '→ گەڕانەوە', successTitle: '!دانرا 🎉', successMsg: 'ئۆتۆمبێلەکەت تەماشا دەکرێت.', backHome: 'گەڕانەوە بۆ ماڵەوە', errFill: 'تکایە هەموو خانەکان پڕ بکەوە' }
   }
   const t = T[lang]
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
   const inp = (f) => ({ width: '100%', padding: '14px 16px', border: `2px solid ${focus === f ? '#FF6B35' : 'rgba(0,0,0,0.1)'}`, borderRadius: 14, fontSize: 15, fontFamily: FONT, outline: 'none', background: '#fff', color: '#1a1a1a', boxSizing: 'border-box', transition: 'border-color 0.2s', direction: 'ltr' })
   const label = { display: 'block', fontSize: 13, fontWeight: 700, color: '#444', marginBottom: 6 }
 
+  const handleImages = (e) => {
+    const files = Array.from(e.target.files).slice(0, 5)
+    setImages(files)
+  }
+
   const handleSubmit = async () => {
     setError('')
-    const { make, model, year, mileage, price, condition, description, phone, email, city } = form
-    if (!make || !model || !year || !mileage || !price || !condition || !description || !phone || !email || !city) return setError(t.errFill)
+    const { make, model, year, mileage, price, condition, description, phone, email, city, postcode } = form
+    if (!make || !model || !year || !mileage || !price || !condition || !description || !phone || !email || !city || !postcode) return setError(t.errFill)
     setLoading(true)
     try {
       const supabase = getSupabase()
       const { data: { user } } = await supabase.auth.getUser()
-      const { error: e } = await supabase.from('listings').insert({ type: 'sell_car', user_id: user?.id, status: 'pending', data: form })
+      const imageUrls = []
+      for (const img of images) {
+        const ext = img.name.split('.').pop()
+        const path = `listings/${user?.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+        const { error: uploadError } = await supabase.storage.from('listing-images').upload(path, img)
+        if (!uploadError) {
+          const { data: urlData } = supabase.storage.from('listing-images').getPublicUrl(path)
+          imageUrls.push(urlData.publicUrl)
+        }
+      }
+      const { error: e } = await supabase.from('listings').insert({ type: 'sell_car', user_id: user?.id, status: 'pending', data: { ...form, imageUrls } })
       if (e) throw e
       setSubmitted(true)
     } catch (err) { setError(err.message || 'Something went wrong.') }
@@ -77,10 +91,7 @@ function SellCarInner() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
               <label style={label}>{t.make} *</label>
-              <select value={form.make} onChange={e => set('make', e.target.value)} style={{ ...inp('make'), appearance: 'none', WebkitAppearance: 'none', cursor: 'pointer' }}>
-                <option value="">Select…</option>
-                {MAKES.map(m => <option key={m} value={m}>{m}</option>)}
-              </select>
+              <input type="text" value={form.make} onChange={e => set('make', e.target.value)} placeholder={t.makePh} onFocus={() => setFocus('make')} onBlur={() => setFocus(null)} style={inp('make')} />
             </div>
             <div>
               <label style={label}>{t.model} *</label>
@@ -110,12 +121,15 @@ function SellCarInner() {
               </select>
             </div>
           </div>
-          <div>
-            <label style={label}>{t.city} *</label>
-            <select value={form.city} onChange={e => set('city', e.target.value)} style={{ ...inp('city'), appearance: 'none', WebkitAppearance: 'none', cursor: 'pointer' }}>
-              <option value="">Select…</option>
-              {CITIES.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div>
+              <label style={label}>{t.city} *</label>
+              <input type="text" value={form.city} onChange={e => set('city', e.target.value)} placeholder={t.cityPh} onFocus={() => setFocus('city')} onBlur={() => setFocus(null)} style={inp('city')} />
+            </div>
+            <div>
+              <label style={label}>{t.postcode} *</label>
+              <input type="text" value={form.postcode} onChange={e => set('postcode', e.target.value)} placeholder={t.postcodePh} onFocus={() => setFocus('postcode')} onBlur={() => setFocus(null)} style={inp('postcode')} />
+            </div>
           </div>
           <div>
             <label style={label}>{t.description} *</label>
@@ -128,6 +142,20 @@ function SellCarInner() {
           <div>
             <label style={label}>{t.email} *</label>
             <input type="email" value={form.email} onChange={e => set('email', e.target.value)} placeholder={t.emailPh} onFocus={() => setFocus('email')} onBlur={() => setFocus(null)} style={inp('email')} />
+          </div>
+          <div>
+            <label style={label}>{t.images}</label>
+            <p style={{ fontSize: 12, color: '#888', margin: '0 0 8px' }}>{t.imagesDesc}</p>
+            <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', border: '2px dashed rgba(0,0,0,0.15)', borderRadius: 14, background: '#fff', cursor: 'pointer', gap: 8 }}>
+              <span style={{ fontSize: 28 }}>📷</span>
+              <span style={{ fontSize: 13, color: '#666', fontWeight: 600 }}>{images.length > 0 ? `${images.length} photo(s) selected` : 'Tap to upload photos'}</span>
+              <input type="file" accept="image/*" multiple onChange={handleImages} style={{ display: 'none' }} />
+            </label>
+            {images.length > 0 && (
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
+                {images.map((img, i) => (<div key={i} style={{ fontSize: 12, background: '#e8f5e9', color: '#2e7d32', padding: '4px 10px', borderRadius: 20, fontWeight: 600 }}>✓ {img.name.slice(0, 15)}…</div>))}
+              </div>
+            )}
           </div>
           <button onClick={handleSubmit} disabled={loading} style={{ width: '100%', padding: '15px', background: loading ? '#ccc' : ORANGE, border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 700, color: '#fff', cursor: loading ? 'default' : 'pointer', fontFamily: FONT, boxShadow: loading ? 'none' : '0 4px 16px rgba(255,107,53,0.35)', marginTop: 8 }}>
             {loading ? t.submitting : t.submit}
