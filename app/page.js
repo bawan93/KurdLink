@@ -1,5 +1,4 @@
 'use client'
-
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import styles from './page.module.css'
@@ -11,44 +10,74 @@ const TX = {
     tagline: 'Your trusted community platform',
     question: 'What would you like to do?',
     findServices: 'Find Services',
-    findServicesDesc: 'Discover trusted Kurdish professionals',
+    findServicesDesc: 'Discover trusted Kurdish professionals near you',
     sellBusiness: 'Sell Your Business',
-    sellBusinessDesc: 'Find a buyer quickly',
+    sellBusinessDesc: 'Find a buyer quickly and securely',
     sellCar: 'Sell Your Car',
-    sellCarDesc: 'List and connect with buyers',
+    sellCarDesc: 'List your car and connect with buyers',
     hireStaff: 'Hire Staff',
-    hireStaffDesc: 'Post jobs and find talent',
+    hireStaffDesc: 'Post a job and find the right talent',
     listService: 'List My Service',
-    listServiceDesc: 'Build your verified profile',
+    listServiceDesc: 'Build your verified professional profile',
     alreadyHave: 'Already have an account?',
     signIn: 'Sign In',
   },
   ku: {
     dir: 'rtl',
     welcome: 'بەخێربێیت بۆ KurdLink',
-    tagline: 'پلاتفۆرمی کۆمەڵگای قوتابیت',
+    tagline: 'پلاتفۆرمی پشتیوانی کۆمەڵگاکەت',
     question: 'چیت دەیهوێت بکەی؟',
-    findServices: 'بدۆزەوە بۆ خزمەتگوزاریەکان',
-    findServicesDesc: 'کاریگەری کرد بە پیشەوەری کورد',
-    sellBusiness: 'فرۆشتنی بیزنسەکەت',
-    sellBusinessDesc: 'بیدۆزەوە بۆ کڕیار بە خێرایی',
-    sellCar: 'فرۆشتنی ئۆتۆمبێلەکەت',
-    sellCarDesc: 'لیست کردن و پەیوەندی کردن',
-    hireStaff: 'کاری بکەرمنند بگرە',
-    hireStaffDesc: 'پۆستی پڕۆگرامی کردن و بدۆزەوە نیعمە',
-    listService: 'لیستکردنی خزمەتگوزاریەکەم',
-    listServiceDesc: 'دروستکردنی پڕۆفایلی سەلماندراو',
+    findServices: 'بدۆزەوە خزمەتگوزاری',
+    findServicesDesc: 'پیشەوەری کوردی متمانەپێکراو نزیکت بدۆزەوە',
+    sellBusiness: 'بیزنسەکەت بفرۆشە',
+    sellBusinessDesc: 'بە خێرایی و پارێزراوی کڕیار بدۆزەوە',
+    sellCar: 'ئۆتۆمبێلەکەت بفرۆشە',
+    sellCarDesc: 'ئۆتۆمبێلەکەت لیست بکە و کڕیار بدۆزەوە',
+    hireStaff: 'کارمەند بگرە',
+    hireStaffDesc: 'کار پۆست بکە و ئەو بەتوانا بدۆزەوە',
+    listService: 'خزمەتگوزاریەکەم لیست بکە',
+    listServiceDesc: 'پڕۆفایلی پیشەیی سەلماندراوت بنیاد بنێ',
     alreadyHave: 'حسابی هەیت؟',
     signIn: 'چوونەژوورەوە',
   }
 }
 
 const OPTIONS = [
-  { id: 'find', icon: '🔍', color: '#FF6B35' },
-  { id: 'sellBiz', icon: '💼', color: '#00B4D8' },
-  { id: 'sellCar', icon: '🚗', color: '#06FFA5' },
-  { id: 'hire', icon: '👥', color: '#FFB703' },
-  { id: 'listService', icon: '🎯', color: '#FF006E' },
+  {
+    id: 'find',
+    icon: '🔍',
+    titleKey: 'findServices',
+    descKey: 'findServicesDesc',
+    route: '/search',
+  },
+  {
+    id: 'sellBiz',
+    icon: '💼',
+    titleKey: 'sellBusiness',
+    descKey: 'sellBusinessDesc',
+    route: '/listings/sell-business',
+  },
+  {
+    id: 'sellCar',
+    icon: '🚗',
+    titleKey: 'sellCar',
+    descKey: 'sellCarDesc',
+    route: '/listings/sell-car',
+  },
+  {
+    id: 'hire',
+    icon: '👥',
+    titleKey: 'hireStaff',
+    descKey: 'hireStaffDesc',
+    route: '/listings/hire-staff',
+  },
+  {
+    id: 'listService',
+    icon: '🎯',
+    titleKey: 'listService',
+    descKey: 'listServiceDesc',
+    route: '/listings/list-service',
+  },
 ]
 
 export default function LandingChoice() {
@@ -56,54 +85,20 @@ export default function LandingChoice() {
   const [lang, setLang] = useState('en')
   const t = TX[lang]
 
-  const handleOption = (optionId) => {
-    const routes = {
-      find: '/listings/browse',
-      sellBiz: '/listings/sell-business',
-      sellCar: '/listings/sell-car',
-      hire: '/listings/hire-staff',
-      listService: '/listings/list-service',
-    }
-    router.push(routes[optionId])
-  }
-
-  const getCardTitle = (id) => {
-    const keyMap = {
-      find: 'findServices',
-      sellBiz: 'sellBusiness',
-      sellCar: 'sellCar',
-      hire: 'hireStaff',
-      listService: 'listService',
-    }
-    return t[keyMap[id]]
-  }
-
-  const getCardDesc = (id) => {
-    const keyMap = {
-      find: 'findServicesDesc',
-      sellBiz: 'sellBusinessDesc',
-      sellCar: 'sellCarDesc',
-      hire: 'hireStaffDesc',
-      listService: 'listServiceDesc',
-    }
-    return t[keyMap[id]]
-  }
-
   return (
     <div className={styles.container} dir={t.dir}>
+
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.logo}>KurdLink</div>
-
-        {/* Language Toggle */}
         <div className={styles.langToggle}>
-          {['en', 'ku'].map(langCode => (
+          {['en', 'ku'].map(l => (
             <button
-              key={langCode}
-              onClick={() => setLang(langCode)}
-              className={`${styles.langButton} ${lang === langCode ? styles.active : ''}`}
+              key={l}
+              onClick={() => setLang(l)}
+              className={`${styles.langButton} ${lang === l ? styles.active : ''}`}
             >
-              {langCode === 'en' ? 'EN' : 'KU'}
+              {l === 'en' ? 'EN' : 'KU'}
             </button>
           ))}
         </div>
@@ -111,7 +106,8 @@ export default function LandingChoice() {
 
       {/* Main Content */}
       <div className={styles.mainContent}>
-        {/* Hero Section */}
+
+        {/* Hero */}
         <div className={styles.hero}>
           <h1 className={styles.title}>{t.welcome}</h1>
           <p className={styles.tagline}>{t.tagline}</p>
@@ -120,19 +116,20 @@ export default function LandingChoice() {
         {/* Question */}
         <p className={styles.question}>{t.question}</p>
 
-        {/* Option Cards */}
+        {/* Cards */}
         <div className={styles.grid}>
-          {OPTIONS.map((option) => (
+          {OPTIONS.map(option => (
             <button
               key={option.id}
-              onClick={() => handleOption(option.id)}
+              onClick={() => router.push(option.route)}
               className={styles.card}
             >
               <div className={styles.cardIcon}>{option.icon}</div>
               <div className={styles.cardContent}>
-                <p className={styles.cardTitle}>{getCardTitle(option.id)}</p>
-                <p className={styles.cardDesc}>{getCardDesc(option.id)}</p>
+                <p className={styles.cardTitle}>{t[option.titleKey]}</p>
+                <p className={styles.cardDesc}>{t[option.descKey]}</p>
               </div>
+              <span className={styles.cardArrow}>›</span>
             </button>
           ))}
         </div>
@@ -149,7 +146,6 @@ export default function LandingChoice() {
         </div>
       </div>
 
-      {/* Decorative Elements */}
       <div className={styles.decorativeBottom} />
       <div className={styles.decorativeTop} />
     </div>
