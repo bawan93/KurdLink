@@ -6,8 +6,6 @@ import { createBrowserClient } from '@supabase/ssr'
 const FONT = "'Plus Jakarta Sans', 'Sora', sans-serif"
 const ORANGE = 'linear-gradient(135deg, #FF6B35, #FF8C61)'
 const NAVY = '#1A2B5F'
-const CITIES = ['London','Birmingham','Manchester','Leeds','Sheffield','Glasgow','Bristol','Leicester','Nottingham','Liverpool','Newcastle','Cardiff','Edinburgh','Coventry','Bradford']
-const JOB_TYPES = ['Full Time','Part Time','Casual','Contract','Apprenticeship']
 
 function getSupabase() {
   return createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
@@ -20,12 +18,12 @@ function HireStaffInner() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [submitted, setSubmitted] = useState(false)
-  const [form, setForm] = useState({ jobTitle: '', jobType: '', city: '', salary: '', description: '', requirements: '', applyPhone: '', applyEmail: '' })
+  const [form, setForm] = useState({ jobTitle: '', city: '', postcode: '', salary: '', description: '', applyPhone: '', applyEmail: '' })
 
   const isRtl = lang === 'ku'
   const T = {
-    en: { title: 'Hire Staff', subtitle: 'Post a job and find the right talent within the Kurdish community', jobTitle: 'Job Title', jobTitlePh: 'e.g. Shop Assistant, Driver, Chef', jobType: 'Job Type', city: 'Location', salary: 'Salary / Rate', salaryPh: 'e.g. £12/hr or £28,000/year', description: 'Job Description', descriptionPh: 'Describe the role, responsibilities, hours…', requirements: 'Requirements', requirementsPh: 'Experience needed, languages, qualifications…', applyPhone: 'Apply by Phone', applyPhonePh: '+44 7700 900000', applyEmail: 'Apply by Email', applyEmailPh: 'jobs@yourbusiness.com', submit: 'Post Job', submitting: 'Posting…', back: '← Back', successTitle: 'Job Posted! 🎉', successMsg: 'Your job listing is under review. We\'ll notify you within 24 hours once approved.', backHome: 'Back to Home', errFill: 'Please fill in all required fields' },
-    ku: { title: 'کارمەند بگرە', subtitle: 'کار پۆست بکە و ئەو بەتوانا لە کۆمەڵگای کورد بدۆزەوە', jobTitle: 'ناوی کار', jobTitlePh: 'وەک: یاریدەدەری دوکان، شۆفێر', jobType: 'جۆری کار', city: 'شوێن', salary: 'مووچە / نرخ', salaryPh: 'وەک: £١٢ کاتژمێر یان £٢٨,٠٠٠ ساڵانە', description: 'وەسفی کار', descriptionPh: 'کارەکە وەسف بکە، ئەرکەکان، کاتژمێرەکان…', requirements: 'مەرجەکان', requirementsPh: 'ئەزموون، زمان، بڕوانامە…', applyPhone: 'دەرخواستی تەلەفۆن', applyPhonePh: '+44 7700 900000', applyEmail: 'دەرخواستی ئیمەیڵ', applyEmailPh: 'jobs@yourbusiness.com', submit: 'کار پۆست بکە', submitting: 'دەنێردرێت…', back: '→ گەڕانەوە', successTitle: '!کار پۆست کرا 🎉', successMsg: 'کارەکەت تەماشا دەکرێت. لە ٢٤ کاتژمێردا ئاگادارت دەکەینەوە.', backHome: 'گەڕانەوە بۆ ماڵەوە', errFill: 'تکایە هەموو خانەکان پڕ بکەوە' }
+    en: { title: 'Hire Staff', subtitle: 'Post a job and find the right talent within the Kurdish community', jobTitle: 'Full Job Title', jobTitlePh: 'e.g. Full Time Shop Assistant, Part Time Driver, Head Chef', city: 'City', cityPh: 'e.g. Birmingham', postcode: 'Postcode', postcodePh: 'e.g. B1 1AA', salary: 'Salary / Rate', salaryPh: 'e.g. £12/hr or £28,000/year', description: 'Job Description', descriptionPh: 'Describe the role, responsibilities, working hours…', applyPhone: 'Apply by Phone', applyPhonePh: '+44 7700 900000', applyEmail: 'Apply by Email', applyEmailPh: 'jobs@yourbusiness.com', submit: 'Post Job', submitting: 'Posting…', back: '← Back', successTitle: 'Job Posted! 🎉', successMsg: 'Your job listing is under review. We\'ll notify you within 24 hours once approved.', backHome: 'Back to Home', errFill: 'Please fill in all required fields' },
+    ku: { title: 'کارمەند بگرە', subtitle: 'کار پۆست بکە و ئەو بەتوانا لە کۆمەڵگای کورد بدۆزەوە', jobTitle: 'ناوی تەواوی کار', jobTitlePh: 'وەک: یاریدەدەری دوکان تەواو کات، شۆفێر نیوەکات', city: 'شار', cityPh: 'وەک: بێرمینگەم', postcode: 'پۆستکۆد', postcodePh: 'وەک: B1 1AA', salary: 'مووچە / نرخ', salaryPh: 'وەک: £١٢ کاتژمێر', description: 'وەسفی کار', descriptionPh: 'کارەکە وەسف بکە، ئەرکەکان، کاتژمێرەکان…', applyPhone: 'دەرخواستی تەلەفۆن', applyPhonePh: '+44 7700 900000', applyEmail: 'دەرخواستی ئیمەیڵ', applyEmailPh: 'jobs@yourbusiness.com', submit: 'کار پۆست بکە', submitting: 'دەنێردرێت…', back: '→ گەڕانەوە', successTitle: '!کار پۆست کرا 🎉', successMsg: 'کارەکەت تەماشا دەکرێت. لە ٢٤ کاتژمێردا ئاگادارت دەکەینەوە.', backHome: 'گەڕانەوە بۆ ماڵەوە', errFill: 'تکایە هەموو خانەکان پڕ بکەوە' }
   }
   const t = T[lang]
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
@@ -34,8 +32,8 @@ function HireStaffInner() {
 
   const handleSubmit = async () => {
     setError('')
-    const { jobTitle, jobType, city, salary, description, applyPhone, applyEmail } = form
-    if (!jobTitle || !jobType || !city || !salary || !description || (!applyPhone && !applyEmail)) return setError(t.errFill)
+    const { jobTitle, city, postcode, salary, description, applyPhone, applyEmail } = form
+    if (!jobTitle || !city || !postcode || !salary || !description || (!applyPhone && !applyEmail)) return setError(t.errFill)
     setLoading(true)
     try {
       const supabase = getSupabase()
@@ -79,18 +77,12 @@ function HireStaffInner() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
-              <label style={label}>{t.jobType} *</label>
-              <select value={form.jobType} onChange={e => set('jobType', e.target.value)} style={{ ...inp('jobType'), appearance: 'none', WebkitAppearance: 'none', cursor: 'pointer' }}>
-                <option value="">Select…</option>
-                {JOB_TYPES.map(j => <option key={j} value={j}>{j}</option>)}
-              </select>
+              <label style={label}>{t.city} *</label>
+              <input type="text" value={form.city} onChange={e => set('city', e.target.value)} placeholder={t.cityPh} onFocus={() => setFocus('city')} onBlur={() => setFocus(null)} style={inp('city')} />
             </div>
             <div>
-              <label style={label}>{t.city} *</label>
-              <select value={form.city} onChange={e => set('city', e.target.value)} style={{ ...inp('city'), appearance: 'none', WebkitAppearance: 'none', cursor: 'pointer' }}>
-                <option value="">Select…</option>
-                {CITIES.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
+              <label style={label}>{t.postcode} *</label>
+              <input type="text" value={form.postcode} onChange={e => set('postcode', e.target.value)} placeholder={t.postcodePh} onFocus={() => setFocus('postcode')} onBlur={() => setFocus(null)} style={inp('postcode')} />
             </div>
           </div>
           <div>
@@ -100,10 +92,6 @@ function HireStaffInner() {
           <div>
             <label style={label}>{t.description} *</label>
             <textarea value={form.description} onChange={e => set('description', e.target.value)} placeholder={t.descriptionPh} onFocus={() => setFocus('description')} onBlur={() => setFocus(null)} rows={4} style={{ ...inp('description'), resize: 'vertical', lineHeight: 1.5 }} />
-          </div>
-          <div>
-            <label style={label}>{t.requirements}</label>
-            <textarea value={form.requirements} onChange={e => set('requirements', e.target.value)} placeholder={t.requirementsPh} onFocus={() => setFocus('requirements')} onBlur={() => setFocus(null)} rows={3} style={{ ...inp('requirements'), resize: 'vertical', lineHeight: 1.5 }} />
           </div>
           <div>
             <label style={label}>{t.applyPhone}</label>
