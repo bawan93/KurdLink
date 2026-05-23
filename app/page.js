@@ -262,4 +262,4 @@ export default function LandingChoice() {
       </div>
     </div>
   )
-} 
+}
