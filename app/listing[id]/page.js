@@ -35,18 +35,24 @@ export default function ListingDetail({ params }) {
   const isRtl = lang === 'ku'
 
   useEffect(() => {
-    fetchListing()
-  }, [])
+    if (params?.id) fetchListing(params.id)
+  }, [params?.id])
 
-  const fetchListing = async () => {
-    const supabase = getSupabase()
-    const { data } = await supabase
-      .from('listings')
-      .select('*')
-      .eq('id', params.id)
-      .single()
-    setListing(data)
-    setLoading(false)
+  const fetchListing = async (id) => {
+    try {
+      const supabase = getSupabase()
+      const { data, error } = await supabase
+        .from('listings')
+        .select('*')
+        .eq('id', id)
+        .single()
+      if (error) throw error
+      setListing(data)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (loading) return (
@@ -56,7 +62,7 @@ export default function ListingDetail({ params }) {
   )
 
   if (!listing) return (
-    <div style={{ minHeight: '100vh', background: '#f7f7f5', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: FONT, padding: 20 }}>
+    <div style={{ minHeight: '100vh', background: '#f7f7f5', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: FONT, padding: 20, textAlign: 'center' }}>
       <div style={{ fontSize: 48, marginBottom: 12 }}>😕</div>
       <p style={{ fontSize: 16, fontWeight: 700, color: '#444' }}>Listing not found</p>
       <button onClick={() => router.push('/home')} style={{ marginTop: 16, background: ORANGE, border: 'none', borderRadius: 12, padding: '12px 24px', color: '#fff', fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>Go Home</button>
@@ -93,31 +99,19 @@ export default function ListingDetail({ params }) {
 
       {/* Image Gallery */}
       {images.length > 0 && (
-        <div style={{ position: 'relative', background: '#000' }}>
-          <img
-            src={images[activeImage]}
-            alt={title}
-            style={{ width: '100%', height: 280, objectFit: 'cover', opacity: 0.95 }}
-          />
-          {/* Image counter */}
+        <div style={{ background: '#000' }}>
+          <img src={images[activeImage]} alt={title} style={{ width: '100%', height: 280, objectFit: 'cover', opacity: 0.95, display: 'block' }} />
           {images.length > 1 && (
-            <div style={{ position: 'absolute', bottom: 12, right: 12, background: 'rgba(0,0,0,0.6)', color: '#fff', fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 20, fontFamily: FONT }}>
-              {activeImage + 1} / {images.length}
-            </div>
-          )}
-          {/* Thumbnail strip */}
-          {images.length > 1 && (
-            <div style={{ display: 'flex', gap: 6, padding: '10px 16px', background: '#000', overflowX: 'auto', scrollbarWidth: 'none' }}>
-              {images.map((img, i) => (
-                <img
-                  key={i}
-                  src={img}
-                  alt={`photo ${i + 1}`}
-                  onClick={() => setActiveImage(i)}
-                  style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 8, cursor: 'pointer', border: activeImage === i ? '2px solid #FF6B35' : '2px solid transparent', flexShrink: 0, opacity: activeImage === i ? 1 : 0.6 }}
-                />
-              ))}
-            </div>
+            <>
+              <div style={{ position: 'absolute', marginTop: -40, right: 12, background: 'rgba(0,0,0,0.6)', color: '#fff', fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 20, fontFamily: FONT }}>
+                {activeImage + 1} / {images.length}
+              </div>
+              <div style={{ display: 'flex', gap: 6, padding: '10px 16px', background: '#111', overflowX: 'auto', scrollbarWidth: 'none' }}>
+                {images.map((img, i) => (
+                  <img key={i} src={img} alt={`photo ${i + 1}`} onClick={() => setActiveImage(i)} style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 8, cursor: 'pointer', border: activeImage === i ? '2px solid #FF6B35' : '2px solid transparent', flexShrink: 0, opacity: activeImage === i ? 1 : 0.6 }} />
+                ))}
+              </div>
+            </>
           )}
         </div>
       )}
@@ -125,33 +119,23 @@ export default function ListingDetail({ params }) {
       {/* Main Content */}
       <div style={{ maxWidth: 600, margin: '0 auto', padding: '20px 16px', boxSizing: 'border-box' }}>
 
-        {/* Type badge + title */}
+        {/* Type + Title */}
         <div style={{ marginBottom: 20 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 16 }}>{meta.icon}</span>
             <span style={{ fontSize: 12, fontWeight: 700, color: meta.color, textTransform: 'uppercase', letterSpacing: 0.5 }}>{meta.label[lang]}</span>
             {d.city && <span style={{ fontSize: 12, color: '#aaa', marginLeft: 'auto' }}>📍 {d.city} {d.postcode}</span>}
           </div>
           <h1 style={{ fontSize: 24, fontWeight: 900, color: NAVY, margin: '0 0 8px', lineHeight: 1.2 }}>{title}</h1>
 
-          {/* Key info based on type */}
-          {listing.type === 'sell_car' && d.price && (
-            <div style={{ fontSize: 22, fontWeight: 800, color: '#FF6B35', marginBottom: 8 }}>£{Number(d.price).toLocaleString()}</div>
-          )}
-          {listing.type === 'sell_business' && d.askingPrice && (
-            <div style={{ fontSize: 22, fontWeight: 800, color: '#FF6B35', marginBottom: 8 }}>£{Number(d.askingPrice).toLocaleString()}</div>
-          )}
-          {listing.type === 'hire_staff' && d.salary && (
-            <div style={{ fontSize: 16, fontWeight: 700, color: '#FF6B35', marginBottom: 8 }}>💰 {d.salary}</div>
-          )}
-          {listing.type === 'list_service' && d.category && (
-            <div style={{ display: 'inline-block', background: 'rgba(255,0,110,0.08)', color: '#FF006E', fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 20, marginBottom: 8 }}>{d.category}</div>
-          )}
+          {listing.type === 'sell_car' && d.price && <div style={{ fontSize: 22, fontWeight: 800, color: '#FF6B35' }}>£{Number(d.price).toLocaleString()}</div>}
+          {listing.type === 'sell_business' && d.askingPrice && <div style={{ fontSize: 22, fontWeight: 800, color: '#FF6B35' }}>£{Number(d.askingPrice).toLocaleString()}</div>}
+          {listing.type === 'hire_staff' && d.salary && <div style={{ fontSize: 16, fontWeight: 700, color: '#FF6B35' }}>💰 {d.salary}</div>}
+          {listing.type === 'list_service' && d.category && <div style={{ display: 'inline-block', background: 'rgba(255,0,110,0.08)', color: '#FF006E', fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 20 }}>{d.category}</div>}
         </div>
 
-        {/* Details Card */}
+        {/* Details */}
         <div style={{ background: '#fff', borderRadius: 16, padding: '20px', marginBottom: 16, border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-          {/* Sell Car fields */}
           {listing.type === 'sell_car' && <>
             <Field label="Make" value={d.make} />
             <Field label="Model" value={d.model} />
@@ -162,8 +146,6 @@ export default function ListingDetail({ params }) {
             <Field label="Description" value={d.description} />
             <Field label="Seller" value={d.name} />
           </>}
-
-          {/* Sell Business fields */}
           {listing.type === 'sell_business' && <>
             <Field label="Business Name" value={d.businessName} />
             <Field label="Asking Price" value={d.askingPrice ? `£${Number(d.askingPrice).toLocaleString()}` : null} />
@@ -171,8 +153,6 @@ export default function ListingDetail({ params }) {
             <Field label="About the Business" value={d.description} />
             <Field label="Contact Name" value={d.name} />
           </>}
-
-          {/* Hire Staff fields */}
           {listing.type === 'hire_staff' && <>
             <Field label="Job Title" value={d.jobTitle} />
             <Field label="Salary / Rate" value={d.salary} />
@@ -180,8 +160,6 @@ export default function ListingDetail({ params }) {
             <Field label="Job Description" value={d.description} />
             <Field label="Posted by" value={d.name} />
           </>}
-
-          {/* List Service fields */}
           {listing.type === 'list_service' && <>
             <Field label="Name" value={d.fullName} />
             <Field label="Business / Practice" value={d.businessName} />
@@ -195,22 +173,16 @@ export default function ListingDetail({ params }) {
         </div>
       </div>
 
-      {/* Fixed Contact Buttons */}
-      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#fff', borderTop: '1px solid rgba(0,0,0,0.08)', padding: '12px 16px', display: 'flex', gap: 10, maxWidth: 600, margin: '0 auto', boxSizing: 'border-box', zIndex: 30 }}>
+      {/* Fixed Contact Bar */}
+      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#fff', borderTop: '1px solid rgba(0,0,0,0.08)', padding: '12px 16px', display: 'flex', gap: 10, zIndex: 30, boxSizing: 'border-box' }}>
         {(d.phone || d.applyPhone) && (
-          <a href={`tel:${d.phone || d.applyPhone}`} style={{ flex: 1, background: ORANGE, borderRadius: 14, padding: '14px', color: '#fff', fontWeight: 700, fontSize: 15, textAlign: 'center', textDecoration: 'none', display: 'block', boxShadow: '0 4px 12px rgba(255,107,53,0.3)' }}>
-            📞 Call
-          </a>
+          <a href={`tel:${d.phone || d.applyPhone}`} style={{ flex: 1, background: ORANGE, borderRadius: 14, padding: '14px', color: '#fff', fontWeight: 700, fontSize: 15, textAlign: 'center', textDecoration: 'none', display: 'block', boxShadow: '0 4px 12px rgba(255,107,53,0.3)' }}>📞 Call</a>
         )}
         {d.whatsapp && (
-          <a href={`https://wa.me/${d.whatsapp.replace(/\D/g, '')}`} target="_blank" style={{ flex: 1, background: '#25D366', borderRadius: 14, padding: '14px', color: '#fff', fontWeight: 700, fontSize: 15, textAlign: 'center', textDecoration: 'none', display: 'block' }}>
-            💬 WhatsApp
-          </a>
+          <a href={`https://wa.me/${d.whatsapp.replace(/\D/g, '')}`} target="_blank" style={{ flex: 1, background: '#25D366', borderRadius: 14, padding: '14px', color: '#fff', fontWeight: 700, fontSize: 15, textAlign: 'center', textDecoration: 'none', display: 'block' }}>💬 WhatsApp</a>
         )}
         {(d.email || d.applyEmail || d.contactEmail) && (
-          <a href={`mailto:${d.email || d.applyEmail || d.contactEmail}`} style={{ flex: 1, background: 'rgba(26,43,95,0.08)', borderRadius: 14, padding: '14px', color: NAVY, fontWeight: 700, fontSize: 15, textAlign: 'center', textDecoration: 'none', display: 'block' }}>
-            ✉️ Email
-          </a>
+          <a href={`mailto:${d.email || d.applyEmail || d.contactEmail}`} style={{ flex: 1, background: 'rgba(26,43,95,0.08)', borderRadius: 14, padding: '14px', color: NAVY, fontWeight: 700, fontSize: 15, textAlign: 'center', textDecoration: 'none', display: 'block' }}>✉️ Email</a>
         )}
       </div>
     </div>
