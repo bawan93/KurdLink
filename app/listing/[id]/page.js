@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
 
@@ -26,7 +26,8 @@ function getTitle(type, data) {
   return 'Listing'
 }
 
-export default function ListingDetail({ params: { id } }) {
+export default function ListingDetail({ params }) {
+  const { id } = use(params)
   const router = useRouter()
   const [listing, setListing] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -35,21 +36,21 @@ export default function ListingDetail({ params: { id } }) {
   const isRtl = lang === 'ku'
 
   useEffect(() => {
-    fetchListing(id)
+    if (id) fetchListing(id)
   }, [id])
 
-  const fetchListing = async (id) => {
+  const fetchListing = async (listingId) => {
     try {
       const supabase = getSupabase()
       const { data, error } = await supabase
         .from('listings')
         .select('*')
-        .eq('id', id)
+        .eq('id', listingId)
         .maybeSingle()
-      if (error) throw error
+      if (error) console.error('Supabase error:', error)
       setListing(data)
     } catch (err) {
-      console.error(err)
+      console.error('Fetch error:', err)
     } finally {
       setLoading(false)
     }
@@ -83,8 +84,6 @@ export default function ListingDetail({ params: { id } }) {
 
   return (
     <div style={{ minHeight: '100vh', background: '#f7f7f5', fontFamily: FONT, direction: isRtl ? 'rtl' : 'ltr', paddingBottom: 100 }}>
-
-      {/* Header */}
       <div style={{ background: NAVY, padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 20 }}>
         <button onClick={() => router.back()} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.8)', fontSize: 15, cursor: 'pointer', fontFamily: FONT, fontWeight: 600 }}>← Back</button>
         <div style={{ fontSize: 16, fontWeight: 900, background: ORANGE, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>KurdLink</div>
@@ -97,29 +96,20 @@ export default function ListingDetail({ params: { id } }) {
         </div>
       </div>
 
-      {/* Image Gallery */}
       {images.length > 0 && (
         <div style={{ background: '#000' }}>
-          <img src={images[activeImage]} alt={title} style={{ width: '100%', height: 280, objectFit: 'cover', opacity: 0.95, display: 'block' }} />
+          <img src={images[activeImage]} alt={title} style={{ width: '100%', height: 280, objectFit: 'cover', display: 'block' }} />
           {images.length > 1 && (
-            <>
-              <div style={{ position: 'absolute', marginTop: -40, right: 12, background: 'rgba(0,0,0,0.6)', color: '#fff', fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 20, fontFamily: FONT }}>
-                {activeImage + 1} / {images.length}
-              </div>
-              <div style={{ display: 'flex', gap: 6, padding: '10px 16px', background: '#111', overflowX: 'auto', scrollbarWidth: 'none' }}>
-                {images.map((img, i) => (
-                  <img key={i} src={img} alt={`photo ${i + 1}`} onClick={() => setActiveImage(i)} style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 8, cursor: 'pointer', border: activeImage === i ? '2px solid #FF6B35' : '2px solid transparent', flexShrink: 0, opacity: activeImage === i ? 1 : 0.6 }} />
-                ))}
-              </div>
-            </>
+            <div style={{ display: 'flex', gap: 6, padding: '10px 16px', background: '#111', overflowX: 'auto', scrollbarWidth: 'none' }}>
+              {images.map((img, i) => (
+                <img key={i} src={img} alt={`photo ${i + 1}`} onClick={() => setActiveImage(i)} style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 8, cursor: 'pointer', border: activeImage === i ? '2px solid #FF6B35' : '2px solid transparent', flexShrink: 0, opacity: activeImage === i ? 1 : 0.6 }} />
+              ))}
+            </div>
           )}
         </div>
       )}
 
-      {/* Main Content */}
       <div style={{ maxWidth: 600, margin: '0 auto', padding: '20px 16px', boxSizing: 'border-box' }}>
-
-        {/* Type + Title */}
         <div style={{ marginBottom: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 16 }}>{meta.icon}</span>
@@ -127,14 +117,12 @@ export default function ListingDetail({ params: { id } }) {
             {d.city && <span style={{ fontSize: 12, color: '#aaa', marginLeft: 'auto' }}>📍 {d.city} {d.postcode}</span>}
           </div>
           <h1 style={{ fontSize: 24, fontWeight: 900, color: NAVY, margin: '0 0 8px', lineHeight: 1.2 }}>{title}</h1>
-
           {listing.type === 'sell_car' && d.price && <div style={{ fontSize: 22, fontWeight: 800, color: '#FF6B35' }}>£{Number(d.price).toLocaleString()}</div>}
           {listing.type === 'sell_business' && d.askingPrice && <div style={{ fontSize: 22, fontWeight: 800, color: '#FF6B35' }}>£{Number(d.askingPrice).toLocaleString()}</div>}
           {listing.type === 'hire_staff' && d.salary && <div style={{ fontSize: 16, fontWeight: 700, color: '#FF6B35' }}>💰 {d.salary}</div>}
           {listing.type === 'list_service' && d.category && <div style={{ display: 'inline-block', background: 'rgba(255,0,110,0.08)', color: '#FF006E', fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 20 }}>{d.category}</div>}
         </div>
 
-        {/* Details */}
         <div style={{ background: '#fff', borderRadius: 16, padding: '20px', marginBottom: 16, border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
           {listing.type === 'sell_car' && <>
             <Field label="Make" value={d.make} />
@@ -173,7 +161,6 @@ export default function ListingDetail({ params: { id } }) {
         </div>
       </div>
 
-      {/* Fixed Contact Bar */}
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#fff', borderTop: '1px solid rgba(0,0,0,0.08)', padding: '12px 16px', display: 'flex', gap: 10, zIndex: 30, boxSizing: 'border-box' }}>
         {(d.phone || d.applyPhone) && (
           <a href={`tel:${d.phone || d.applyPhone}`} style={{ flex: 1, background: ORANGE, borderRadius: 14, padding: '14px', color: '#fff', fontWeight: 700, fontSize: 15, textAlign: 'center', textDecoration: 'none', display: 'block', boxShadow: '0 4px 12px rgba(255,107,53,0.3)' }}>📞 Call</a>
