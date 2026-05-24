@@ -84,6 +84,16 @@ function AdminInner() {
     setActionLoading(false)
   }
 
+  const handleDelete = async (id) => {
+    if (!confirm('Are you sure you want to permanently delete this listing?')) return
+    setActionLoading(true)
+    const supabase = getSupabase()
+    await supabase.from('listings').delete().eq('id', id)
+    setSelected(null)
+    await fetchListings()
+    setActionLoading(false)
+  }
+
   const handleReject = async (id) => {
     if (!rejectReason.trim()) return
     setActionLoading(true)
@@ -157,7 +167,13 @@ function AdminInner() {
           </div>
 
           {/* Actions */}
-          {selected.status === 'pending' && (
+          <div style={{ marginTop: 12 }}>
+            <button onClick={() => handleDelete(selected.id)} disabled={actionLoading} style={{ width: '100%', padding: '15px', background: '#333', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: FONT }}>
+              🗑️ Delete Permanently
+            </button>
+          </div>
+
+          {selected.status === 'pending'           {selected.status === 'pending' && (          {selected.status === 'pending' && ( (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {!showReject ? (
                 <>
@@ -166,6 +182,9 @@ function AdminInner() {
                   </button>
                   <button onClick={() => setShowReject(true)} style={{ width: '100%', padding: '15px', background: 'linear-gradient(135deg, #C62828, #E53935)', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: FONT, boxShadow: '0 4px 16px rgba(198,40,40,0.3)' }}>
                     ❌ Reject Listing
+                  </button>
+                  <button onClick={() => handleDelete(selected.id)} disabled={actionLoading} style={{ width: '100%', padding: '15px', background: '#333', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: FONT }}>
+                    🗑️ Delete Permanently
                   </button>
                 </>
               ) : (
