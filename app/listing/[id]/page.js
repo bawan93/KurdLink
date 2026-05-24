@@ -26,7 +26,7 @@ function getTitle(type, data) {
   return 'Listing'
 }
 
-export default function ListingDetail({ params }) {
+export default function ListingDetail({ params: { id } }) {
   const router = useRouter()
   const [listing, setListing] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -35,8 +35,8 @@ export default function ListingDetail({ params }) {
   const isRtl = lang === 'ku'
 
   useEffect(() => {
-    if (params?.id) fetchListing(params.id)
-  }, [params?.id])
+    fetchListing(id)
+  }, [id])
 
   const fetchListing = async (id) => {
     try {
