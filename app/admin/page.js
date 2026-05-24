@@ -9,10 +9,7 @@ const NAVY = '#1A2B5F'
 const ADMIN_EMAIL = 'bawanhozhin@outlook.com'
 
 function getSupabase() {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  )
+  return createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
 }
 
 const TYPE_LABELS = {
@@ -34,42 +31,25 @@ function AdminInner() {
   const [actionLoading, setActionLoading] = useState(false)
   const [counts, setCounts] = useState({ pending: 0, approved: 0, rejected: 0 })
 
-  useEffect(() => {
-    checkAuth()
-  }, [])
-
-  useEffect(() => {
-    if (authorized) fetchListings()
-  }, [authorized, filter])
+  useEffect(() => { checkAuth() }, [])
+  useEffect(() => { if (authorized) fetchListings() }, [authorized, filter])
 
   const checkAuth = async () => {
     const supabase = getSupabase()
     const { data: { user } } = await supabase.auth.getUser()
-    if (user?.email === ADMIN_EMAIL) {
-      setAuthorized(true)
-    } else {
-      router.push('/')
-    }
+    if (user?.email === ADMIN_EMAIL) setAuthorized(true)
+    else router.push('/')
     setLoading(false)
   }
 
   const fetchListings = async () => {
     const supabase = getSupabase()
-    const { data } = await supabase
-      .from('listings')
-      .select('*')
-      .eq('status', filter)
-      .order('created_at', { ascending: false })
+    const { data } = await supabase.from('listings').select('*').eq('status', filter).order('created_at', { ascending: false })
     setListings(data || [])
-
-    // Get counts
     const statuses = ['pending', 'approved', 'rejected']
     const newCounts = {}
     for (const s of statuses) {
-      const { count } = await supabase
-        .from('listings')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', s)
+      const { count } = await supabase.from('listings').select('*', { count: 'exact', head: true }).eq('status', s)
       newCounts[s] = count || 0
     }
     setCounts(newCounts)
@@ -84,16 +64,6 @@ function AdminInner() {
     setActionLoading(false)
   }
 
-  const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to permanently delete this listing?')) return
-    setActionLoading(true)
-    const supabase = getSupabase()
-    await supabase.from('listings').delete().eq('id', id)
-    setSelected(null)
-    await fetchListings()
-    setActionLoading(false)
-  }
-
   const handleReject = async (id) => {
     if (!rejectReason.trim()) return
     setActionLoading(true)
@@ -102,6 +72,16 @@ function AdminInner() {
     setSelected(null)
     setShowReject(false)
     setRejectReason('')
+    await fetchListings()
+    setActionLoading(false)
+  }
+
+  const handleDelete = async (id) => {
+    if (!confirm('Permanently delete this listing?')) return
+    setActionLoading(true)
+    const supabase = getSupabase()
+    await supabase.from('listings').delete().eq('id', id)
+    setSelected(null)
     await fetchListings()
     setActionLoading(false)
   }
@@ -124,7 +104,6 @@ function AdminInner() {
 
     return (
       <div style={{ minHeight: '100vh', background: '#f7f7f5', fontFamily: FONT }}>
-        {/* Header */}
         <div style={{ background: NAVY, padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 10 }}>
           <button onClick={() => { setSelected(null); setShowReject(false); setRejectReason('') }} style={{ background: 'none', border: 'none', color: '#fff', fontSize: 15, cursor: 'pointer', fontFamily: FONT, fontWeight: 600 }}>← Back</button>
           <div style={{ fontSize: 16, fontWeight: 800, background: ORANGE, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Review Listing</div>
@@ -132,7 +111,6 @@ function AdminInner() {
         </div>
 
         <div style={{ maxWidth: 600, margin: '0 auto', padding: '24px 20px 60px', boxSizing: 'border-box' }}>
-          {/* Type badge */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
             <span style={{ fontSize: 28 }}>{type.icon}</span>
             <div>
@@ -144,19 +122,17 @@ function AdminInner() {
             </div>
           </div>
 
-          {/* Images */}
           {d.imageUrls && d.imageUrls.length > 0 && (
             <div style={{ marginBottom: 20 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#444', marginBottom: 8 }}>Photos</div>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {d.imageUrls.map((url, i) => (
-                  <img key={i} src={url} alt={`photo ${i+1}`} style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 12, border: '1px solid rgba(0,0,0,0.1)' }} />
+                  <img key={i} src={url} alt={`photo ${i + 1}`} style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 12, border: '1px solid rgba(0,0,0,0.1)' }} />
                 ))}
               </div>
             </div>
           )}
 
-          {/* Details */}
           <div style={{ background: '#fff', borderRadius: 16, padding: '20px', marginBottom: 20, border: '1px solid rgba(0,0,0,0.06)' }}>
             {fields.map(([key, val]) => (
               <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: 2, marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
@@ -167,40 +143,35 @@ function AdminInner() {
           </div>
 
           {/* Actions */}
-          <div style={{ marginTop: 12 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {selected.status === 'pending' && !showReject && (
+              <>
+                <button onClick={() => handleApprove(selected.id)} disabled={actionLoading} style={{ width: '100%', padding: '15px', background: 'linear-gradient(135deg, #2E7D32, #43A047)', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: FONT, boxShadow: '0 4px 16px rgba(46,125,50,0.3)' }}>
+                  {actionLoading ? 'Processing…' : '✅ Approve Listing'}
+                </button>
+                <button onClick={() => setShowReject(true)} style={{ width: '100%', padding: '15px', background: 'linear-gradient(135deg, #C62828, #E53935)', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: FONT }}>
+                  ❌ Reject Listing
+                </button>
+              </>
+            )}
+
+            {selected.status === 'pending' && showReject && (
+              <div style={{ background: '#fff', borderRadius: 16, padding: 20, border: '1.5px solid #ffcdd2' }}>
+                <p style={{ fontSize: 14, fontWeight: 700, color: '#C62828', margin: '0 0 12px' }}>Reason for rejection:</p>
+                <textarea value={rejectReason} onChange={e => setRejectReason(e.target.value)} placeholder="e.g. Inappropriate content, missing details…" rows={3} style={{ width: '100%', padding: '12px', border: '1.5px solid rgba(0,0,0,0.1)', borderRadius: 12, fontSize: 14, fontFamily: FONT, outline: 'none', resize: 'vertical', boxSizing: 'border-box' }} />
+                <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
+                  <button onClick={() => { setShowReject(false); setRejectReason('') }} style={{ flex: 1, padding: '12px', background: '#f5f5f5', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 700, color: '#666', cursor: 'pointer', fontFamily: FONT }}>Cancel</button>
+                  <button onClick={() => handleReject(selected.id)} disabled={actionLoading || !rejectReason.trim()} style={{ flex: 2, padding: '12px', background: 'linear-gradient(135deg, #C62828, #E53935)', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: FONT }}>
+                    {actionLoading ? 'Rejecting…' : 'Confirm Reject'}
+                  </button>
+                </div>
+              </div>
+            )}
+
             <button onClick={() => handleDelete(selected.id)} disabled={actionLoading} style={{ width: '100%', padding: '15px', background: '#333', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: FONT }}>
               🗑️ Delete Permanently
             </button>
           </div>
-
-          {selected.status === 'pending'           {selected.status === 'pending' && (          {selected.status === 'pending' && ( (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {!showReject ? (
-                <>
-                  <button onClick={() => handleApprove(selected.id)} disabled={actionLoading} style={{ width: '100%', padding: '15px', background: 'linear-gradient(135deg, #2E7D32, #43A047)', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: FONT, boxShadow: '0 4px 16px rgba(46,125,50,0.3)' }}>
-                    {actionLoading ? 'Processing…' : '✅ Approve Listing'}
-                  </button>
-                  <button onClick={() => setShowReject(true)} style={{ width: '100%', padding: '15px', background: 'linear-gradient(135deg, #C62828, #E53935)', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: FONT, boxShadow: '0 4px 16px rgba(198,40,40,0.3)' }}>
-                    ❌ Reject Listing
-                  </button>
-                  <button onClick={() => handleDelete(selected.id)} disabled={actionLoading} style={{ width: '100%', padding: '15px', background: '#333', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: FONT }}>
-                    🗑️ Delete Permanently
-                  </button>
-                </>
-              ) : (
-                <div style={{ background: '#fff', borderRadius: 16, padding: 20, border: '1.5px solid #ffcdd2' }}>
-                  <p style={{ fontSize: 14, fontWeight: 700, color: '#C62828', margin: '0 0 12px' }}>Reason for rejection:</p>
-                  <textarea value={rejectReason} onChange={e => setRejectReason(e.target.value)} placeholder="e.g. Inappropriate content, missing details, suspicious contact info…" rows={3} style={{ width: '100%', padding: '12px', border: '1.5px solid rgba(0,0,0,0.1)', borderRadius: 12, fontSize: 14, fontFamily: FONT, outline: 'none', resize: 'vertical', boxSizing: 'border-box' }} />
-                  <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
-                    <button onClick={() => { setShowReject(false); setRejectReason('') }} style={{ flex: 1, padding: '12px', background: '#f5f5f5', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 700, color: '#666', cursor: 'pointer', fontFamily: FONT }}>Cancel</button>
-                    <button onClick={() => handleReject(selected.id)} disabled={actionLoading || !rejectReason.trim()} style={{ flex: 2, padding: '12px', background: 'linear-gradient(135deg, #C62828, #E53935)', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: FONT }}>
-                      {actionLoading ? 'Rejecting…' : 'Confirm Reject'}
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </div>
     )
@@ -209,28 +180,19 @@ function AdminInner() {
   // List view
   return (
     <div style={{ minHeight: '100vh', background: '#f7f7f5', fontFamily: FONT }}>
-      {/* Header */}
       <div style={{ background: NAVY, padding: '16px 20px', position: 'sticky', top: 0, zIndex: 10 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <div style={{ fontSize: 18, fontWeight: 800, background: ORANGE, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>KurdLink Admin</div>
-          <button onClick={() => router.push('/')} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: 12, cursor: 'pointer', fontFamily: FONT, fontWeight: 600, padding: '6px 12px', borderRadius: 20 }}>← App</button>
+          <button onClick={() => router.push('/home')} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: 12, cursor: 'pointer', fontFamily: FONT, fontWeight: 600, padding: '6px 12px', borderRadius: 20 }}>← App</button>
         </div>
-
-        {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 16 }}>
-          {[
-            { label: 'Pending', count: counts.pending, color: '#FFB703' },
-            { label: 'Approved', count: counts.approved, color: '#06FFA5' },
-            { label: 'Rejected', count: counts.rejected, color: '#FF6B6B' },
-          ].map(s => (
+          {[{ label: 'Pending', count: counts.pending, color: '#FFB703' }, { label: 'Approved', count: counts.approved, color: '#06FFA5' }, { label: 'Rejected', count: counts.rejected, color: '#FF6B6B' }].map(s => (
             <div key={s.label} style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 12, padding: '10px 8px', textAlign: 'center' }}>
               <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.count}</div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>{s.label}</div>
             </div>
           ))}
         </div>
-
-        {/* Filter tabs */}
         <div style={{ display: 'flex', gap: 6 }}>
           {['pending', 'approved', 'rejected'].map(f => (
             <button key={f} onClick={() => setFilter(f)} style={{ flex: 1, padding: '8px', background: filter === f ? '#fff' : 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 700, color: filter === f ? NAVY : 'rgba(255,255,255,0.7)', cursor: 'pointer', fontFamily: FONT, textTransform: 'capitalize' }}>{f}</button>
@@ -238,7 +200,6 @@ function AdminInner() {
         </div>
       </div>
 
-      {/* Listings */}
       <div style={{ maxWidth: 600, margin: '0 auto', padding: '16px 16px 60px', boxSizing: 'border-box' }}>
         {listings.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 20px' }}>
