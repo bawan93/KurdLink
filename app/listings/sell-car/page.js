@@ -24,8 +24,8 @@ function SellCarInner() {
 
   const isRtl = lang === 'ku'
   const T = {
-    en: { title: 'Sell Your Car', subtitle: 'Fill in your car details and we\'ll review within 24 hours', name: 'Your Full Name', namePh: 'e.g. Ahmed Hassan', make: 'Make', makePh: 'e.g. BMW, Toyota, Ford', model: 'Model', modelPh: 'e.g. 3 Series, Corolla', year: 'Year', yearPh: 'e.g. 2019', mileage: 'Mileage', mileagePh: 'e.g. 45000', price: 'Asking Price (£)', pricePh: 'e.g. 12500', condition: 'Condition', city: 'City', cityPh: 'e.g. Manchester', postcode: 'Postcode', postcodePh: 'e.g. M1 1AE', description: 'Description', descriptionPh: 'Describe the car, service history, any extras…', phone: 'Phone Number', phonePh: '+44 7700 900000', email: 'Your Email Address', emailPh: 'you@example.com', emailNote: 'We\'ll email you within 24 hours once your listing is reviewed. Please also check your junk/spam folder.', images: 'Car Photos', imagesDesc: 'Upload up to 5 photos', submit: 'Submit for Review', submitting: 'Submitting…', back: '← Back', successTitle: 'Submitted! 🎉', successMsg: 'Your car listing is under review. Check your email within 24 hours — and don\'t forget to check your junk folder!', backHome: 'Back to Home', errFill: 'Please fill in all required fields' },
-    ku: { title: 'ئۆتۆمبێلەکەت بفرۆشە', subtitle: 'زانیاریەکان پڕ بکەوە، ئێمەش لە ٢٤ کاتژمێردا پێداچوونەوەی دەکەین', name: 'ناوی تەواو', namePh: 'وەک: ئەحمەد حەسەن', make: 'مارکا', makePh: 'وەک: BMW، تۆیۆتا', model: 'مۆدێل', modelPh: 'وەک: 3 Series', year: 'ساڵ', yearPh: 'وەک: ٢٠١٩', mileage: 'میلیج', mileagePh: 'وەک: ٤٥٠٠٠', price: 'نرخی داواکراو (£)', pricePh: 'وەک: ١٢٥٠٠', condition: 'حاڵەت', city: 'شار', cityPh: 'وەک: مانچستەر', postcode: 'پۆستکۆد', postcodePh: 'وەک: M1 1AE', description: 'وەسف', descriptionPh: 'ئۆتۆمبێلەکە وەسف بکە…', phone: 'ژمارەی تەلەفۆن', phonePh: '+44 7700 900000', email: 'ئیمەیڵەکەت', emailPh: 'you@example.com', emailNote: 'ئێمە لە ماوەی ٢٤ کاتژمێردا ئیمەیڵت بۆ دەنێرین. فۆڵدەری جەنکیشت بچێکە.', images: 'وێنەی ئۆتۆمبێل', imagesDesc: 'تا ٥ وێنە بار بکە', submit: 'بنێرە بۆ پێداچوونەوە', submitting: 'دەنێردرێت…', back: '→ گەڕانەوە', successTitle: '!دانرا 🎉', successMsg: 'ئۆتۆمبێلەکەت تەماشا دەکرێت. ئیمەیڵەکەت سەیر بکە لە ماوەی ٢٤ کاتژمێردا!', backHome: 'گەڕانەوە بۆ ماڵەوە', errFill: 'تکایە هەموو خانەکان پڕ بکەوە' }
+    en: { title: 'Sell Your Car', subtitle: 'Fill in your car details and we\'ll review within 24 hours', name: 'Your Full Name', namePh: 'e.g. Ahmed Hassan', make: 'Make', makePh: 'e.g. BMW, Toyota, Ford', model: 'Model', modelPh: 'e.g. 3 Series, Corolla', year: 'Year', yearPh: 'e.g. 2019', mileage: 'Mileage', mileagePh: 'e.g. 45000', price: 'Asking Price (£)', pricePh: 'e.g. 12500', condition: 'Condition', city: 'City', cityPh: 'e.g. Manchester', postcode: 'Postcode', postcodePh: 'e.g. M1 1AE', description: 'Description', descriptionPh: 'Describe the car, service history, any extras…', phone: 'Phone Number', phonePh: '+44 7700 900000', email: 'Your Email Address', emailPh: 'you@example.com', emailNote: 'We\'ll email you within 24 hours once your listing is reviewed. Please also check your junk/spam folder.', images: 'Car Photos', imagesDesc: 'Upload up to 5 photos', submit: 'Submit for Review', submitting: 'Submitting…', back: '← Back', successTitle: 'Submitted! 🎉', successMsg: 'Your car listing is under review. You can track its status in your Account page.', backHome: 'View My Listings', errFill: 'Please fill in all required fields' },
+    ku: { title: 'ئۆتۆمبێلەکەت بفرۆشە', subtitle: 'زانیاریەکان پڕ بکەوە، ئێمەش لە ٢٤ کاتژمێردا پێداچوونەوەی دەکەین', name: 'ناوی تەواو', namePh: 'وەک: ئەحمەد حەسەن', make: 'مارکا', makePh: 'وەک: BMW، تۆیۆتا', model: 'مۆدێل', modelPh: 'وەک: 3 Series', year: 'ساڵ', yearPh: 'وەک: ٢٠١٩', mileage: 'میلیج', mileagePh: 'وەک: ٤٥٠٠٠', price: 'نرخی داواکراو (£)', pricePh: 'وەک: ١٢٥٠٠', condition: 'حاڵەت', city: 'شار', cityPh: 'وەک: مانچستەر', postcode: 'پۆستکۆد', postcodePh: 'وەک: M1 1AE', description: 'وەسف', descriptionPh: 'ئۆتۆمبێلەکە وەسف بکە…', phone: 'ژمارەی تەلەفۆن', phonePh: '+44 7700 900000', email: 'ئیمەیڵەکەت', emailPh: 'you@example.com', emailNote: 'دوای پەسەندکردن دەتوانیت لە پەیجی ئەکاونتەکەت بینیت.', images: 'وێنەی ئۆتۆمبێل', imagesDesc: 'تا ٥ وێنە بار بکە', submit: 'بنێرە بۆ پێداچوونەوە', submitting: 'دەنێردرێت…', back: '→ گەڕانەوە', successTitle: '!دانرا 🎉', successMsg: 'ئۆتۆمبێلەکەت تەماشا دەکرێت. دەتوانیت حاڵەتەکەی لە پەیجی ئەکاونتەکەت بچێکیت.', backHome: 'لیستەکانم ببینە', errFill: 'تکایە هەموو خانەکان پڕ بکەوە' }
   }
   const t = T[lang]
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
@@ -41,6 +41,11 @@ function SellCarInner() {
     setLoading(true)
     try {
       const supabase = getSupabase()
+
+      // Get the logged in user
+      const { data: { session } } = await supabase.auth.getSession()
+      const userId = session?.user?.id
+
       const imageUrls = []
       for (const img of images) {
         const ext = img.name.split('.').pop()
@@ -51,7 +56,13 @@ function SellCarInner() {
           imageUrls.push(urlData.publicUrl)
         }
       }
-      const { error: e } = await supabase.from('listings').insert({ type: 'sell_car', status: 'pending', data: { ...form, imageUrls } })
+
+      const { error: e } = await supabase.from('listings').insert({
+        type: 'sell_car',
+        status: 'pending',
+        user_id: userId,
+        data: { ...form, imageUrls }
+      })
       if (e) throw e
       setSubmitted(true)
     } catch (err) { setError(err.message || 'Something went wrong.') }
@@ -63,7 +74,7 @@ function SellCarInner() {
       <div style={{ fontSize: 60, marginBottom: 20 }}>🎉</div>
       <h2 style={{ fontSize: 24, fontWeight: 800, color: NAVY, margin: '0 0 12px' }}>{t.successTitle}</h2>
       <p style={{ fontSize: 15, color: '#666', maxWidth: 320, lineHeight: 1.6, margin: '0 0 32px' }}>{t.successMsg}</p>
-      <button onClick={() => router.push('/home')} style={{ background: ORANGE, border: 'none', borderRadius: 14, padding: '14px 32px', color: '#fff', fontWeight: 700, fontSize: 15, cursor: 'pointer', fontFamily: FONT }}>{t.backHome}</button>
+      <button onClick={() => router.push('/account')} style={{ background: ORANGE, border: 'none', borderRadius: 14, padding: '14px 32px', color: '#fff', fontWeight: 700, fontSize: 15, cursor: 'pointer', fontFamily: FONT }}>{t.backHome}</button>
     </div>
   )
 
