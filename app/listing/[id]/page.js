@@ -74,6 +74,8 @@ export default function ListingDetail({ params }) {
   const meta = TYPE_META[listing.type] || { icon: '📋', color: '#888', label: { en: 'Listing', ku: 'لیست' } }
   const images = d.imageUrls || []
   const title = getTitle(listing.type, d)
+  const isSold = listing.status === 'sold'
+  const isFilled = listing.status === 'filled'
 
   const Field = ({ label, value }) => value ? (
     <div style={{ paddingBottom: 14, marginBottom: 14, borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
@@ -84,6 +86,8 @@ export default function ListingDetail({ params }) {
 
   return (
     <div style={{ minHeight: '100vh', background: '#f7f7f5', fontFamily: FONT, direction: isRtl ? 'rtl' : 'ltr', paddingBottom: 100 }}>
+
+      {/* Header */}
       <div style={{ background: NAVY, padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 20 }}>
         <button onClick={() => router.back()} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.8)', fontSize: 15, cursor: 'pointer', fontFamily: FONT, fontWeight: 600 }}>← Back</button>
         <div style={{ fontSize: 16, fontWeight: 900, background: ORANGE, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>KurdLink</div>
@@ -96,9 +100,35 @@ export default function ListingDetail({ params }) {
         </div>
       </div>
 
+      {/* SOLD / FILLED banner — no image */}
+      {(isSold || isFilled) && images.length === 0 && (
+        <div style={{ background: isSold ? '#EF4444' : '#22C55E', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+          <span style={{ fontSize: 20 }}>{isSold ? '🚫' : '✅'}</span>
+          <span style={{ color: '#fff', fontWeight: 900, fontSize: 18, letterSpacing: 1 }}>
+            {isSold ? (lang === 'ku' ? 'فرۆشراوە' : 'THIS ITEM HAS BEEN SOLD') : (lang === 'ku' ? 'پڕکراوە' : 'POSITION FILLED')}
+          </span>
+        </div>
+      )}
+
+      {/* Image gallery */}
       {images.length > 0 && (
-        <div style={{ background: '#000' }}>
-          <img src={images[activeImage]} alt={title} style={{ width: '100%', height: 280, objectFit: 'cover', display: 'block' }} />
+        <div style={{ background: '#000', position: 'relative' }}>
+          <img
+            src={images[activeImage]}
+            alt={title}
+            style={{ width: '100%', height: 280, objectFit: 'cover', display: 'block', filter: isSold || isFilled ? 'brightness(0.45)' : 'none' }}
+          />
+          {/* SOLD overlay on image */}
+          {(isSold || isFilled) && (
+            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
+              <div style={{ background: isSold ? '#EF4444' : '#22C55E', color: '#fff', fontWeight: 900, fontSize: 28, padding: '12px 32px', borderRadius: 14, letterSpacing: 3, boxShadow: '0 6px 24px rgba(0,0,0,0.4)', marginBottom: 6 }}>
+                {isSold ? 'SOLD' : 'FILLED'}
+              </div>
+              <div style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13, fontWeight: 600 }}>
+                {isSold ? (lang === 'ku' ? 'ئەم بابەتە فرۆشراوە' : 'This item is no longer available') : (lang === 'ku' ? 'پۆستەکە پڕکراوە' : 'This position has been filled')}
+              </div>
+            </div>
+          )}
           {images.length > 1 && (
             <div style={{ display: 'flex', gap: 6, padding: '10px 16px', background: '#111', overflowX: 'auto', scrollbarWidth: 'none' }}>
               {images.map((img, i) => (
@@ -110,6 +140,22 @@ export default function ListingDetail({ params }) {
       )}
 
       <div style={{ maxWidth: 600, margin: '0 auto', padding: '20px 16px', boxSizing: 'border-box' }}>
+
+        {/* Sold/Filled notice box */}
+        {(isSold || isFilled) && (
+          <div style={{ background: isSold ? '#FEF2F2' : '#F0FDF4', border: `1.5px solid ${isSold ? '#FECACA' : '#BBF7D0'}`, borderRadius: 14, padding: '14px 16px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ fontSize: 24 }}>{isSold ? '🚫' : '✅'}</span>
+            <div>
+              <p style={{ fontWeight: 800, fontSize: 15, color: isSold ? '#991B1B' : '#166534', margin: '0 0 3px' }}>
+                {isSold ? (lang === 'ku' ? 'فرۆشراوە' : 'This item has been sold') : (lang === 'ku' ? 'پڕکراوە' : 'This position has been filled')}
+              </p>
+              <p style={{ fontSize: 13, color: '#666', margin: 0 }}>
+                {lang === 'ku' ? 'تەنها بۆ تێڕوانین بەردەستە' : 'Listed for reference only — no longer available'}
+              </p>
+            </div>
+          </div>
+        )}
+
         <div style={{ marginBottom: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 16 }}>{meta.icon}</span>
@@ -117,8 +163,8 @@ export default function ListingDetail({ params }) {
             {d.city && <span style={{ fontSize: 12, color: '#aaa', marginLeft: 'auto' }}>📍 {d.city} {d.postcode}</span>}
           </div>
           <h1 style={{ fontSize: 24, fontWeight: 900, color: NAVY, margin: '0 0 8px', lineHeight: 1.2 }}>{title}</h1>
-          {listing.type === 'sell_car' && d.price && <div style={{ fontSize: 22, fontWeight: 800, color: '#FF6B35' }}>£{Number(d.price).toLocaleString()}</div>}
-          {listing.type === 'sell_business' && d.askingPrice && <div style={{ fontSize: 22, fontWeight: 800, color: '#FF6B35' }}>£{Number(d.askingPrice).toLocaleString()}</div>}
+          {listing.type === 'sell_car' && d.price && <div style={{ fontSize: 22, fontWeight: 800, color: isSold ? '#aaa' : '#FF6B35', textDecoration: isSold ? 'line-through' : 'none' }}>£{Number(d.price).toLocaleString()}</div>}
+          {listing.type === 'sell_business' && d.askingPrice && <div style={{ fontSize: 22, fontWeight: 800, color: isSold ? '#aaa' : '#FF6B35', textDecoration: isSold ? 'line-through' : 'none' }}>£{Number(d.askingPrice).toLocaleString()}</div>}
           {listing.type === 'hire_staff' && d.salary && <div style={{ fontSize: 16, fontWeight: 700, color: '#FF6B35' }}>💰 {d.salary}</div>}
           {listing.type === 'list_service' && d.category && <div style={{ display: 'inline-block', background: 'rgba(255,0,110,0.08)', color: '#FF006E', fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 20 }}>{d.category}</div>}
         </div>
@@ -161,17 +207,30 @@ export default function ListingDetail({ params }) {
         </div>
       </div>
 
-      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#fff', borderTop: '1px solid rgba(0,0,0,0.08)', padding: '12px 16px', display: 'flex', gap: 10, zIndex: 30, boxSizing: 'border-box' }}>
-        {(d.phone || d.applyPhone) && (
-          <a href={`tel:${d.phone || d.applyPhone}`} style={{ flex: 1, background: ORANGE, borderRadius: 14, padding: '14px', color: '#fff', fontWeight: 700, fontSize: 15, textAlign: 'center', textDecoration: 'none', display: 'block', boxShadow: '0 4px 12px rgba(255,107,53,0.3)' }}>📞 Call</a>
-        )}
-        {d.whatsapp && (
-          <a href={`https://wa.me/${d.whatsapp.replace(/\D/g, '')}`} target="_blank" style={{ flex: 1, background: '#25D366', borderRadius: 14, padding: '14px', color: '#fff', fontWeight: 700, fontSize: 15, textAlign: 'center', textDecoration: 'none', display: 'block' }}>💬 WhatsApp</a>
-        )}
-        {(d.email || d.applyEmail || d.contactEmail) && (
-          <a href={`mailto:${d.email || d.applyEmail || d.contactEmail}`} style={{ flex: 1, background: 'rgba(26,43,95,0.08)', borderRadius: 14, padding: '14px', color: NAVY, fontWeight: 700, fontSize: 15, textAlign: 'center', textDecoration: 'none', display: 'block' }}>✉️ Email</a>
-        )}
-      </div>
+      {/* Contact buttons — hide if sold/filled */}
+      {!isSold && !isFilled && (
+        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#fff', borderTop: '1px solid rgba(0,0,0,0.08)', padding: '12px 16px', display: 'flex', gap: 10, zIndex: 30, boxSizing: 'border-box' }}>
+          {(d.phone || d.applyPhone) && (
+            <a href={`tel:${d.phone || d.applyPhone}`} style={{ flex: 1, background: ORANGE, borderRadius: 14, padding: '14px', color: '#fff', fontWeight: 700, fontSize: 15, textAlign: 'center', textDecoration: 'none', display: 'block', boxShadow: '0 4px 12px rgba(255,107,53,0.3)' }}>📞 Call</a>
+          )}
+          {d.whatsapp && (
+            <a href={`https://wa.me/${d.whatsapp.replace(/\D/g, '')}`} target="_blank" style={{ flex: 1, background: '#25D366', borderRadius: 14, padding: '14px', color: '#fff', fontWeight: 700, fontSize: 15, textAlign: 'center', textDecoration: 'none', display: 'block' }}>💬 WhatsApp</a>
+          )}
+          {(d.email || d.applyEmail || d.contactEmail) && (
+            <a href={`mailto:${d.email || d.applyEmail || d.contactEmail}`} style={{ flex: 1, background: 'rgba(26,43,95,0.08)', borderRadius: 14, padding: '14px', color: NAVY, fontWeight: 700, fontSize: 15, textAlign: 'center', textDecoration: 'none', display: 'block' }}>✉️ Email</a>
+          )}
+        </div>
+      )}
+
+      {/* Sold footer message */}
+      {(isSold || isFilled) && (
+        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: isSold ? '#FEF2F2' : '#F0FDF4', borderTop: `1px solid ${isSold ? '#FECACA' : '#BBF7D0'}`, padding: '14px 20px', textAlign: 'center', zIndex: 30 }}>
+          <p style={{ margin: 0, fontWeight: 700, color: isSold ? '#991B1B' : '#166534', fontSize: 14 }}>
+            {isSold ? (lang === 'ku' ? '🚫 ئەم بابەتە فرۆشراوە' : '🚫 This item is no longer available') : (lang === 'ku' ? '✅ ئەم پۆستە پڕکراوە' : '✅ This position has been filled')}
+          </p>
+        </div>
+      )}
+
     </div>
   )
 }
