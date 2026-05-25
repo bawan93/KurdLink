@@ -22,10 +22,10 @@ const STATUS_CONFIG = {
 };
 
 const TYPE_CONFIG = {
-  'sell-car': { label: 'Car Sale', labelKu: 'فرۆشتنی ئۆتۆمبێل', icon: '🚗' },
-  'sell-business': { label: 'Business Sale', labelKu: 'فرۆشتنی بازرگانی', icon: '🏢' },
-  'hire-staff': { label: 'Staff Hire', labelKu: 'کرێکارگرتن', icon: '👥' },
-  'list-service': { label: 'Service', labelKu: 'خزمەتگوزاری', icon: '🛠️' },
+  'sell_car': { label: 'Car Sale', labelKu: 'فرۆشتنی ئۆتۆمبێل', icon: '🚗' },
+  'sell_business': { label: 'Business Sale', labelKu: 'فرۆشتنی بازرگانی', icon: '🏢' },
+  'hire_staff': { label: 'Staff Hire', labelKu: 'کرێکارگرتن', icon: '👥' },
+  'list_service': { label: 'Service', labelKu: 'خزمەتگوزاری', icon: '🛠️' },
 };
 
 export default function AccountPage() {
@@ -367,21 +367,21 @@ export default function AccountPage() {
                         )}
 
                         {/* SOLD — cars and businesses */}
-                        {['sell-car', 'sell-business'].includes(listing.type) && listing.status === 'approved' && !listing.paused && (
+                        {['sell_car', 'sell_business'].includes(listing.type) && listing.status === 'approved' && !listing.paused && (
                           <button onClick={() => handleInstantUpdate(listing, { status: 'sold' })} disabled={isLoading} style={{ padding: '8px 14px', background: '#F0FDF4', color: GREEN, borderRadius: 10, fontSize: 13, fontWeight: 700, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                             {isLoading ? '...' : `✅ ${t('Mark as Sold', 'وەک فرۆشراو نیشان بدە')}`}
                           </button>
                         )}
 
                         {/* FILLED — staff hire */}
-                        {listing.type === 'hire-staff' && listing.status === 'approved' && !listing.paused && (
+                        {listing.type === 'hire_staff' && listing.status === 'approved' && !listing.paused && (
                           <button onClick={() => handleInstantUpdate(listing, { status: 'filled' })} disabled={isLoading} style={{ padding: '8px 14px', background: '#F0FDF4', color: GREEN, borderRadius: 10, fontSize: 13, fontWeight: 700, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                             {isLoading ? '...' : `✅ ${t('Mark as Filled', 'وەک پڕکراو نیشان بدە')}`}
                           </button>
                         )}
 
                         {/* PAUSE/UNPAUSE — services only */}
-                        {listing.type === 'list-service' && listing.status === 'approved' && (
+                        {listing.type === 'list_service' && listing.status === 'approved' && (
                           <button onClick={() => handleInstantUpdate(listing, { paused: !listing.paused })} disabled={isLoading} style={{ padding: '8px 14px', background: listing.paused ? '#EFF6FF' : '#FFF7ED', color: listing.paused ? BLUE : AMBER, borderRadius: 10, fontSize: 13, fontWeight: 700, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                             {isLoading ? '...' : listing.paused ? `▶️ ${t('Unpause', 'دووبارە چالاک بکەرەوە')}` : `⏸️ ${t('Pause', 'ڕاگرتن')}`}
                           </button>
