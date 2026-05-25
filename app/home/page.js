@@ -48,6 +48,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState('all')
   const [listings, setListings] = useState([])
   const [loading, setLoading] = useState(true)
+  const [activeNav, setActiveNav] = useState('home')
   const isRtl = lang === 'ku'
 
   useEffect(() => {
@@ -64,6 +65,12 @@ export default function Home() {
     setLoading(false)
   }
 
+  const NAV_ITEMS = [
+    { id: 'home', icon: '🏠', label: { en: 'Home', ku: 'سەرەکی' }, action: () => { setActiveNav('home') } },
+    { id: 'post', icon: '➕', label: { en: 'Post', ku: 'پۆست' }, action: () => { setActiveNav('post'); router.push('/post') } },
+    { id: 'account', icon: '👤', label: { en: 'Account', ku: 'ئەکاونت' }, action: () => { setActiveNav('account'); router.push('/account') } },
+  ]
+
   return (
     <div style={{ minHeight: '100vh', minHeight: '100dvh', background: '#f7f7f5', fontFamily: FONT, direction: isRtl ? 'rtl' : 'ltr', paddingBottom: 80 }}>
 
@@ -72,7 +79,6 @@ export default function Home() {
         <div style={{ padding: '14px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ fontSize: 20, fontWeight: 900, background: ORANGE, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>KurdLink</div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            {/* Lang toggle */}
             <div style={{ display: 'flex', gap: 3, background: 'rgba(255,255,255,0.08)', padding: '4px 5px', borderRadius: 16 }}>
               {['en', 'ku'].map(l => (
                 <button key={l} onClick={() => setLang(l)} style={{ padding: '5px 10px', background: lang === l ? '#fff' : 'transparent', color: lang === l ? NAVY : 'rgba(255,255,255,0.7)', border: 'none', borderRadius: 12, fontWeight: 700, fontSize: 11, cursor: 'pointer', fontFamily: FONT }}>
@@ -80,10 +86,6 @@ export default function Home() {
                 </button>
               ))}
             </div>
-            {/* Post button */}
-            <button onClick={() => router.push('/post')} style={{ background: ORANGE, border: 'none', borderRadius: 12, padding: '8px 14px', color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: FONT, boxShadow: '0 2px 10px rgba(255,107,53,0.4)' }}>
-              + {lang === 'en' ? 'Post' : 'پۆست'}
-            </button>
           </div>
         </div>
 
@@ -141,44 +143,33 @@ export default function Home() {
 
             return (
               <div key={listing.id} onClick={() => router.push(`/listing/${listing.id}`)} style={{ background: "#fff", borderRadius: 16, marginBottom: 12, cursor: "pointer", border: '1.5px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', overflow: 'hidden' }}>
-                {/* Image if available */}
                 {img && <img src={img} alt={title} style={{ width: '100%', height: 180, objectFit: 'cover' }} />}
-
                 <div style={{ padding: '14px 16px' }}>
-                  {/* Type badge */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
                     <span style={{ fontSize: 14 }}>{meta.icon}</span>
                     <span style={{ fontSize: 11, fontWeight: 700, color: meta.color, textTransform: 'uppercase', letterSpacing: 0.5 }}>{meta.label[lang]}</span>
                     {d.city && <span style={{ fontSize: 11, color: '#aaa', marginLeft: 'auto' }}>📍 {d.city}</span>}
                   </div>
-
-                  {/* Title */}
                   <h3 style={{ fontSize: 16, fontWeight: 800, color: NAVY, margin: '0 0 4px', lineHeight: 1.2 }}>{title}</h3>
-
-                  {/* Subtitle */}
                   {subtitle && <p style={{ fontSize: 13, fontWeight: 600, color: '#FF6B35', margin: '0 0 8px' }}>{subtitle}</p>}
-
-                  {/* Description */}
                   {d.description && (
                     <p style={{ fontSize: 13, color: '#777', margin: '0 0 12px', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                       {d.description}
                     </p>
                   )}
-
-                  {/* Contact buttons */}
                   <div style={{ display: 'flex', gap: 8 }}>
                     {(d.phone || d.applyPhone) && (
-                      <a href={`tel:${d.phone || d.applyPhone}`} style={{ flex: 1, background: ORANGE, borderRadius: 10, padding: '9px', color: '#fff', fontWeight: 700, fontSize: 13, textAlign: 'center', textDecoration: 'none', display: 'block' }}>
+                      <a href={`tel:${d.phone || d.applyPhone}`} onClick={e => e.stopPropagation()} style={{ flex: 1, background: ORANGE, borderRadius: 10, padding: '9px', color: '#fff', fontWeight: 700, fontSize: 13, textAlign: 'center', textDecoration: 'none', display: 'block' }}>
                         📞 {lang === 'en' ? 'Call' : 'پەیوەندی'}
                       </a>
                     )}
                     {(d.email || d.applyEmail) && (
-                      <a href={`mailto:${d.email || d.applyEmail}`} style={{ flex: 1, background: 'rgba(26,43,95,0.07)', borderRadius: 10, padding: '9px', color: NAVY, fontWeight: 700, fontSize: 13, textAlign: 'center', textDecoration: 'none', display: 'block' }}>
+                      <a href={`mailto:${d.email || d.applyEmail}`} onClick={e => e.stopPropagation()} style={{ flex: 1, background: 'rgba(26,43,95,0.07)', borderRadius: 10, padding: '9px', color: NAVY, fontWeight: 700, fontSize: 13, textAlign: 'center', textDecoration: 'none', display: 'block' }}>
                         ✉️ {lang === 'en' ? 'Email' : 'ئیمەیڵ'}
                       </a>
                     )}
                     {d.whatsapp && (
-                      <a href={`https://wa.me/${d.whatsapp.replace(/\D/g,'')}`} target="_blank" style={{ flex: 1, background: '#25D366', borderRadius: 10, padding: '9px', color: '#fff', fontWeight: 700, fontSize: 13, textAlign: 'center', textDecoration: 'none', display: 'block' }}>
+                      <a href={`https://wa.me/${d.whatsapp.replace(/\D/g,'')}`} onClick={e => e.stopPropagation()} target="_blank" style={{ flex: 1, background: '#25D366', borderRadius: 10, padding: '9px', color: '#fff', fontWeight: 700, fontSize: 13, textAlign: 'center', textDecoration: 'none', display: 'block' }}>
                         💬 WhatsApp
                       </a>
                     )}
@@ -190,12 +181,66 @@ export default function Home() {
         )}
       </div>
 
-      {/* Floating Post button */}
-      <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 50 }}>
-        <button onClick={() => router.push('/post')} style={{ background: ORANGE, border: 'none', borderRadius: 50, width: 56, height: 56, fontSize: 24, cursor: 'pointer', boxShadow: '0 6px 20px rgba(255,107,53,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          ✏️
-        </button>
+      {/* Bottom Navigation */}
+      <div style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        background: '#fff',
+        borderTop: '1px solid rgba(0,0,0,0.08)',
+        display: 'flex',
+        zIndex: 50,
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        boxShadow: '0 -4px 20px rgba(0,0,0,0.06)',
+      }}>
+        {NAV_ITEMS.map(item => (
+          <button
+            key={item.id}
+            onClick={item.action}
+            style={{
+              flex: 1,
+              padding: '10px 0 8px',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 3,
+              fontFamily: FONT,
+            }}
+          >
+            {item.id === 'post' ? (
+              <div style={{
+                width: 44,
+                height: 44,
+                background: 'linear-gradient(135deg, #FF6B35, #FF8C61)',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 20,
+                marginTop: -20,
+                boxShadow: '0 4px 16px rgba(255,107,53,0.5)',
+              }}>
+                ➕
+              </div>
+            ) : (
+              <span style={{ fontSize: 20 }}>{item.icon}</span>
+            )}
+            <span style={{
+              fontSize: 10,
+              fontWeight: 700,
+              color: activeNav === item.id ? '#FF6B35' : '#aaa',
+              marginTop: item.id === 'post' ? 2 : 0,
+            }}>
+              {item.label[lang]}
+            </span>
+          </button>
+        ))}
       </div>
+
     </div>
   )
 }
