@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowserClient } from '@supabase/ssr';
 import { useRouter } from 'next/navigation';
 
 const NAV_H = 64;
@@ -29,7 +29,7 @@ const TYPE_CONFIG = {
 };
 
 export default function AccountPage() {
-  const supabase = createClientComponentClient();
+  const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   const router = useRouter();
 
   const [lang, setLang] = useState('en');
@@ -402,4 +402,4 @@ export default function AccountPage() {
       </div>
     </div>
   );
-} 
+}
