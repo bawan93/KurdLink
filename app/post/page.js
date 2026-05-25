@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowserClient } from '@supabase/ssr';
 import { useRouter } from 'next/navigation';
 
 const NAVY = '#1A2B5F';
@@ -10,7 +10,7 @@ const BORDER = '#E8ECF4';
 const CARD_BG = '#FFFFFF';
 
 export default function PostPage() {
-  const supabase = createClientComponentClient();
+  const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   const router = useRouter();
   const [checking, setChecking] = useState(true);
   const [lang, setLang] = useState('en');
@@ -121,4 +121,4 @@ export default function PostPage() {
       </div>
     </div>
   );
-} 
+}
