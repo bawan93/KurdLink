@@ -15,6 +15,8 @@ const AMBER = '#F59E0B';
 const BLUE = '#3B82F6';
 
 const STATUS_CONFIG = {
+  sold: { label: 'Sold', labelKu: 'فرۆشراوە', color: '#6B7280', bg: '#F3F4F6' },
+  filled: { label: 'Filled', labelKu: 'پڕکراوە', color: '#6B7280', bg: '#F3F4F6' },
   approved: { label: 'Approved', labelKu: 'پەسەندکراو', color: GREEN, bg: '#F0FDF4' },
   pending: { label: 'Pending', labelKu: 'چاوەڕوانە', color: AMBER, bg: '#FFFBEB' },
   rejected: { label: 'Rejected', labelKu: 'ڕەتکراوە', color: RED, bg: '#FEF2F2' },
