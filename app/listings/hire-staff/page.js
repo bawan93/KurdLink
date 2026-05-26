@@ -6,6 +6,7 @@ import { createBrowserClient } from '@supabase/ssr'
 const FONT = "'Plus Jakarta Sans', 'Sora', sans-serif"
 const ORANGE = 'linear-gradient(135deg, #FF6B35, #FF8C61)'
 const NAVY = '#1A2B5F'
+const JOB_TYPES = ['Full-Time', 'Part-Time', 'Temporary', 'Weekend Only', 'Flexible']
 
 function getSupabase() {
   return createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
@@ -18,30 +19,129 @@ function HireStaffInner() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [submitted, setSubmitted] = useState(false)
-  const [form, setForm] = useState({ name: '', jobTitle: '', city: '', postcode: '', salary: '', description: '', applyPhone: '', applyEmail: '', contactEmail: '' })
+  const [form, setForm] = useState({
+    name: '',
+    companyName: '',
+    jobTitle: '',
+    jobType: '',
+    salary: '',
+    city: '',
+    postcode: '',
+    description: '',
+    phone: '',
+    email: ''
+  })
 
   const isRtl = lang === 'ku'
   const T = {
-    en: { title: 'Hire Staff', subtitle: 'Post a job and find the right talent within the Kurdish community', name: 'Your Full Name', namePh: 'e.g. Ahmed Hassan', jobTitle: 'Full Job Title', jobTitlePh: 'e.g. Full Time Shop Assistant, Part Time Driver', city: 'City', cityPh: 'e.g. Birmingham', postcode: 'Postcode', postcodePh: 'e.g. B1 1AA', salary: 'Salary / Rate', salaryPh: 'e.g. £12/hr or £28,000/year', description: 'Job Description', descriptionPh: 'Describe the role, responsibilities, working hours…', applyPhone: 'Apply by Phone', applyPhonePh: '+44 7700 900000', applyEmail: 'Apply by Email', applyEmailPh: 'jobs@yourbusiness.com', contactEmail: 'Your Email Address (for notifications)', contactEmailPh: 'you@example.com', emailNote: 'We\'ll email you within 24 hours once your listing is reviewed. Please also check your junk/spam folder.', submit: 'Post Job', submitting: 'Posting…', back: '← Back', successTitle: 'Job Posted! 🎉', successMsg: 'Your job listing is under review. Check your email within 24 hours — and don\'t forget to check your junk folder!', backHome: 'Back to Home', errFill: 'Please fill in all required fields' },
-    ku: { title: 'کارمەند بگرە', subtitle: 'کار پۆست بکە و ئەو بەتوانا لە کۆمەڵگای کورد بدۆزەوە', name: 'ناوی تەواو', namePh: 'وەک: ئەحمەد حەسەن', jobTitle: 'ناوی تەواوی کار', jobTitlePh: 'وەک: یاریدەدەری دوکان تەواو کات', city: 'شار', cityPh: 'وەک: بێرمینگەم', postcode: 'پۆستکۆد', postcodePh: 'وەک: B1 1AA', salary: 'مووچە / نرخ', salaryPh: 'وەک: £١٢ کاتژمێر', description: 'وەسفی کار', descriptionPh: 'کارەکە وەسف بکە، ئەرکەکان، کاتژمێرەکان…', applyPhone: 'دەرخواستی تەلەفۆن', applyPhonePh: '+44 7700 900000', applyEmail: 'دەرخواستی ئیمەیڵ', applyEmailPh: 'jobs@yourbusiness.com', contactEmail: 'ئیمەیڵەکەت (بۆ ئاگادارکردنەوە)', contactEmailPh: 'you@example.com', emailNote: 'ئێمە لە ماوەی ٢٤ کاتژمێردا ئیمەیڵت بۆ دەنێرین. فۆڵدەری جەنکیشت بچێکە.', submit: 'کار پۆست بکە', submitting: 'دەنێردرێت…', back: '→ گەڕانەوە', successTitle: '!کار پۆست کرا 🎉', successMsg: 'کارەکەت تەماشا دەکرێت. ئیمەیڵەکەت سەیر بکە لە ماوەی ٢٤ کاتژمێردا!', backHome: 'گەڕانەوە بۆ ماڵەوە', errFill: 'تکایە هەموو خانەکان پڕ بکەوە' }
+    en: {
+      title: 'Hire Staff',
+      subtitle: 'Post a job vacancy and we\'ll review within 24 hours',
+      name: 'Your Full Name',
+      namePh: 'e.g. Ahmed Hassan',
+      companyName: 'Company / Business Name',
+      companyNamePh: 'e.g. Hassan Takeaway',
+      jobTitle: 'Job Title',
+      jobTitlePh: 'e.g. Chef, Driver, Cashier',
+      jobType: 'Job Type',
+      salary: 'Salary / Pay Rate',
+      salaryPh: 'e.g. £12/hr or £24,000/year',
+      city: 'City',
+      cityPh: 'e.g. Birmingham',
+      postcode: 'Postcode',
+      postcodePh: 'e.g. B1 1AA',
+      description: 'Job Description',
+      descriptionPh: 'Describe the role, responsibilities, requirements, working hours…',
+      phone: 'Phone Number',
+      phonePh: '+44 7700 900000',
+      email: 'Your Email Address',
+      emailPh: 'you@example.com',
+      emailNote: 'You can track your listing status in your Account page.',
+      submit: 'Submit for Review',
+      submitting: 'Submitting…',
+      back: '← Back',
+      successTitle: 'Job Posted! 🎉',
+      successMsg: 'Your job listing is under review. You can track its status and mark it as filled from your Account page.',
+      backHome: 'View My Listings',
+      errFill: 'Please fill in all required fields',
+      selectType: 'Select job type…'
+    },
+    ku: {
+      title: 'کرێکار بگرە',
+      subtitle: 'شوێنی کارێکی بەتاڵ بڵاو بکەرەوە، ئێمەش لە ٢٤ کاتژمێردا پێداچوونەوەی دەکەین',
+      name: 'ناوی تەواو',
+      namePh: 'وەک: ئەحمەد حەسەن',
+      companyName: 'ناوی کۆمپانیا / بیزنس',
+      companyNamePh: 'وەک: رستەرانی حەسەن',
+      jobTitle: 'ناوی کار',
+      jobTitlePh: 'وەک: ئاشپەز، شۆفێر، کاشێر',
+      jobType: 'جۆری کار',
+      salary: 'مووچە / کرێ',
+      salaryPh: 'وەک: £12 کاتژمێر یان £24,000 ساڵانە',
+      city: 'شار',
+      cityPh: 'وەک: بیرمینگەم',
+      postcode: 'پۆستکۆد',
+      postcodePh: 'وەک: B1 1AA',
+      description: 'وەسفی کار',
+      descriptionPh: 'کارەکە وەسف بکە، پێداویستییەکان، کاتی کار…',
+      phone: 'ژمارەی تەلەفۆن',
+      phonePh: '+44 7700 900000',
+      email: 'ئیمەیڵەکەت',
+      emailPh: 'you@example.com',
+      emailNote: 'دوای پەسەندکردن دەتوانیت لە پەیجی ئەکاونتەکەت بینیت.',
+      submit: 'بنێرە بۆ پێداچوونەوە',
+      submitting: 'دەنێردرێت…',
+      back: '→ گەڕانەوە',
+      successTitle: '!کارەکە بڵاو کرایەوە 🎉',
+      successMsg: 'داواکاریەکەت تەماشا دەکرێت. دەتوانیت حاڵەتەکەی لە پەیجی ئەکاونتەکەت بچێکیت.',
+      backHome: 'لیستەکانم ببینە',
+      errFill: 'تکایە هەموو خانەکان پڕ بکەوە',
+      selectType: 'جۆری کار هەڵبژێرە…'
+    }
   }
   const t = T[lang]
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
-  const inp = (f) => ({ width: '100%', padding: '14px 16px', border: `2px solid ${focus === f ? '#FF6B35' : 'rgba(0,0,0,0.1)'}`, borderRadius: 14, fontSize: 15, fontFamily: FONT, outline: 'none', background: '#fff', color: '#1a1a1a', boxSizing: 'border-box', transition: 'border-color 0.2s', direction: 'ltr' })
-  const label = { display: 'block', fontSize: 13, fontWeight: 700, color: '#444', marginBottom: 6 }
+  const inp = (f) => ({
+    width: '100%',
+    padding: '14px 16px',
+    border: `2px solid ${focus === f ? '#FF6B35' : 'rgba(0,0,0,0.1)'}`,
+    borderRadius: 14,
+    fontSize: 15,
+    fontFamily: FONT,
+    outline: 'none',
+    background: '#fff',
+    color: '#1a1a1a',
+    boxSizing: 'border-box',
+    transition: 'border-color 0.2s',
+    direction: 'ltr'
+  })
+  const labelStyle = { display: 'block', fontSize: 13, fontWeight: 700, color: '#444', marginBottom: 6 }
 
   const handleSubmit = async () => {
     setError('')
-    const { name, jobTitle, city, postcode, salary, description, contactEmail } = form
-    if (!name || !jobTitle || !city || !postcode || !salary || !description || !contactEmail) return setError(t.errFill)
+    const { name, companyName, jobTitle, jobType, salary, city, postcode, description, email } = form
+    if (!name || !companyName || !jobTitle || !jobType || !salary || !city || !postcode || !description || !email) {
+      return setError(t.errFill)
+    }
     setLoading(true)
     try {
       const supabase = getSupabase()
-      const { error: e } = await supabase.from('listings').insert({ type: 'hire_staff', status: 'pending', data: form })
+      const { data: { session } } = await supabase.auth.getSession()
+      const userId = session?.user?.id
+
+      const { error: e } = await supabase.from('listings').insert({
+        type: 'hire_staff',
+        status: 'pending',
+        user_id: userId,
+        data: { ...form }
+      })
       if (e) throw e
       setSubmitted(true)
-    } catch (err) { setError(err.message || 'Something went wrong.') }
-    finally { setLoading(false) }
+    } catch (err) {
+      setError(err.message || 'Something went wrong.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (submitted) return (
@@ -49,66 +149,98 @@ function HireStaffInner() {
       <div style={{ fontSize: 60, marginBottom: 20 }}>🎉</div>
       <h2 style={{ fontSize: 24, fontWeight: 800, color: NAVY, margin: '0 0 12px' }}>{t.successTitle}</h2>
       <p style={{ fontSize: 15, color: '#666', maxWidth: 320, lineHeight: 1.6, margin: '0 0 32px' }}>{t.successMsg}</p>
-      <button onClick={() => router.push('/home')} style={{ background: ORANGE, border: 'none', borderRadius: 14, padding: '14px 32px', color: '#fff', fontWeight: 700, fontSize: 15, cursor: 'pointer', fontFamily: FONT }}>{t.backHome}</button>
+      <button onClick={() => router.push('/account')} style={{ background: ORANGE, border: 'none', borderRadius: 14, padding: '14px 32px', color: '#fff', fontWeight: 700, fontSize: 15, cursor: 'pointer', fontFamily: FONT }}>{t.backHome}</button>
     </div>
   )
 
   return (
     <div style={{ minHeight: '100vh', background: '#f7f7f5', fontFamily: FONT, direction: isRtl ? 'rtl' : 'ltr' }}>
+      {/* Header */}
       <div style={{ background: NAVY, padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 10 }}>
         <button onClick={() => router.back()} style={{ background: 'none', border: 'none', color: '#fff', fontSize: 15, cursor: 'pointer', fontFamily: FONT, fontWeight: 600 }}>{t.back}</button>
         <div style={{ fontSize: 18, fontWeight: 800, background: ORANGE, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>KurdLink</div>
         <div style={{ display: 'flex', gap: 4, background: 'rgba(255,255,255,0.1)', padding: '4px 6px', borderRadius: 20 }}>
-          {['en', 'ku'].map(l => (<button key={l} onClick={() => setLang(l)} style={{ padding: '5px 12px', background: lang === l ? '#fff' : 'transparent', color: lang === l ? NAVY : 'rgba(255,255,255,0.7)', border: 'none', borderRadius: 16, fontWeight: 700, fontSize: 11, cursor: 'pointer', fontFamily: FONT }}>{l === 'en' ? 'EN' : 'KU'}</button>))}
+          {['en', 'ku'].map(l => (
+            <button key={l} onClick={() => setLang(l)} style={{ padding: '5px 12px', background: lang === l ? '#fff' : 'transparent', color: lang === l ? NAVY : 'rgba(255,255,255,0.7)', border: 'none', borderRadius: 16, fontWeight: 700, fontSize: 11, cursor: 'pointer', fontFamily: FONT }}>
+              {l === 'en' ? 'EN' : 'KU'}
+            </button>
+          ))}
         </div>
       </div>
+
       <div style={{ maxWidth: 480, margin: '0 auto', padding: '24px 20px 60px', boxSizing: 'border-box' }}>
         <div style={{ marginBottom: 28 }}>
           <div style={{ fontSize: 32, marginBottom: 8 }}>👥</div>
           <h1 style={{ fontSize: 24, fontWeight: 800, color: NAVY, margin: '0 0 6px' }}>{t.title}</h1>
           <p style={{ fontSize: 13, color: '#888', margin: 0, lineHeight: 1.5 }}>{t.subtitle}</p>
         </div>
-        {error && <div style={{ background: '#fff0f0', border: '1.5px solid #ffcdd2', borderRadius: 12, padding: '12px 16px', fontSize: 13, fontWeight: 600, color: '#c62828', marginBottom: 16 }}>{error}</div>}
+
+        {error && (
+          <div style={{ background: '#fff0f0', border: '1.5px solid #ffcdd2', borderRadius: 12, padding: '12px 16px', fontSize: 13, fontWeight: 600, color: '#c62828', marginBottom: 16 }}>
+            {error}
+          </div>
+        )}
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
           <div>
-            <label style={label}>{t.name} *</label>
+            <label style={labelStyle}>{t.name} *</label>
             <input type="text" value={form.name} onChange={e => set('name', e.target.value)} placeholder={t.namePh} onFocus={() => setFocus('name')} onBlur={() => setFocus(null)} style={inp('name')} />
           </div>
+
           <div>
-            <label style={label}>{t.jobTitle} *</label>
+            <label style={labelStyle}>{t.companyName} *</label>
+            <input type="text" value={form.companyName} onChange={e => set('companyName', e.target.value)} placeholder={t.companyNamePh} onFocus={() => setFocus('companyName')} onBlur={() => setFocus(null)} style={inp('companyName')} />
+          </div>
+
+          <div>
+            <label style={labelStyle}>{t.jobTitle} *</label>
             <input type="text" value={form.jobTitle} onChange={e => set('jobTitle', e.target.value)} placeholder={t.jobTitlePh} onFocus={() => setFocus('jobTitle')} onBlur={() => setFocus(null)} style={inp('jobTitle')} />
           </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
-              <label style={label}>{t.city} *</label>
+              <label style={labelStyle}>{t.jobType} *</label>
+              <select value={form.jobType} onChange={e => set('jobType', e.target.value)} style={{ ...inp('jobType'), appearance: 'none', WebkitAppearance: 'none', cursor: 'pointer' }}>
+                <option value="">{t.selectType}</option>
+                {JOB_TYPES.map(j => <option key={j} value={j}>{j}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={labelStyle}>{t.salary} *</label>
+              <input type="text" value={form.salary} onChange={e => set('salary', e.target.value)} placeholder={t.salaryPh} onFocus={() => setFocus('salary')} onBlur={() => setFocus(null)} style={inp('salary')} />
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div>
+              <label style={labelStyle}>{t.city} *</label>
               <input type="text" value={form.city} onChange={e => set('city', e.target.value)} placeholder={t.cityPh} onFocus={() => setFocus('city')} onBlur={() => setFocus(null)} style={inp('city')} />
             </div>
             <div>
-              <label style={label}>{t.postcode} *</label>
+              <label style={labelStyle}>{t.postcode} *</label>
               <input type="text" value={form.postcode} onChange={e => set('postcode', e.target.value)} placeholder={t.postcodePh} onFocus={() => setFocus('postcode')} onBlur={() => setFocus(null)} style={inp('postcode')} />
             </div>
           </div>
+
           <div>
-            <label style={label}>{t.salary} *</label>
-            <input type="text" value={form.salary} onChange={e => set('salary', e.target.value)} placeholder={t.salaryPh} onFocus={() => setFocus('salary')} onBlur={() => setFocus(null)} style={inp('salary')} />
+            <label style={labelStyle}>{t.description} *</label>
+            <textarea value={form.description} onChange={e => set('description', e.target.value)} placeholder={t.descriptionPh} onFocus={() => setFocus('description')} onBlur={() => setFocus(null)} rows={5} style={{ ...inp('description'), resize: 'vertical', lineHeight: 1.5 }} />
           </div>
+
           <div>
-            <label style={label}>{t.description} *</label>
-            <textarea value={form.description} onChange={e => set('description', e.target.value)} placeholder={t.descriptionPh} onFocus={() => setFocus('description')} onBlur={() => setFocus(null)} rows={4} style={{ ...inp('description'), resize: 'vertical', lineHeight: 1.5 }} />
+            <label style={labelStyle}>{t.phone}</label>
+            <input type="tel" value={form.phone} onChange={e => set('phone', e.target.value)} placeholder={t.phonePh} onFocus={() => setFocus('phone')} onBlur={() => setFocus(null)} style={inp('phone')} />
           </div>
+
           <div>
-            <label style={label}>{t.applyPhone}</label>
-            <input type="tel" value={form.applyPhone} onChange={e => set('applyPhone', e.target.value)} placeholder={t.applyPhonePh} onFocus={() => setFocus('applyPhone')} onBlur={() => setFocus(null)} style={inp('applyPhone')} />
+            <label style={labelStyle}>{t.email} *</label>
+            <input type="email" value={form.email} onChange={e => set('email', e.target.value)} placeholder={t.emailPh} onFocus={() => setFocus('email')} onBlur={() => setFocus(null)} style={inp('email')} />
+            <p style={{ fontSize: 12, color: '#888', margin: '8px 0 0', lineHeight: 1.5, background: 'rgba(255,107,53,0.06)', padding: '10px 12px', borderRadius: 10, borderLeft: '3px solid #FF6B35' }}>
+              📬 {t.emailNote}
+            </p>
           </div>
-          <div>
-            <label style={label}>{t.applyEmail}</label>
-            <input type="email" value={form.applyEmail} onChange={e => set('applyEmail', e.target.value)} placeholder={t.applyEmailPh} onFocus={() => setFocus('applyEmail')} onBlur={() => setFocus(null)} style={inp('applyEmail')} />
-          </div>
-          <div>
-            <label style={label}>{t.contactEmail} *</label>
-            <input type="email" value={form.contactEmail} onChange={e => set('contactEmail', e.target.value)} placeholder={t.contactEmailPh} onFocus={() => setFocus('contactEmail')} onBlur={() => setFocus(null)} style={inp('contactEmail')} />
-            <p style={{ fontSize: 12, color: '#888', margin: '8px 0 0', lineHeight: 1.5, background: 'rgba(255,107,53,0.06)', padding: '10px 12px', borderRadius: 10, borderLeft: '3px solid #FF6B35' }}>📬 {t.emailNote}</p>
-          </div>
+
           <button onClick={handleSubmit} disabled={loading} style={{ width: '100%', padding: '15px', background: loading ? '#ccc' : ORANGE, border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 700, color: '#fff', cursor: loading ? 'default' : 'pointer', fontFamily: FONT, boxShadow: loading ? 'none' : '0 4px 16px rgba(255,107,53,0.35)', marginTop: 8 }}>
             {loading ? t.submitting : t.submit}
           </button>
