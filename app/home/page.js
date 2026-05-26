@@ -58,7 +58,7 @@ export default function Home() {
   const fetchListings = async () => {
     setLoading(true)
     const supabase = getSupabase()
-    let query = supabase.from('listings').select('*').in("status", ["approved", "sold"]).order('created_at', { ascending: false })
+    let query = supabase.from('listings').select('*').in("status", ["approved", "sold", "filled"]).order('created_at', { ascending: false })
     if (activeTab !== 'all') query = query.eq('type', activeTab)
     const { data } = await query
     setListings(data || [])
@@ -143,12 +143,17 @@ export default function Home() {
 
             return (
               <div key={listing.id} onClick={() => router.push(`/listing/${listing.id}`)} style={{ background: "#fff", borderRadius: 16, marginBottom: 12, cursor: "pointer", border: '1.5px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', overflow: 'hidden' }}>
-                {/* SOLD banner */}
+                {/* SOLD / FILLED banner */}
                 <div style={{ position: 'relative' }}>
-                  {img && <img src={img} alt={title} style={{ width: '100%', height: 180, objectFit: 'cover', filter: listing.status === 'sold' ? 'brightness(0.7)' : 'none' }} />}
+                  {img && <img src={img} alt={title} style={{ width: '100%', height: 180, objectFit: 'cover', filter: (listing.status === 'sold' || listing.status === 'filled') ? 'brightness(0.7)' : 'none' }} />}
                   {listing.status === 'sold' && (
                     <div style={{ position: 'absolute', top: img ? '50%' : 0, left: '50%', transform: img ? 'translate(-50%, -50%)' : 'translateX(-50%)', background: '#EF4444', color: '#fff', fontWeight: 900, fontSize: 22, padding: '8px 24px', borderRadius: 10, letterSpacing: 2, boxShadow: '0 4px 16px rgba(0,0,0,0.3)', marginTop: img ? 0 : 12 }}>
                       SOLD
+                    </div>
+                  )}
+                  {listing.status === 'filled' && (
+                    <div style={{ position: 'absolute', top: img ? '50%' : 8, left: '50%', transform: img ? 'translate(-50%, -50%)' : 'translateX(-50%)', background: '#22C55E', color: '#fff', fontWeight: 900, fontSize: 22, padding: '8px 24px', borderRadius: 10, letterSpacing: 2, boxShadow: '0 4px 16px rgba(0,0,0,0.3)', marginTop: img ? 0 : 12 }}>
+                      FILLED
                     </div>
                   )}
                 </div>
