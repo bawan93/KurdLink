@@ -67,7 +67,6 @@ export default function Home() {
 
   const NAV_ITEMS = [
     { id: 'home', icon: '🏠', label: { en: 'Home', ku: 'سەرەکی' }, action: () => { setActiveNav('home') } },
-    { id: 'journey', icon: '🗺️', label: { en: 'Journey', ku: 'گەشت' }, action: () => { setActiveNav('journey'); router.push('/journey') } },
     { id: 'post', icon: '➕', label: { en: 'Post', ku: 'پۆست' }, action: () => { setActiveNav('post'); router.push('/post') } },
     { id: 'account', icon: '👤', label: { en: 'Account', ku: 'ئەکاونت' }, action: () => { setActiveNav('account'); router.push('/account') } },
   ]
@@ -90,8 +89,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Category tabs */}
-        <div style={{ display: 'flex', gap: 0, overflowX: 'auto', padding: '0 16px 12px', scrollbarWidth: 'none' }}>
+        {/* Category tabs + Journey button */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 0, overflowX: 'auto', padding: '0 16px 12px', scrollbarWidth: 'none' }}>
           {TABS.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
               padding: '8px 16px',
@@ -111,6 +110,33 @@ export default function Home() {
               {tab.label[lang]}
             </button>
           ))}
+
+          {/* Divider */}
+          <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.2)', margin: '0 8px', flexShrink: 0 }} />
+
+          {/* Journey — distinct pill button */}
+          <button
+            onClick={() => router.push('/journey')}
+            style={{
+              padding: '7px 14px',
+              background: 'linear-gradient(135deg, #FF6B35, #FF8C61)',
+              border: 'none',
+              borderRadius: 20,
+              color: '#fff',
+              fontWeight: 800,
+              fontSize: 13,
+              cursor: 'pointer',
+              fontFamily: FONT,
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
+              boxShadow: '0 2px 10px rgba(255,107,53,0.4)',
+            }}
+          >
+            🗺️ {lang === 'en' ? 'Journey' : 'گەشت'}
+          </button>
         </div>
       </div>
 
@@ -144,7 +170,6 @@ export default function Home() {
 
             return (
               <div key={listing.id} onClick={() => router.push(`/listing/${listing.id}`)} style={{ background: "#fff", borderRadius: 16, marginBottom: 12, cursor: "pointer", border: '1.5px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', overflow: 'hidden' }}>
-                {/* SOLD / FILLED banner */}
                 <div style={{ position: 'relative' }}>
                   {img
                     ? <img src={img} alt={title} style={{ width: '100%', height: 180, objectFit: 'cover', filter: (listing.status === 'sold' || listing.status === 'filled') ? 'brightness(0.5)' : 'none' }} />
@@ -249,20 +274,6 @@ export default function Home() {
                 boxShadow: '0 4px 16px rgba(255,107,53,0.5)',
               }}>
                 ➕
-              </div>
-            ) : item.id === 'journey' ? (
-              <div style={{
-                width: 38,
-                height: 38,
-                background: activeNav === 'journey' ? 'linear-gradient(135deg, #1A2B5F, #2D4A9E)' : 'rgba(26,43,95,0.08)',
-                borderRadius: 12,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 18,
-                transition: 'all 0.2s',
-              }}>
-                🗺️
               </div>
             ) : (
               <span style={{ fontSize: 20 }}>{item.icon}</span>
