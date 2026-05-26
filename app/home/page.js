@@ -145,15 +145,22 @@ export default function Home() {
               <div key={listing.id} onClick={() => router.push(`/listing/${listing.id}`)} style={{ background: "#fff", borderRadius: 16, marginBottom: 12, cursor: "pointer", border: '1.5px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', overflow: 'hidden' }}>
                 {/* SOLD / FILLED banner */}
                 <div style={{ position: 'relative' }}>
-                  {img && <img src={img} alt={title} style={{ width: '100%', height: 180, objectFit: 'cover', filter: (listing.status === 'sold' || listing.status === 'filled') ? 'brightness(0.7)' : 'none' }} />}
+                  {img 
+                    ? <img src={img} alt={title} style={{ width: '100%', height: 180, objectFit: 'cover', filter: (listing.status === 'sold' || listing.status === 'filled') ? 'brightness(0.5)' : 'none' }} />
+                    : (listing.status === 'sold' || listing.status === 'filled') && (
+                      <div style={{ background: listing.status === 'sold' ? '#EF4444' : '#22C55E', padding: '10px', textAlign: 'center', color: '#fff', fontWeight: 900, fontSize: 16, letterSpacing: 2 }}>
+                        {listing.status === 'sold' ? (lang === 'ku' ? 'فرۆشراوە' : 'SOLD') : (lang === 'ku' ? 'پڕکراوە' : 'FILLED')}
+                      </div>
+                    )
+                  }
                   {listing.status === 'sold' && (
-                    <div style={{ position: 'absolute', top: img ? '50%' : 0, left: '50%', transform: img ? 'translate(-50%, -50%)' : 'translateX(-50%)', background: '#EF4444', color: '#fff', fontWeight: 900, fontSize: 22, padding: '8px 24px', borderRadius: 10, letterSpacing: 2, boxShadow: '0 4px 16px rgba(0,0,0,0.3)', marginTop: img ? 0 : 12 }}>
-                      SOLD
+                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: '#EF4444', color: '#fff', fontWeight: 900, fontSize: 22, padding: '8px 24px', borderRadius: 10, letterSpacing: 2, boxShadow: '0 4px 16px rgba(0,0,0,0.3)', whiteSpace: 'nowrap' }}>
+                      {lang === 'ku' ? 'فرۆشراوە' : 'SOLD'}
                     </div>
                   )}
                   {listing.status === 'filled' && (
-                    <div style={{ position: 'absolute', top: img ? '50%' : 8, left: '50%', transform: img ? 'translate(-50%, -50%)' : 'translateX(-50%)', background: '#22C55E', color: '#fff', fontWeight: 900, fontSize: 22, padding: '8px 24px', borderRadius: 10, letterSpacing: 2, boxShadow: '0 4px 16px rgba(0,0,0,0.3)', marginTop: img ? 0 : 12 }}>
-                      FILLED
+                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: '#22C55E', color: '#fff', fontWeight: 900, fontSize: 22, padding: '8px 24px', borderRadius: 10, letterSpacing: 2, boxShadow: '0 4px 16px rgba(0,0,0,0.3)', whiteSpace: 'nowrap' }}>
+                      {lang === 'ku' ? 'پڕکراوە' : 'FILLED'}
                     </div>
                   )}
                 </div>
