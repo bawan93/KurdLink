@@ -23,8 +23,8 @@ function SellBusinessInner() {
 
   const isRtl = lang === 'ku'
   const T = {
-    en: { title: 'Sell Your Business', subtitle: 'Fill in the details and we\'ll review within 24 hours', name: 'Your Full Name', namePh: 'e.g. Ahmed Hassan', businessName: 'Business Name', businessNamePh: 'e.g. Ahmad & Co Grocers', city: 'City', cityPh: 'e.g. Leeds', postcode: 'Postcode', postcodePh: 'e.g. LS1 4AP', askingPrice: 'Asking Price (£)', askingPricePh: 'e.g. 50000', description: 'About the Business', descriptionPh: 'Describe the business, why you\'re selling, what\'s included…', phone: 'Phone Number', phonePh: '+44 7700 900000', email: 'Your Email Address', emailPh: 'you@example.com', emailNote: 'We\'ll email you within 24 hours once your listing is reviewed. Please also check your junk/spam folder.', images: 'Business Photos', imagesDesc: 'Upload up to 5 photos', submit: 'Submit for Review', submitting: 'Submitting…', back: '← Back', successTitle: 'Submitted! 🎉', successMsg: 'Your listing is under review. Check your email within 24 hours — and don\'t forget to check your junk folder!', backHome: 'Back to Home', errFill: 'Please fill in all required fields' },
-    ku: { title: 'بیزنسەکەت بفرۆشە', subtitle: 'زانیاریەکان پڕ بکەوە، ئێمەش لە ٢٤ کاتژمێردا پێداچوونەوەی دەکەین', name: 'ناوی تەواو', namePh: 'وەک: ئەحمەد حەسەن', businessName: 'ناوی بیزنس', businessNamePh: 'وەک: دوکانی ئەحمەد', city: 'شار', cityPh: 'وەک: لیدز', postcode: 'پۆستکۆد', postcodePh: 'وەک: LS1 4AP', askingPrice: 'نرخی داواکراو (£)', askingPricePh: 'وەک: ٥٠٠٠٠', description: 'دەربارەی بیزنس', descriptionPh: 'بیزنسەکە وەسف بکە…', phone: 'ژمارەی تەلەفۆن', phonePh: '+44 7700 900000', email: 'ئیمەیڵەکەت', emailPh: 'you@example.com', emailNote: 'ئێمە لە ماوەی ٢٤ کاتژمێردا ئیمەیڵت بۆ دەنێرین. تکایە فۆڵدەری جەنکی ئیمەیڵەکەت هەروەها سەیر بکە.', images: 'وێنەی بیزنس', imagesDesc: 'تا ٥ وێنە بار بکە', submit: 'بنێرە بۆ پێداچوونەوە', submitting: 'دەنێردرێت…', back: '→ گەڕانەوە', successTitle: '!دانرا 🎉', successMsg: 'داواکاریەکەت تەماشا دەکرێت. ئیمەیڵەکەت سەیر بکە لە ماوەی ٢٤ کاتژمێردا — فۆڵدەری جەنکیشت بچێکە!', backHome: 'گەڕانەوە بۆ ماڵەوە', errFill: 'تکایە هەموو خانەکان پڕ بکەوە' }
+    en: { title: 'Sell Your Business', subtitle: 'Fill in the details and we\'ll review within 24 hours', name: 'Your Full Name', namePh: 'e.g. Ahmed Hassan', businessName: 'Business Name', businessNamePh: 'e.g. Ahmad & Co Grocers', city: 'City', cityPh: 'e.g. Leeds', postcode: 'Postcode', postcodePh: 'e.g. LS1 4AP', askingPrice: 'Asking Price (£)', askingPricePh: 'e.g. 50000', description: 'About the Business', descriptionPh: 'Describe the business, why you\'re selling, what\'s included…', phone: 'Phone Number', phonePh: '+44 7700 900000', email: 'Your Email Address', emailPh: 'you@example.com', emailNote: 'You can track your listing status in your Account page.', images: 'Business Photos', imagesDesc: 'Upload up to 5 photos', submit: 'Submit for Review', submitting: 'Submitting…', back: '← Back', successTitle: 'Submitted! 🎉', successMsg: 'Your business listing is under review. You can track its status in your Account page.', backHome: 'View My Listings', errFill: 'Please fill in all required fields' },
+    ku: { title: 'بیزنسەکەت بفرۆشە', subtitle: 'زانیاریەکان پڕ بکەوە، ئێمەش لە ٢٤ کاتژمێردا پێداچوونەوەی دەکەین', name: 'ناوی تەواو', namePh: 'وەک: ئەحمەد حەسەن', businessName: 'ناوی بیزنس', businessNamePh: 'وەک: دوکانی ئەحمەد', city: 'شار', cityPh: 'وەک: لیدز', postcode: 'پۆستکۆد', postcodePh: 'وەک: LS1 4AP', askingPrice: 'نرخی داواکراو (£)', askingPricePh: 'وەک: ٥٠٠٠٠', description: 'دەربارەی بیزنس', descriptionPh: 'بیزنسەکە وەسف بکە…', phone: 'ژمارەی تەلەفۆن', phonePh: '+44 7700 900000', email: 'ئیمەیڵەکەت', emailPh: 'you@example.com', emailNote: 'دوای پەسەندکردن دەتوانیت لە پەیجی ئەکاونتەکەت بینیت.', images: 'وێنەی بیزنس', imagesDesc: 'تا ٥ وێنە بار بکە', submit: 'بنێرە بۆ پێداچوونەوە', submitting: 'دەنێردرێت…', back: '→ گەڕانەوە', successTitle: '!دانرا 🎉', successMsg: 'بیزنسەکەت تەماشا دەکرێت. دەتوانیت حاڵەتەکەی لە پەیجی ئەکاونتەکەت بچێکیت.', backHome: 'لیستەکانم ببینە', errFill: 'تکایە هەموو خانەکان پڕ بکەوە' }
   }
   const t = T[lang]
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
@@ -35,11 +35,16 @@ function SellBusinessInner() {
 
   const handleSubmit = async () => {
     setError('')
-    const { name, businessName, city, postcode, askingPrice, description, phone, email } = form
+    const { name, businessName, city, postcode, askingPrice, description, email } = form
     if (!name || !businessName || !city || !postcode || !askingPrice || !description || !email) return setError(t.errFill)
     setLoading(true)
     try {
       const supabase = getSupabase()
+
+      // Get logged in user
+      const { data: { session } } = await supabase.auth.getSession()
+      const userId = session?.user?.id
+
       const imageUrls = []
       for (const img of images) {
         const ext = img.name.split('.').pop()
@@ -50,7 +55,12 @@ function SellBusinessInner() {
           imageUrls.push(urlData.publicUrl)
         }
       }
-      const { error: e } = await supabase.from('listings').insert({ type: 'sell_business', status: 'pending', data: { ...form, imageUrls } })
+      const { error: e } = await supabase.from('listings').insert({
+        type: 'sell_business',
+        status: 'pending',
+        user_id: userId,
+        data: { ...form, imageUrls }
+      })
       if (e) throw e
       setSubmitted(true)
     } catch (err) { setError(err.message || 'Something went wrong.') }
@@ -62,7 +72,7 @@ function SellBusinessInner() {
       <div style={{ fontSize: 60, marginBottom: 20 }}>🎉</div>
       <h2 style={{ fontSize: 24, fontWeight: 800, color: NAVY, margin: '0 0 12px' }}>{t.successTitle}</h2>
       <p style={{ fontSize: 15, color: '#666', maxWidth: 320, lineHeight: 1.6, margin: '0 0 32px' }}>{t.successMsg}</p>
-      <button onClick={() => router.push('/home')} style={{ background: ORANGE, border: 'none', borderRadius: 14, padding: '14px 32px', color: '#fff', fontWeight: 700, fontSize: 15, cursor: 'pointer', fontFamily: FONT }}>{t.backHome}</button>
+      <button onClick={() => router.push('/account')} style={{ background: ORANGE, border: 'none', borderRadius: 14, padding: '14px 32px', color: '#fff', fontWeight: 700, fontSize: 15, cursor: 'pointer', fontFamily: FONT }}>{t.backHome}</button>
     </div>
   )
 
