@@ -67,6 +67,7 @@ export default function Home() {
 
   const NAV_ITEMS = [
     { id: 'home', icon: '🏠', label: { en: 'Home', ku: 'سەرەکی' }, action: () => { setActiveNav('home') } },
+    { id: 'journey', icon: '🗺️', label: { en: 'Journey', ku: 'گەشت' }, action: () => { setActiveNav('journey'); router.push('/journey') } },
     { id: 'post', icon: '➕', label: { en: 'Post', ku: 'پۆست' }, action: () => { setActiveNav('post'); router.push('/post') } },
     { id: 'account', icon: '👤', label: { en: 'Account', ku: 'ئەکاونت' }, action: () => { setActiveNav('account'); router.push('/account') } },
   ]
@@ -145,7 +146,7 @@ export default function Home() {
               <div key={listing.id} onClick={() => router.push(`/listing/${listing.id}`)} style={{ background: "#fff", borderRadius: 16, marginBottom: 12, cursor: "pointer", border: '1.5px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', overflow: 'hidden' }}>
                 {/* SOLD / FILLED banner */}
                 <div style={{ position: 'relative' }}>
-                  {img 
+                  {img
                     ? <img src={img} alt={title} style={{ width: '100%', height: 180, objectFit: 'cover', filter: (listing.status === 'sold' || listing.status === 'filled') ? 'brightness(0.5)' : 'none' }} />
                     : (listing.status === 'sold' || listing.status === 'filled') && (
                       <div style={{ background: listing.status === 'sold' ? '#EF4444' : '#22C55E', padding: '10px', textAlign: 'center', color: '#fff', fontWeight: 900, fontSize: 16, letterSpacing: 2 }}>
@@ -164,6 +165,7 @@ export default function Home() {
                     </div>
                   )}
                 </div>
+
                 {/* Type header band */}
                 <div style={{ background: meta.color, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontSize: 20 }}>{meta.icon}</span>
@@ -247,6 +249,20 @@ export default function Home() {
                 boxShadow: '0 4px 16px rgba(255,107,53,0.5)',
               }}>
                 ➕
+              </div>
+            ) : item.id === 'journey' ? (
+              <div style={{
+                width: 38,
+                height: 38,
+                background: activeNav === 'journey' ? 'linear-gradient(135deg, #1A2B5F, #2D4A9E)' : 'rgba(26,43,95,0.08)',
+                borderRadius: 12,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 18,
+                transition: 'all 0.2s',
+              }}>
+                🗺️
               </div>
             ) : (
               <span style={{ fontSize: 20 }}>{item.icon}</span>
