@@ -141,7 +141,7 @@ export default function Home() {
                   {lang === 'en' ? 'Your Guide' : 'ڕێنماکەت'}
                 </span>
                 <span style={{ display: 'block', fontSize: 11, fontWeight: 500, opacity: 0.85 }}>
-                  {lang === 'en' ? 'From arrival to British passport' : 'لە گەیشتن بۆ پاسپۆرتی بەریتانی'}
+                  {lang === 'en' ? 'Everything you need, step by step' : 'هەموو ئەوەی پێویستتە، هەنگاو بە هەنگاو'}
                 </span>
               </span>
             </span>
