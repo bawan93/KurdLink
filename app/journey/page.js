@@ -187,7 +187,7 @@ export default function JourneyPage() {
         {/* Journey / Info Tabs */}
         <div style={{ display: "flex", gap: 8 }}>
           <button onClick={() => setActiveTab("journey")} style={{ flex: 1, padding: "10px 0", borderRadius: 12, border: "none", background: activeTab === "journey" ? ORANGE : "rgba(255,255,255,0.12)", color: "#fff", fontWeight: 800, fontSize: 14, cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-            {lang === "en" ? "🗺️ My Journey" : lang === "ku" ? "🗺️ گەشتەکەم" : lang === "fa" ? "🗺️ سفر من" : "🗺️ رحلتي"}
+            {lang === "en" ? "📍 My Stage" : lang === "ku" ? "📍 قۆناغەکەم" : lang === "fa" ? "📍 مرحله من" : "📍 مرحلتي"}
           </button>
           <button onClick={() => setActiveTab("info")} style={{ flex: 1, padding: "10px 0", borderRadius: 12, border: "none", background: activeTab === "info" ? ORANGE : "rgba(255,255,255,0.12)", color: "#fff", fontWeight: 800, fontSize: 14, cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             {lang === "en" ? "📋 Info & Help" : lang === "ku" ? "📋 زانیاری و یارمەتی" : lang === "fa" ? "📋 اطلاعات و کمک" : "📋 معلومات ومساعدة"}
