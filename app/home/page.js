@@ -49,7 +49,12 @@ export default function Home() {
   const [listings, setListings] = useState([])
   const [loading, setLoading] = useState(true)
   const [activeNav, setActiveNav] = useState('home')
-  const isRtl = lang === 'ku'
+  const isRtl = lang !== 'en'
+
+  useEffect(() => {
+    const saved = localStorage.getItem('kurdlink_lang')
+    if (saved) setLang(saved)
+  }, [])
 
   useEffect(() => {
     fetchListings()
