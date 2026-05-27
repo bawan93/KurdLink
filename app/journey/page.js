@@ -168,10 +168,10 @@ export default function JourneyPage() {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
           <div>
             <div style={{ fontSize: 20, fontWeight: 900, color: "#fff", letterSpacing: -0.5 }}>
-              {lang === "en" && "Your Journey"}
-              {lang === "ku" && "گەشتەکەت"}
-              {lang === "fa" && "سفر تو"}
-              {lang === "ar" && "رحلتك"}
+              {lang === "en" && "Your Guide"}
+              {lang === "ku" && "ڕێنماکەت"}
+              {lang === "fa" && "راهنمای تو"}
+              {lang === "ar" && "دليلك"}
             </div>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", marginTop: 2 }}>KurdLink</div>
           </div>
