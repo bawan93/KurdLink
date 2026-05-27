@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const NAVY = "#1A2B5F";
 const ORANGE = "#FF6B35";
@@ -154,6 +154,11 @@ function InfoCard({ card, lang, stageColor }) {
 export default function JourneyPage() {
   const [lang, setLang] = useState("en");
   const [activeStage, setActiveStage] = useState("arrived");
+
+  useEffect(() => {
+    const saved = localStorage.getItem('kurdlink_lang')
+    if (saved) setLang(saved)
+  }, [])
   const [activeTab, setActiveTab] = useState("journey");
   const [activeStandalone, setActiveStandalone] = useState("health");
   const isRtl = lang !== "en";
