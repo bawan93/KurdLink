@@ -112,7 +112,7 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Journey Banner — always visible, full width */}
+        {/* Guide Banner — always visible, full width */}
         <div style={{ padding: '10px 16px 14px' }}>
           <button
             onClick={() => router.push('/journey')}
@@ -138,7 +138,7 @@ export default function Home() {
               <span style={{ fontSize: 20 }}>🗺️</span>
               <span>
                 <span style={{ display: 'block', fontSize: 14, fontWeight: 900 }}>
-                  {lang === 'en' ? 'Your Journey' : 'گەشتەکەت'}
+                  {lang === 'en' ? 'Your Guide' : 'ڕێنماکەت'}
                 </span>
                 <span style={{ display: 'block', fontSize: 11, fontWeight: 500, opacity: 0.85 }}>
                   {lang === 'en' ? 'From arrival to British passport' : 'لە گەیشتن بۆ پاسپۆرتی بەریتانی'}
