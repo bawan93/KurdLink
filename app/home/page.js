@@ -89,8 +89,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Category tabs + Journey button */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 0, overflowX: 'auto', padding: '0 16px 12px', scrollbarWidth: 'none' }}>
+        {/* Category filter tabs */}
+        <div style={{ display: 'flex', gap: 0, overflowX: 'auto', padding: '0 16px 0', scrollbarWidth: 'none' }}>
           {TABS.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
               padding: '8px 16px',
@@ -110,32 +110,42 @@ export default function Home() {
               {tab.label[lang]}
             </button>
           ))}
+        </div>
 
-          {/* Divider */}
-          <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.2)', margin: '0 8px', flexShrink: 0 }} />
-
-          {/* Journey — distinct pill button */}
+        {/* Journey Banner — always visible, full width */}
+        <div style={{ padding: '10px 16px 14px' }}>
           <button
             onClick={() => router.push('/journey')}
             style={{
-              padding: '7px 14px',
+              width: '100%',
+              padding: '11px 18px',
               background: 'linear-gradient(135deg, #FF6B35, #FF8C61)',
               border: 'none',
-              borderRadius: 20,
+              borderRadius: 14,
               color: '#fff',
               fontWeight: 800,
-              fontSize: 13,
+              fontSize: 14,
               cursor: 'pointer',
               fontFamily: FONT,
-              whiteSpace: 'nowrap',
-              flexShrink: 0,
               display: 'flex',
               alignItems: 'center',
-              gap: 5,
-              boxShadow: '0 2px 10px rgba(255,107,53,0.4)',
+              justifyContent: 'space-between',
+              boxShadow: '0 4px 16px rgba(255,107,53,0.35)',
+              boxSizing: 'border-box',
             }}
           >
-            🗺️ {lang === 'en' ? 'Journey' : 'گەشت'}
+            <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 20 }}>🗺️</span>
+              <span>
+                <span style={{ display: 'block', fontSize: 14, fontWeight: 900 }}>
+                  {lang === 'en' ? 'Your Journey' : 'گەشتەکەت'}
+                </span>
+                <span style={{ display: 'block', fontSize: 11, fontWeight: 500, opacity: 0.85 }}>
+                  {lang === 'en' ? 'From arrival to British passport' : 'لە گەیشتن بۆ پاسپۆرتی بەریتانی'}
+                </span>
+              </span>
+            </span>
+            <span style={{ fontSize: 18, opacity: 0.9 }}>›</span>
           </button>
         </div>
       </div>
