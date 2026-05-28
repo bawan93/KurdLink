@@ -23,7 +23,7 @@ export default function PostPage() {
   const router = useRouter()
   const [checking, setChecking] = useState(true)
   const [lang, setLang] = useState('en')
-  const isRtl = lang !== 'en'
+  
   const t = TX[lang] || TX.en
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export default function PostPage() {
   )
 
   return (
-    <div style={{ minHeight: '100vh', background: LIGHT_BG, fontFamily: FONT, direction: isRtl ? 'rtl' : 'ltr' }}>
+    <div style={{ minHeight: '100vh', background: LIGHT_BG, fontFamily: FONT, direction: 'ltr' }}>
       <style>{`@keyframes fadeIn { from { opacity:0; transform:translateY(16px) } to { opacity:1; transform:translateY(0) } }`}</style>
       <div style={{ background: NAVY, height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px' }}>
         <span onClick={() => router.push('/home')} style={{ color: '#fff', fontWeight: 800, fontSize: 20, cursor: 'pointer' }}>Kurd<span style={{ color: ORANGE }}>Link</span></span>

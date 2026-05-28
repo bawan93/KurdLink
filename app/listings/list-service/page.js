@@ -29,7 +29,7 @@ function ListServiceInner() {
   const [images, setImages] = useState([])
   const [form, setForm] = useState({ fullName: '', businessName: '', category: '', city: '', postcode: '', address: '', phone: '', whatsapp: '', website: '', experience: '', description: '' })
 
-  const isRtl = lang !== 'en'
+  
   const t = TX[lang] || TX.en
 
   useEffect(() => {
@@ -81,7 +81,7 @@ function ListServiceInner() {
   )
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f7f7f5', fontFamily: FONT, direction: isRtl ? 'rtl' : 'ltr' }}>
+    <div style={{ minHeight: '100vh', background: '#f7f7f5', fontFamily: FONT, direction: 'ltr' }}>
       <div style={{ background: NAVY, padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 10 }}>
         <button onClick={() => router.back()} style={{ background: 'none', border: 'none', color: '#fff', fontSize: 15, cursor: 'pointer', fontFamily: FONT, fontWeight: 600 }}>{t.back}</button>
         <div style={{ fontSize: 18, fontWeight: 800, background: ORANGE, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>KurdLink</div>

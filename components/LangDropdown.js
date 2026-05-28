@@ -2,14 +2,11 @@
 import { useState, useRef, useEffect } from 'react'
 
 const LANGS = [
-  { id: 'en', label: 'EN',      full: 'English', flag: '🇬🇧' },
-  { id: 'ku', label: 'کوردی',  full: 'Kurdish',  flag: '🏴' },
-  { id: 'fa', label: 'فارسی',  full: 'Farsi',    flag: '🇮🇷' },
-  { id: 'ar', label: 'عربي',   full: 'Arabic',   flag: '🇮🇶' },
+  { id: 'en', label: 'EN',     full: 'English', flag: '🇬🇧' },
+  { id: 'ku', label: 'کوردی', full: 'Kurdish',  flag: '🏴' },
+  { id: 'fa', label: 'فارسی', full: 'Farsi',    flag: '🇮🇷' },
+  { id: 'ar', label: 'عربي',  full: 'Arabic',   flag: '🇮🇶' },
 ]
-
-// Coloured dot fallback in case emoji flags don't render
-const FLAG_COLORS = { en: '#012169', ku: '#FF9800', fa: '#239f40', ar: '#000000' }
 
 export default function LangDropdown({ lang, onChange }) {
   const [open, setOpen] = useState(false)
@@ -30,22 +27,8 @@ export default function LangDropdown({ lang, onChange }) {
     setOpen(false)
   }
 
-  // Wrapper style — always LTR, always positioned top-right
-  // position:absolute + right:0 pins it regardless of page direction
   return (
-    <div
-      ref={ref}
-      style={{
-        position: 'absolute',
-        top: '50%',
-        right: 16,
-        transform: 'translateY(-50%)',
-        userSelect: 'none',
-        direction: 'ltr',
-        zIndex: 100,
-      }}
-    >
-      {/* Trigger button */}
+    <div ref={ref} style={{ position: 'relative', userSelect: 'none', direction: 'ltr' }}>
       <button
         onClick={() => setOpen(o => !o)}
         style={{
@@ -65,51 +48,35 @@ export default function LangDropdown({ lang, onChange }) {
         <span style={{ fontSize: 9, opacity: 0.7 }}>{open ? '▲' : '▼'}</span>
       </button>
 
-      {/* Dropdown — always anchored to right edge */}
       {open && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 'calc(100% + 8px)',
-            right: 0,
-            background: '#fff',
-            borderRadius: 14,
-            overflow: 'hidden',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
-            zIndex: 300,
-            minWidth: 160,
-            border: '1px solid rgba(0,0,0,0.08)',
-            direction: 'ltr',
-          }}
-        >
+        <div style={{
+          position: 'absolute', top: 'calc(100% + 8px)', right: 0,
+          background: '#fff', borderRadius: 14, overflow: 'hidden',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+          zIndex: 300, minWidth: 160,
+          border: '1px solid rgba(0,0,0,0.08)',
+          direction: 'ltr',
+        }}>
           {LANGS.map(l => (
             <button
               key={l.id}
               onClick={() => handleSelect(l.id)}
               style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 10,
+                width: '100%', display: 'flex', alignItems: 'center', gap: 10,
                 padding: '11px 16px',
                 background: lang === l.id ? '#FFF4F0' : '#fff',
                 border: 'none',
                 borderBottom: '1px solid rgba(0,0,0,0.05)',
-                cursor: 'pointer',
-                textAlign: 'left',
+                cursor: 'pointer', textAlign: 'left',
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
               }}
             >
               <span style={{ fontSize: 20, lineHeight: 1, flexShrink: 0 }}>{l.flag}</span>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: lang === l.id ? '#FF6B35' : '#1a1a1a' }}>
-                  {l.label}
-                </div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: lang === l.id ? '#FF6B35' : '#1a1a1a' }}>{l.label}</div>
                 <div style={{ fontSize: 11, color: '#aaa' }}>{l.full}</div>
               </div>
-              {lang === l.id && (
-                <span style={{ color: '#FF6B35', fontSize: 14, flexShrink: 0 }}>✓</span>
-              )}
+              {lang === l.id && <span style={{ color: '#FF6B35', fontSize: 14 }}>✓</span>}
             </button>
           ))}
         </div>

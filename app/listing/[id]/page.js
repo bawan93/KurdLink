@@ -43,7 +43,7 @@ export default function ListingDetail({ params }) {
   const [loading, setLoading] = useState(true)
   const [activeImage, setActiveImage] = useState(0)
   const [lang, setLang] = useState('en')
-  const isRtl = lang !== 'en'
+  
   const t = TX[lang] || TX.en
 
   useEffect(() => {
@@ -86,7 +86,7 @@ export default function ListingDetail({ params }) {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f7f7f5', fontFamily: FONT, direction: isRtl ? 'rtl' : 'ltr', paddingBottom: 100 }}>
+    <div style={{ minHeight: '100vh', background: '#f7f7f5', fontFamily: FONT, direction: 'ltr', paddingBottom: 100 }}>
       {/* Header */}
       <div style={{ background: NAVY, padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 20 }}>
         <button onClick={() => router.back()} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.8)', fontSize: 15, cursor: 'pointer', fontFamily: FONT, fontWeight: 600 }}>{t.back}</button>

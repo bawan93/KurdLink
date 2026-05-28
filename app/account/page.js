@@ -51,7 +51,7 @@ export default function AccountPage() {
   const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
   const router = useRouter()
   const [lang, setLang] = useState('en')
-  const isRtl = lang !== 'en'
+  
   const t = TX[lang] || TX.en
 
   const [mode, setMode] = useState('login')
@@ -144,7 +144,7 @@ export default function AccountPage() {
   )
 
   return (
-    <div style={{ minHeight: '100vh', background: LIGHT_BG, fontFamily: FONT, direction: isRtl ? 'rtl' : 'ltr' }}>
+    <div style={{ minHeight: '100vh', background: LIGHT_BG, fontFamily: FONT, direction: 'ltr' }}>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } } @keyframes fadeIn { from { opacity:0; transform:translateY(16px) } to { opacity:1; transform:translateY(0) } } * { box-sizing:border-box; } input,button { font-family:${FONT}; }`}</style>
 
       {/* Header */}
