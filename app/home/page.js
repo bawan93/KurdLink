@@ -90,7 +90,7 @@ export default function Home() {
 
       {/* Header */}
       <div style={{ background: NAVY, position: 'sticky', top: 0, zIndex: 20 }}>
-        <div style={{ padding: '14px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ padding: '14px 20px', display: 'flex', justifyContent: 'flex-start', alignItems: 'center', position: 'relative', minHeight: 52 }}>
           <div style={{ fontSize: 20, fontWeight: 900, background: ORANGE, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>KurdLink</div>
           <LangDropdown lang={lang} onChange={setLang} />
         </div>
