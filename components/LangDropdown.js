@@ -29,7 +29,9 @@ export default function LangDropdown({ lang, onChange }) {
   }
 
   return (
-    <div ref={ref} style={{ position: 'relative', userSelect: 'none' }}>
+    // direction: ltr forces this component to always sit on the right
+    // and open its dropdown to the right, regardless of page RTL direction
+    <div ref={ref} style={{ position: 'relative', userSelect: 'none', direction: 'ltr' }}>
       {/* Trigger */}
       <button
         onClick={() => setOpen(o => !o)}
@@ -47,13 +49,14 @@ export default function LangDropdown({ lang, onChange }) {
         <span style={{ fontSize: 10, opacity: 0.7, marginLeft: 2 }}>{open ? '▲' : '▼'}</span>
       </button>
 
-      {/* Dropdown */}
+      {/* Dropdown — always anchored to right edge of trigger */}
       {open && (
         <div style={{
           position: 'absolute', top: 'calc(100% + 8px)', right: 0,
           background: '#fff', borderRadius: 14, overflow: 'hidden',
           boxShadow: '0 8px 32px rgba(0,0,0,0.18)', zIndex: 200,
           minWidth: 160, border: '1px solid rgba(0,0,0,0.08)',
+          direction: 'ltr', // always LTR inside dropdown regardless of page direction
         }}>
           {LANGS.map(l => (
             <button
