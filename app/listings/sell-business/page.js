@@ -1,7 +1,8 @@
 'use client'
-import { useState, Suspense } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
+import LangDropdown from '@/components/LangDropdown'
 
 const FONT = "'Plus Jakarta Sans', 'Sora', sans-serif"
 const ORANGE = 'linear-gradient(135deg, #FF6B35, #FF8C61)'
@@ -11,56 +12,54 @@ function getSupabase() {
   return createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
 }
 
-function SellBusinessInner() {
+const JOB_TYPES = {
+  en: ['Full-Time', 'Part-Time', 'Temporary', 'Weekend Only', 'Flexible'],
+  ku: ['کاتی تەواو', 'نیوەکاتی', 'کاتی', 'ئەندێنە تەنها', 'نەرم'],
+  fa: ['تمام‌وقت', 'پاره‌وقت', 'موقت', 'آخر هفته', 'انعطاف‌پذیر'],
+  ar: ['دوام كامل', 'دوام جزئي', 'مؤقت', 'عطلة نهاية الأسبوع', 'مرن'],
+}
+
+const TX = {
+  en: { title: 'Hire Staff', subtitle: "Post a job vacancy and we'll review within 24 hours", companyName: 'Company / Business Name', companyNamePh: 'e.g. Hassan Takeaway', jobTitle: 'Job Title', jobTitlePh: 'e.g. Chef, Driver, Cashier', jobType: 'Job Type', selectType: 'Select job type…', salary: 'Salary / Pay Rate', salaryPh: 'e.g. £12/hr or £24,000/year', city: 'City', cityPh: 'e.g. Birmingham', postcode: 'Postcode', postcodePh: 'e.g. B1 1AA', description: 'Job Description', descriptionPh: 'Describe the role, responsibilities, requirements…', phone: 'Phone Number', phonePh: '+44 7700 900000', submit: 'Submit for Review', submitting: 'Submitting…', back: '← Back', successTitle: 'Job Posted! 🎉', successMsg: 'Your job listing is under review. Track its status in your Account page.', backHome: 'View My Listings', errFill: 'Please fill in all required fields' },
+  ku: { title: 'کرێکار بگرە', subtitle: 'شوێنی کارێکی بەتاڵ بڵاو بکەرەوە، ئێمەش لە ٢٤ کاتژمێردا پێداچوونەوەی دەکەین', companyName: 'ناوی کۆمپانیا / بیزنس', companyNamePh: 'وەک: رستەرانی حەسەن', jobTitle: 'ناوی کار', jobTitlePh: 'وەک: ئاشپەز، شۆفێر', jobType: 'جۆری کار', selectType: 'جۆری کار هەڵبژێرە…', salary: 'مووچە / کرێ', salaryPh: 'وەک: £12 کاتژمێر', city: 'شار', cityPh: 'وەک: بیرمینگەم', postcode: 'پۆستکۆد', postcodePh: 'وەک: B1 1AA', description: 'وەسفی کار', descriptionPh: 'کارەکە وەسف بکە…', phone: 'ژمارەی تەلەفۆن', phonePh: '+44 7700 900000', submit: 'بنێرە بۆ پێداچوونەوە', submitting: 'دەنێردرێت…', back: '→ گەڕانەوە', successTitle: '!کارەکە بڵاو کرایەوە 🎉', successMsg: 'داواکاریەکەت تەماشا دەکرێت.', backHome: 'لیستەکانم ببینە', errFill: 'تکایە هەموو خانەکان پڕ بکەوە' },
+  fa: { title: 'استخدام کارمند', subtitle: 'آگهی شغلی منتشر کن، ما ظرف ۲۴ ساعت بررسی می‌کنیم', companyName: 'نام شرکت / کسب‌وکار', companyNamePh: 'مثلاً رستوران حسن', jobTitle: 'عنوان شغل', jobTitlePh: 'مثلاً آشپز، راننده', jobType: 'نوع شغل', selectType: 'نوع شغل را انتخاب کن…', salary: 'حقوق / دستمزد', salaryPh: 'مثلاً ۱۲ پوند در ساعت', city: 'شهر', cityPh: 'مثلاً بیرمنگام', postcode: 'کد پستی', postcodePh: 'مثلاً B1 1AA', description: 'شرح شغل', descriptionPh: 'شغل را توصیف کن…', phone: 'شماره تلفن', phonePh: '+44 7700 900000', submit: 'ارسال برای بررسی', submitting: 'در حال ارسال…', back: '→ بازگشت', successTitle: 'آگهی منتشر شد! 🎉', successMsg: 'آگهی شغلی‌ات در حال بررسی است.', backHome: 'آگهی‌هایم', errFill: 'لطفاً همه فیلدهای ضروری را پر کن' },
+  ar: { title: 'توظيف موظفين', subtitle: 'انشر وظيفة شاغرة وسنراجع خلال ٢٤ ساعة', companyName: 'اسم الشركة / العمل', companyNamePh: 'مثلاً مطعم حسن', jobTitle: 'المسمى الوظيفي', jobTitlePh: 'مثلاً طاهٍ، سائق', jobType: 'نوع الوظيفة', selectType: 'اختر نوع الوظيفة…', salary: 'الراتب / الأجر', salaryPh: 'مثلاً ١٢ جنيهاً/ساعة', city: 'المدينة', cityPh: 'مثلاً برمنغهام', postcode: 'الرمز البريدي', postcodePh: 'مثلاً B1 1AA', description: 'وصف الوظيفة', descriptionPh: 'صف الوظيفة…', phone: 'رقم الهاتف', phonePh: '+44 7700 900000', submit: 'إرسال للمراجعة', submitting: 'جاري الإرسال…', back: '→ رجوع', successTitle: 'تم نشر الوظيفة! 🎉', successMsg: 'إعلان وظيفتك قيد المراجعة.', backHome: 'إعلاناتي', errFill: 'يرجى ملء جميع الحقول المطلوبة' },
+}
+
+function HireStaffInner() {
   const router = useRouter()
   const [lang, setLang] = useState('en')
   const [focus, setFocus] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [submitted, setSubmitted] = useState(false)
-  const [images, setImages] = useState([])
-  const [form, setForm] = useState({ name: '', businessName: '', city: '', postcode: '', askingPrice: '', description: '', phone: '', email: '' })
+  const [form, setForm] = useState({ companyName: '', jobTitle: '', jobType: '', salary: '', city: '', postcode: '', description: '', phone: '' })
 
-  const isRtl = lang === 'ku'
-  const T = {
-    en: { title: 'Sell Your Business', subtitle: 'Fill in the details and we\'ll review within 24 hours', name: 'Your Full Name', namePh: 'e.g. Ahmed Hassan', businessName: 'Business Name', businessNamePh: 'e.g. Ahmad & Co Grocers', city: 'City', cityPh: 'e.g. Leeds', postcode: 'Postcode', postcodePh: 'e.g. LS1 4AP', askingPrice: 'Asking Price (£)', askingPricePh: 'e.g. 50000', description: 'About the Business', descriptionPh: 'Describe the business, why you\'re selling, what\'s included…', phone: 'Phone Number', phonePh: '+44 7700 900000', email: 'Your Email Address', emailPh: 'you@example.com', emailNote: 'You can track your listing status in your Account page.', images: 'Business Photos', imagesDesc: 'Upload up to 5 photos', submit: 'Submit for Review', submitting: 'Submitting…', back: '← Back', successTitle: 'Submitted! 🎉', successMsg: 'Your business listing is under review. You can track its status in your Account page.', backHome: 'View My Listings', errFill: 'Please fill in all required fields' },
-    ku: { title: 'بیزنسەکەت بفرۆشە', subtitle: 'زانیاریەکان پڕ بکەوە، ئێمەش لە ٢٤ کاتژمێردا پێداچوونەوەی دەکەین', name: 'ناوی تەواو', namePh: 'وەک: ئەحمەد حەسەن', businessName: 'ناوی بیزنس', businessNamePh: 'وەک: دوکانی ئەحمەد', city: 'شار', cityPh: 'وەک: لیدز', postcode: 'پۆستکۆد', postcodePh: 'وەک: LS1 4AP', askingPrice: 'نرخی داواکراو (£)', askingPricePh: 'وەک: ٥٠٠٠٠', description: 'دەربارەی بیزنس', descriptionPh: 'بیزنسەکە وەسف بکە…', phone: 'ژمارەی تەلەفۆن', phonePh: '+44 7700 900000', email: 'ئیمەیڵەکەت', emailPh: 'you@example.com', emailNote: 'دوای پەسەندکردن دەتوانیت لە پەیجی ئەکاونتەکەت بینیت.', images: 'وێنەی بیزنس', imagesDesc: 'تا ٥ وێنە بار بکە', submit: 'بنێرە بۆ پێداچوونەوە', submitting: 'دەنێردرێت…', back: '→ گەڕانەوە', successTitle: '!دانرا 🎉', successMsg: 'بیزنسەکەت تەماشا دەکرێت. دەتوانیت حاڵەتەکەی لە پەیجی ئەکاونتەکەت بچێکیت.', backHome: 'لیستەکانم ببینە', errFill: 'تکایە هەموو خانەکان پڕ بکەوە' }
-  }
-  const t = T[lang]
+  const isRtl = lang !== 'en'
+  const t = TX[lang] || TX.en
+  const jobTypes = JOB_TYPES[lang] || JOB_TYPES.en
+
+  useEffect(() => {
+    const saved = localStorage.getItem('kurdlink_lang')
+    if (saved) setLang(saved)
+  }, [])
+
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
   const inp = (f) => ({ width: '100%', padding: '14px 16px', border: `2px solid ${focus === f ? '#FF6B35' : 'rgba(0,0,0,0.1)'}`, borderRadius: 14, fontSize: 15, fontFamily: FONT, outline: 'none', background: '#fff', color: '#1a1a1a', boxSizing: 'border-box', transition: 'border-color 0.2s', direction: 'ltr' })
-  const label = { display: 'block', fontSize: 13, fontWeight: 700, color: '#444', marginBottom: 6 }
-
-  const handleImages = (e) => setImages(Array.from(e.target.files).slice(0, 5))
+  const labelStyle = { display: 'block', fontSize: 13, fontWeight: 700, color: '#444', marginBottom: 6 }
 
   const handleSubmit = async () => {
     setError('')
-    const { name, businessName, city, postcode, askingPrice, description, email } = form
-    if (!name || !businessName || !city || !postcode || !askingPrice || !description || !email) return setError(t.errFill)
+    const { companyName, jobTitle, jobType, salary, city, postcode, description, phone } = form
+    if (!companyName || !jobTitle || !jobType || !salary || !city || !postcode || !description || !phone) return setError(t.errFill)
     setLoading(true)
     try {
       const supabase = getSupabase()
-
-      // Get logged in user
       const { data: { session } } = await supabase.auth.getSession()
       const userId = session?.user?.id
-
-      const imageUrls = []
-      for (const img of images) {
-        const ext = img.name.split('.').pop()
-        const path = `listings/public/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-        const { error: uploadError } = await supabase.storage.from('listing-images').upload(path, img)
-        if (!uploadError) {
-          const { data: urlData } = supabase.storage.from('listing-images').getPublicUrl(path)
-          imageUrls.push(urlData.publicUrl)
-        }
-      }
-      const { error: e } = await supabase.from('listings').insert({
-        type: 'sell_business',
-        status: 'pending',
-        user_id: userId,
-        data: { ...form, imageUrls }
-      })
+      const userName = session?.user?.user_metadata?.full_name || ''
+      const userEmail = session?.user?.email || ''
+      const { error: e } = await supabase.from('listings').insert({ type: 'hire_staff', status: 'pending', user_id: userId, data: { ...form, name: userName, email: userEmail } })
       if (e) throw e
       setSubmitted(true)
     } catch (err) { setError(err.message || 'Something went wrong.') }
@@ -81,62 +80,34 @@ function SellBusinessInner() {
       <div style={{ background: NAVY, padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 10 }}>
         <button onClick={() => router.back()} style={{ background: 'none', border: 'none', color: '#fff', fontSize: 15, cursor: 'pointer', fontFamily: FONT, fontWeight: 600 }}>{t.back}</button>
         <div style={{ fontSize: 18, fontWeight: 800, background: ORANGE, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>KurdLink</div>
-        <div style={{ display: 'flex', gap: 4, background: 'rgba(255,255,255,0.1)', padding: '4px 6px', borderRadius: 20 }}>
-          {['en', 'ku'].map(l => (<button key={l} onClick={() => setLang(l)} style={{ padding: '5px 12px', background: lang === l ? '#fff' : 'transparent', color: lang === l ? NAVY : 'rgba(255,255,255,0.7)', border: 'none', borderRadius: 16, fontWeight: 700, fontSize: 11, cursor: 'pointer', fontFamily: FONT }}>{l === 'en' ? 'EN' : 'KU'}</button>))}
-        </div>
+        <LangDropdown lang={lang} onChange={setLang} />
       </div>
       <div style={{ maxWidth: 480, margin: '0 auto', padding: '24px 20px 60px', boxSizing: 'border-box' }}>
         <div style={{ marginBottom: 28 }}>
-          <div style={{ fontSize: 32, marginBottom: 8 }}>💼</div>
+          <div style={{ fontSize: 32, marginBottom: 8 }}>👥</div>
           <h1 style={{ fontSize: 24, fontWeight: 800, color: NAVY, margin: '0 0 6px' }}>{t.title}</h1>
           <p style={{ fontSize: 13, color: '#888', margin: 0, lineHeight: 1.5 }}>{t.subtitle}</p>
         </div>
         {error && <div style={{ background: '#fff0f0', border: '1.5px solid #ffcdd2', borderRadius: 12, padding: '12px 16px', fontSize: 13, fontWeight: 600, color: '#c62828', marginBottom: 16 }}>{error}</div>}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div>
-            <label style={label}>{t.name} *</label>
-            <input type="text" value={form.name} onChange={e => set('name', e.target.value)} placeholder={t.namePh} onFocus={() => setFocus('name')} onBlur={() => setFocus(null)} style={inp('name')} />
-          </div>
-          <div>
-            <label style={label}>{t.businessName} *</label>
-            <input type="text" value={form.businessName} onChange={e => set('businessName', e.target.value)} placeholder={t.businessNamePh} onFocus={() => setFocus('businessName')} onBlur={() => setFocus(null)} style={inp('businessName')} />
-          </div>
+          <div><label style={labelStyle}>{t.companyName} *</label><input type="text" value={form.companyName} onChange={e => set('companyName', e.target.value)} placeholder={t.companyNamePh} onFocus={() => setFocus('companyName')} onBlur={() => setFocus(null)} style={inp('companyName')} /></div>
+          <div><label style={labelStyle}>{t.jobTitle} *</label><input type="text" value={form.jobTitle} onChange={e => set('jobTitle', e.target.value)} placeholder={t.jobTitlePh} onFocus={() => setFocus('jobTitle')} onBlur={() => setFocus(null)} style={inp('jobTitle')} /></div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
-              <label style={label}>{t.city} *</label>
-              <input type="text" value={form.city} onChange={e => set('city', e.target.value)} placeholder={t.cityPh} onFocus={() => setFocus('city')} onBlur={() => setFocus(null)} style={inp('city')} />
+              <label style={labelStyle}>{t.jobType} *</label>
+              <select value={form.jobType} onChange={e => set('jobType', e.target.value)} style={{ ...inp('jobType'), appearance: 'none', WebkitAppearance: 'none', cursor: 'pointer' }}>
+                <option value="">{t.selectType}</option>
+                {jobTypes.map((j, i) => <option key={i} value={JOB_TYPES.en[i]}>{j}</option>)}
+              </select>
             </div>
-            <div>
-              <label style={label}>{t.postcode} *</label>
-              <input type="text" value={form.postcode} onChange={e => set('postcode', e.target.value)} placeholder={t.postcodePh} onFocus={() => setFocus('postcode')} onBlur={() => setFocus(null)} style={inp('postcode')} />
-            </div>
+            <div><label style={labelStyle}>{t.salary} *</label><input type="text" value={form.salary} onChange={e => set('salary', e.target.value)} placeholder={t.salaryPh} onFocus={() => setFocus('salary')} onBlur={() => setFocus(null)} style={inp('salary')} /></div>
           </div>
-          <div>
-            <label style={label}>{t.askingPrice} *</label>
-            <input type="number" value={form.askingPrice} onChange={e => set('askingPrice', e.target.value)} placeholder={t.askingPricePh} onFocus={() => setFocus('askingPrice')} onBlur={() => setFocus(null)} style={inp('askingPrice')} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div><label style={labelStyle}>{t.city} *</label><input type="text" value={form.city} onChange={e => set('city', e.target.value)} placeholder={t.cityPh} onFocus={() => setFocus('city')} onBlur={() => setFocus(null)} style={inp('city')} /></div>
+            <div><label style={labelStyle}>{t.postcode} *</label><input type="text" value={form.postcode} onChange={e => set('postcode', e.target.value)} placeholder={t.postcodePh} onFocus={() => setFocus('postcode')} onBlur={() => setFocus(null)} style={inp('postcode')} /></div>
           </div>
-          <div>
-            <label style={label}>{t.description} *</label>
-            <textarea value={form.description} onChange={e => set('description', e.target.value)} placeholder={t.descriptionPh} onFocus={() => setFocus('description')} onBlur={() => setFocus(null)} rows={4} style={{ ...inp('description'), resize: 'vertical', lineHeight: 1.5 }} />
-          </div>
-          <div>
-            <label style={label}>{t.phone}</label>
-            <input type="tel" value={form.phone} onChange={e => set('phone', e.target.value)} placeholder={t.phonePh} onFocus={() => setFocus('phone')} onBlur={() => setFocus(null)} style={inp('phone')} />
-          </div>
-          <div>
-            <label style={label}>{t.email} *</label>
-            <input type="email" value={form.email} onChange={e => set('email', e.target.value)} placeholder={t.emailPh} onFocus={() => setFocus('email')} onBlur={() => setFocus(null)} style={inp('email')} />
-            <p style={{ fontSize: 12, color: '#888', margin: '8px 0 0', lineHeight: 1.5, background: 'rgba(255,107,53,0.06)', padding: '10px 12px', borderRadius: 10, borderLeft: '3px solid #FF6B35' }}>📬 {t.emailNote}</p>
-          </div>
-          <div>
-            <label style={label}>{t.images}</label>
-            <p style={{ fontSize: 12, color: '#888', margin: '0 0 8px' }}>{t.imagesDesc}</p>
-            <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', border: '2px dashed rgba(0,0,0,0.15)', borderRadius: 14, background: '#fff', cursor: 'pointer', gap: 8 }}>
-              <span style={{ fontSize: 28 }}>📷</span>
-              <span style={{ fontSize: 13, color: '#666', fontWeight: 600 }}>{images.length > 0 ? `${images.length} photo(s) selected` : 'Tap to upload photos'}</span>
-              <input type="file" accept="image/jpeg,image/jpg,image/png,image/webp" multiple onChange={handleImages} style={{ display: 'none' }} />
-            </label>
-          </div>
+          <div><label style={labelStyle}>{t.description} *</label><textarea value={form.description} onChange={e => set('description', e.target.value)} placeholder={t.descriptionPh} onFocus={() => setFocus('description')} onBlur={() => setFocus(null)} rows={5} style={{ ...inp('description'), resize: 'vertical', lineHeight: 1.5 }} /></div>
+          <div><label style={labelStyle}>{t.phone} *</label><input type="tel" value={form.phone} onChange={e => set('phone', e.target.value)} placeholder={t.phonePh} onFocus={() => setFocus('phone')} onBlur={() => setFocus(null)} style={inp('phone')} /></div>
           <button onClick={handleSubmit} disabled={loading} style={{ width: '100%', padding: '15px', background: loading ? '#ccc' : ORANGE, border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 700, color: '#fff', cursor: loading ? 'default' : 'pointer', fontFamily: FONT, boxShadow: loading ? 'none' : '0 4px 16px rgba(255,107,53,0.35)', marginTop: 8 }}>
             {loading ? t.submitting : t.submit}
           </button>
@@ -146,10 +117,6 @@ function SellBusinessInner() {
   )
 }
 
-export default function SellBusiness() {
-  return (
-    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#f7f7f5' }} />}>
-      <SellBusinessInner />
-    </Suspense>
-  )
+export default function HireStaff() {
+  return <Suspense fallback={<div style={{ minHeight: '100vh', background: '#f7f7f5' }} />}><HireStaffInner /></Suspense>
 }

@@ -1,0 +1,82 @@
+// components/LangDropdown.js
+// Drop this in your components folder and import on every page
+'use client'
+import { useState, useRef, useEffect } from 'react'
+
+const NAVY = '#1A2B5F'
+const LANGS = [
+  { id: 'en', label: 'EN', full: 'English', flag: '🇬🇧' },
+  { id: 'ku', label: 'کوردی', full: 'Kurdish', flag: '🏴' },
+  { id: 'fa', label: 'فارسی', full: 'Farsi', flag: '🇮🇷' },
+  { id: 'ar', label: 'عربي', full: 'Arabic', flag: '🇮🇶' },
+]
+
+export default function LangDropdown({ lang, onChange }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+  const current = LANGS.find(l => l.id === lang) || LANGS[0]
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const handleSelect = (id) => {
+    localStorage.setItem('kurdlink_lang', id)
+    onChange(id)
+    setOpen(false)
+  }
+
+  return (
+    <div ref={ref} style={{ position: 'relative', userSelect: 'none' }}>
+      {/* Trigger */}
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 6,
+          padding: '6px 10px', background: 'rgba(255,255,255,0.12)',
+          border: '1px solid rgba(255,255,255,0.2)', borderRadius: 20,
+          color: '#fff', fontWeight: 700, fontSize: 12,
+          cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', sans-serif",
+          whiteSpace: 'nowrap',
+        }}
+      >
+        <span>{current.flag}</span>
+        <span>{current.label}</span>
+        <span style={{ fontSize: 10, opacity: 0.7, marginLeft: 2 }}>{open ? '▲' : '▼'}</span>
+      </button>
+
+      {/* Dropdown */}
+      {open && (
+        <div style={{
+          position: 'absolute', top: 'calc(100% + 8px)', right: 0,
+          background: '#fff', borderRadius: 14, overflow: 'hidden',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.18)', zIndex: 200,
+          minWidth: 160, border: '1px solid rgba(0,0,0,0.08)',
+        }}>
+          {LANGS.map(l => (
+            <button
+              key={l.id}
+              onClick={() => handleSelect(l.id)}
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                padding: '11px 16px', background: lang === l.id ? '#FFF4F0' : '#fff',
+                border: 'none', cursor: 'pointer', textAlign: 'left',
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                borderBottom: '1px solid rgba(0,0,0,0.05)',
+              }}
+            >
+              <span style={{ fontSize: 20 }}>{l.flag}</span>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: lang === l.id ? '#FF6B35' : '#1a1a1a' }}>{l.label}</div>
+                <div style={{ fontSize: 11, color: '#aaa' }}>{l.full}</div>
+              </div>
+              {lang === l.id && <span style={{ marginLeft: 'auto', color: '#FF6B35', fontSize: 14 }}>✓</span>}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
