@@ -1,13 +1,34 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
-import KurdishFlag from '@/components/KurdishFlag'
 
 const LANGS = [
-  { id: 'en', flag: '🇬🇧', name: 'EN',     full: 'English', isKurdish: false },
-  { id: 'ku', flag: null,   name: 'کوردی', full: 'Kurdish', isKurdish: true  },
-  { id: 'fa', flag: '🇮🇷', name: 'فارسی', full: 'Farsi',   isKurdish: false },
-  { id: 'ar', flag: '🇮🇶', name: 'عربي',  full: 'Arabic',  isKurdish: false },
+  { id: 'en', flag: '🇬🇧', name: 'EN',     full: 'English' },
+  { id: 'ku', flag: null,   name: 'کوردی', full: 'Kurdish' },
+  { id: 'fa', flag: '🇮🇷', name: 'فارسی', full: 'Farsi'   },
+  { id: 'ar', flag: '🇮🇶', name: 'عربي',  full: 'Arabic'  },
 ]
+
+function KurdFlag({ size = 22 }) {
+  const w = size * 1.5
+  const h = size
+  return (
+    <svg width={w} height={h} viewBox="0 0 90 60" style={{ borderRadius: 3, display: 'block', flexShrink: 0 }}>
+      <rect width="90" height="20" fill="#E30A17" />
+      <rect y="20" width="90" height="20" fill="#FFFFFF" />
+      <rect y="40" width="90" height="20" fill="#009C3B" />
+      <circle cx="45" cy="30" r="9" fill="#F7C200" />
+      {Array.from({ length: 21 }).map((_, i) => {
+        const angle = (i * 360 / 21) * Math.PI / 180
+        const x1 = 45 + Math.cos(angle) * 9
+        const y1 = 30 + Math.sin(angle) * 9
+        const x2 = 45 + Math.cos(angle) * 14
+        const y2 = 30 + Math.sin(angle) * 14
+        return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#F7C200" strokeWidth="1.5" />
+      })}
+      <circle cx="45" cy="30" r="5" fill="#E30A17" />
+    </svg>
+  )
+}
 
 export default function LangDropdown({ lang, onChange }) {
   const [open, setOpen] = useState(false)
@@ -30,7 +51,6 @@ export default function LangDropdown({ lang, onChange }) {
 
   return (
     <div ref={ref} style={{ position: 'relative', userSelect: 'none', direction: 'ltr' }}>
-      {/* Trigger */}
       <button
         onClick={() => setOpen(o => !o)}
         style={{
@@ -43,15 +63,14 @@ export default function LangDropdown({ lang, onChange }) {
           whiteSpace: 'nowrap',
         }}
       >
-        {current.isKurdish
-          ? <KurdishFlag size={16} />
+        {current.id === 'ku'
+          ? <KurdFlag size={16} />
           : <span style={{ fontSize: 16, lineHeight: 1 }}>{current.flag}</span>
         }
         <span>{current.name}</span>
         <span style={{ fontSize: 9, opacity: 0.7 }}>{open ? '▲' : '▼'}</span>
       </button>
 
-      {/* Dropdown */}
       {open && (
         <div style={{
           position: 'absolute', top: 'calc(100% + 8px)', right: 0,
@@ -75,8 +94,8 @@ export default function LangDropdown({ lang, onChange }) {
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
               }}
             >
-              {l.isKurdish
-                ? <KurdishFlag size={22} />
+              {l.id === 'ku'
+                ? <KurdFlag size={22} />
                 : <span style={{ fontSize: 22, lineHeight: 1, flexShrink: 0 }}>{l.flag}</span>
               }
               <div style={{ flex: 1 }}>
