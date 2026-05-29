@@ -1,3 +1,4 @@
+'use client'
 // components/KurdishFlag.js
 // Inline SVG of the Kurdish flag — red/white/green stripes with yellow sun
 
