@@ -1,11 +1,12 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
+import KurdishFlag from '@/components/KurdishFlag'
 
 const LANGS = [
-  { id: 'en', label: 'EN',     full: 'English', flag: '🇬🇧' },
-  { id: 'ku', label: 'کوردی', full: 'Kurdish',  flag: '🏴' },
-  { id: 'fa', label: 'فارسی', full: 'Farsi',    flag: '🇮🇷' },
-  { id: 'ar', label: 'عربي',  full: 'Arabic',   flag: '🇮🇶' },
+  { id: 'en', flag: '🇬🇧', name: 'EN',     full: 'English', isKurdish: false },
+  { id: 'ku', flag: null,   name: 'کوردی', full: 'Kurdish', isKurdish: true  },
+  { id: 'fa', flag: '🇮🇷', name: 'فارسی', full: 'Farsi',   isKurdish: false },
+  { id: 'ar', flag: '🇮🇶', name: 'عربي',  full: 'Arabic',  isKurdish: false },
 ]
 
 export default function LangDropdown({ lang, onChange }) {
@@ -29,6 +30,7 @@ export default function LangDropdown({ lang, onChange }) {
 
   return (
     <div ref={ref} style={{ position: 'relative', userSelect: 'none', direction: 'ltr' }}>
+      {/* Trigger */}
       <button
         onClick={() => setOpen(o => !o)}
         style={{
@@ -36,18 +38,20 @@ export default function LangDropdown({ lang, onChange }) {
           padding: '6px 10px',
           background: 'rgba(255,255,255,0.12)',
           border: '1px solid rgba(255,255,255,0.25)',
-          borderRadius: 20,
-          color: '#fff', fontWeight: 700, fontSize: 12,
-          cursor: 'pointer',
-          fontFamily: "'Plus Jakarta Sans', sans-serif",
+          borderRadius: 20, color: '#fff', fontWeight: 700, fontSize: 12,
+          cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', sans-serif",
           whiteSpace: 'nowrap',
         }}
       >
-        <span style={{ fontSize: 16, lineHeight: 1 }}>{current.flag}</span>
-        <span>{current.label}</span>
+        {current.isKurdish
+          ? <KurdishFlag size={16} />
+          : <span style={{ fontSize: 16, lineHeight: 1 }}>{current.flag}</span>
+        }
+        <span>{current.name}</span>
         <span style={{ fontSize: 9, opacity: 0.7 }}>{open ? '▲' : '▼'}</span>
       </button>
 
+      {/* Dropdown */}
       {open && (
         <div style={{
           position: 'absolute', top: 'calc(100% + 8px)', right: 0,
@@ -71,9 +75,12 @@ export default function LangDropdown({ lang, onChange }) {
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
               }}
             >
-              <span style={{ fontSize: 20, lineHeight: 1, flexShrink: 0 }}>{l.flag}</span>
+              {l.isKurdish
+                ? <KurdishFlag size={22} />
+                : <span style={{ fontSize: 22, lineHeight: 1, flexShrink: 0 }}>{l.flag}</span>
+              }
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: lang === l.id ? '#FF6B35' : '#1a1a1a' }}>{l.label}</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: lang === l.id ? '#FF6B35' : '#1a1a1a' }}>{l.name}</div>
                 <div style={{ fontSize: 11, color: '#aaa' }}>{l.full}</div>
               </div>
               {lang === l.id && <span style={{ color: '#FF6B35', fontSize: 14 }}>✓</span>}
