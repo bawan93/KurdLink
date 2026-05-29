@@ -13,11 +13,19 @@ function getSupabase() {
 }
 
 const TYPE_LABELS = {
-  sell_car: { label: 'Sell Car', icon: '🚗', color: '#00B4D8' },
+  sell_car:      { label: 'Sell Car',      icon: '🚗', color: '#00B4D8' },
   sell_business: { label: 'Sell Business', icon: '💼', color: '#FFB703' },
-  hire_staff: { label: 'Hire Staff', icon: '👥', color: '#06FFA5' },
-  list_service: { label: 'List Service', icon: '🎯', color: '#FF006E' },
+  hire_staff:    { label: 'Hire Staff',    icon: '👥', color: '#06FFA5' },
+  list_service:  { label: 'List Service',  icon: '🎯', color: '#FF006E' },
 }
+
+const FILTERS = [
+  { id: 'pending',  label: 'Pending',  color: '#FFB703' },
+  { id: 'approved', label: 'Approved', color: '#06FFA5' },
+  { id: 'rejected', label: 'Rejected', color: '#FF6B6B' },
+  { id: 'sold',     label: 'Sold',     color: '#aaa'    },
+  { id: 'filled',   label: 'Filled',   color: '#aaa'    },
+]
 
 function AdminInner() {
   const router = useRouter()
@@ -29,7 +37,7 @@ function AdminInner() {
   const [rejectReason, setRejectReason] = useState('')
   const [showReject, setShowReject] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
-  const [counts, setCounts] = useState({ pending: 0, approved: 0, rejected: 0 })
+  const [counts, setCounts] = useState({})
 
   useEffect(() => { checkAuth() }, [])
   useEffect(() => { if (authorized) fetchListings() }, [authorized, filter])
@@ -46,19 +54,17 @@ function AdminInner() {
     const supabase = getSupabase()
     const { data } = await supabase.from('listings').select('*').eq('status', filter).order('created_at', { ascending: false })
     setListings(data || [])
-    const statuses = ['pending', 'approved', 'rejected']
     const newCounts = {}
-    for (const s of statuses) {
-      const { count } = await supabase.from('listings').select('*', { count: 'exact', head: true }).eq('status', s)
-      newCounts[s] = count || 0
+    for (const f of FILTERS) {
+      const { count } = await supabase.from('listings').select('*', { count: 'exact', head: true }).eq('status', f.id)
+      newCounts[f.id] = count || 0
     }
     setCounts(newCounts)
   }
 
   const handleApprove = async (id) => {
     setActionLoading(true)
-    const supabase = getSupabase()
-    await supabase.from('listings').update({ status: 'approved' }).eq('id', id)
+    await getSupabase().from('listings').update({ status: 'approved' }).eq('id', id)
     setSelected(null)
     await fetchListings()
     setActionLoading(false)
@@ -67,11 +73,8 @@ function AdminInner() {
   const handleReject = async (id) => {
     if (!rejectReason.trim()) return
     setActionLoading(true)
-    const supabase = getSupabase()
-    await supabase.from('listings').update({ status: 'rejected', reject_reason: rejectReason }).eq('id', id)
-    setSelected(null)
-    setShowReject(false)
-    setRejectReason('')
+    await getSupabase().from('listings').update({ status: 'rejected', reject_reason: rejectReason }).eq('id', id)
+    setSelected(null); setShowReject(false); setRejectReason('')
     await fetchListings()
     setActionLoading(false)
   }
@@ -79,8 +82,7 @@ function AdminInner() {
   const handleDelete = async (id) => {
     if (!confirm('Permanently delete this listing?')) return
     setActionLoading(true)
-    const supabase = getSupabase()
-    await supabase.from('listings').delete().eq('id', id)
+    await getSupabase().from('listings').delete().eq('id', id)
     setSelected(null)
     await fetchListings()
     setActionLoading(false)
@@ -96,7 +98,6 @@ function AdminInner() {
 
   if (!authorized) return null
 
-  // Detail view
   if (selected) {
     const d = selected.data || {}
     const type = TYPE_LABELS[selected.type] || { label: selected.type, icon: '📋', color: '#888' }
@@ -117,7 +118,7 @@ function AdminInner() {
               <div style={{ fontSize: 18, fontWeight: 800, color: NAVY }}>{type.label}</div>
               <div style={{ fontSize: 12, color: '#888' }}>Submitted {formatDate(selected.created_at)}</div>
             </div>
-            <div style={{ marginLeft: 'auto', padding: '6px 14px', borderRadius: 20, background: selected.status === 'pending' ? '#FFF3E0' : selected.status === 'approved' ? '#E8F5E9' : '#FFEBEE', color: selected.status === 'pending' ? '#E65100' : selected.status === 'approved' ? '#2E7D32' : '#C62828', fontSize: 12, fontWeight: 700 }}>
+            <div style={{ marginLeft: 'auto', padding: '6px 14px', borderRadius: 20, background: selected.status === 'pending' ? '#FFF3E0' : selected.status === 'approved' ? '#E8F5E9' : selected.status === 'sold' || selected.status === 'filled' ? '#F3F4F6' : '#FFEBEE', color: selected.status === 'pending' ? '#E65100' : selected.status === 'approved' ? '#2E7D32' : selected.status === 'sold' || selected.status === 'filled' ? '#6B7280' : '#C62828', fontSize: 12, fontWeight: 700 }}>
               {selected.status.toUpperCase()}
             </div>
           </div>
@@ -142,7 +143,6 @@ function AdminInner() {
             ))}
           </div>
 
-          {/* Actions */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {selected.status === 'pending' && !showReject && (
               <>
@@ -168,6 +168,7 @@ function AdminInner() {
               </div>
             )}
 
+            {/* Delete always visible */}
             <button onClick={() => handleDelete(selected.id)} disabled={actionLoading} style={{ width: '100%', padding: '15px', background: '#333', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: FONT }}>
               🗑️ Delete Permanently
             </button>
@@ -177,7 +178,6 @@ function AdminInner() {
     )
   }
 
-  // List view
   return (
     <div style={{ minHeight: '100vh', background: '#f7f7f5', fontFamily: FONT }}>
       <div style={{ background: NAVY, padding: '16px 20px', position: 'sticky', top: 0, zIndex: 10 }}>
@@ -185,17 +185,23 @@ function AdminInner() {
           <div style={{ fontSize: 18, fontWeight: 800, background: ORANGE, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>KurdLink Admin</div>
           <button onClick={() => router.push('/home')} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: 12, cursor: 'pointer', fontFamily: FONT, fontWeight: 600, padding: '6px 12px', borderRadius: 20 }}>← App</button>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 16 }}>
-          {[{ label: 'Pending', count: counts.pending, color: '#FFB703' }, { label: 'Approved', count: counts.approved, color: '#06FFA5' }, { label: 'Rejected', count: counts.rejected, color: '#FF6B6B' }].map(s => (
-            <div key={s.label} style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 12, padding: '10px 8px', textAlign: 'center' }}>
-              <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.count}</div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>{s.label}</div>
+
+        {/* Counts */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6, marginBottom: 14 }}>
+          {FILTERS.map(f => (
+            <div key={f.id} style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 10, padding: '8px 4px', textAlign: 'center' }}>
+              <div style={{ fontSize: 18, fontWeight: 800, color: f.color }}>{counts[f.id] ?? 0}</div>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>{f.label}</div>
             </div>
           ))}
         </div>
-        <div style={{ display: 'flex', gap: 6 }}>
-          {['pending', 'approved', 'rejected'].map(f => (
-            <button key={f} onClick={() => setFilter(f)} style={{ flex: 1, padding: '8px', background: filter === f ? '#fff' : 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 700, color: filter === f ? NAVY : 'rgba(255,255,255,0.7)', cursor: 'pointer', fontFamily: FONT, textTransform: 'capitalize' }}>{f}</button>
+
+        {/* Filter tabs */}
+        <div style={{ display: 'flex', gap: 6, overflowX: 'auto', scrollbarWidth: 'none' }}>
+          {FILTERS.map(f => (
+            <button key={f.id} onClick={() => setFilter(f.id)} style={{ flexShrink: 0, padding: '7px 14px', background: filter === f.id ? '#fff' : 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 700, color: filter === f.id ? NAVY : 'rgba(255,255,255,0.7)', cursor: 'pointer', fontFamily: FONT }}>
+              {f.label} {counts[f.id] ? `(${counts[f.id]})` : ''}
+            </button>
           ))}
         </div>
       </div>
