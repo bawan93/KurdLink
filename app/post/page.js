@@ -23,7 +23,6 @@ export default function PostPage() {
   const router = useRouter()
   const [checking, setChecking] = useState(true)
   const [lang, setLang] = useState('en')
-  
   const t = TX[lang] || TX.en
 
   useEffect(() => {
@@ -36,9 +35,9 @@ export default function PostPage() {
   }, [])
 
   const options = [
-    { icon: '🚗', title: t.sellCar, desc: t.sellCarDesc, route: '/listings/sell-car' },
-    { icon: '🏢', title: t.sellBiz, desc: t.sellBizDesc, route: '/listings/sell-business' },
-    { icon: '👥', title: t.hireStaff, desc: t.hireStaffDesc, route: '/listings/hire-staff' },
+    { icon: '🚗', title: t.sellCar,     desc: t.sellCarDesc,     route: '/listings/sell-car' },
+    { icon: '🏢', title: t.sellBiz,     desc: t.sellBizDesc,     route: '/listings/sell-business' },
+    { icon: '👥', title: t.hireStaff,   desc: t.hireStaffDesc,   route: '/listings/hire-staff' },
     { icon: '🛠️', title: t.listService, desc: t.listServiceDesc, route: '/listings/list-service' },
   ]
 
@@ -53,7 +52,9 @@ export default function PostPage() {
     <div style={{ minHeight: '100vh', background: LIGHT_BG, fontFamily: FONT, direction: 'ltr' }}>
       <style>{`@keyframes fadeIn { from { opacity:0; transform:translateY(16px) } to { opacity:1; transform:translateY(0) } }`}</style>
       <div style={{ background: NAVY, height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px' }}>
-        <span onClick={() => router.push('/home')} style={{ color: '#fff', fontWeight: 800, fontSize: 20, cursor: 'pointer' }}>Kurd<span style={{ color: ORANGE }}>Link</span></span>
+        <span onClick={() => router.push('/home')} style={{ color: '#fff', fontWeight: 800, fontSize: 20, cursor: 'pointer' }}>
+          Kurd<span style={{ color: ORANGE }}>Link</span>
+        </span>
         <LangDropdown lang={lang} onChange={setLang} />
       </div>
       <div style={{ maxWidth: 560, margin: '0 auto', padding: '32px 16px', animation: 'fadeIn 0.4s ease' }}>
@@ -61,19 +62,23 @@ export default function PostPage() {
         <p style={{ fontSize: 14, color: '#888', marginBottom: 28 }}>{t.sub}</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {options.map(opt => (
-            <button key={opt.route} onClick={() => router.push(opt.route)} style={{ background: CARD_BG, border: `1.5px solid ${BORDER}`, borderRadius: 18, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 16, cursor: 'pointer', textAlign: isRtl ? 'right' : 'left', fontFamily: FONT, transition: 'all 0.2s' }}
+            <button
+              key={opt.route}
+              onClick={() => router.push(opt.route)}
+              style={{ background: CARD_BG, border: `1.5px solid ${BORDER}`, borderRadius: 18, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 16, cursor: 'pointer', textAlign: 'left', fontFamily: FONT, transition: 'all 0.2s' }}
               onMouseOver={e => { e.currentTarget.style.borderColor = ORANGE; e.currentTarget.style.background = '#FFF8F5' }}
-              onMouseOut={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.background = CARD_BG }}>
+              onMouseOut={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.background = CARD_BG }}
+            >
               <span style={{ fontSize: 32, flexShrink: 0 }}>{opt.icon}</span>
               <div>
                 <p style={{ fontWeight: 800, fontSize: 16, color: NAVY, marginBottom: 3 }}>{opt.title}</p>
                 <p style={{ fontSize: 13, color: '#888', margin: 0 }}>{opt.desc}</p>
               </div>
-              <span style={{ marginLeft: 'auto', color: '#ccc', fontSize: 20 }}>{isRtl ? '←' : '→'}</span>
+              <span style={{ marginLeft: 'auto', color: '#ccc', fontSize: 20 }}>→</span>
             </button>
           ))}
         </div>
       </div>
     </div>
   )
-} 
+}
