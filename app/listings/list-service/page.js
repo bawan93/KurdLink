@@ -54,16 +54,18 @@ function ListServiceInner() {
       const { data: { session } } = await supabase.auth.getSession()
       const userId = session?.user?.id
       const userEmail = session?.user?.email || ''
-      const imageUrls = []
-      for (const img of images) {
-        const ext = img.name.split('.').pop()
-        const path = `listings/public/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-        const { error: uploadError } = await supabase.storage.from('listing-images').upload(path, img)
-        if (!uploadError) {
-          const { data: urlData } = supabase.storage.from('listing-images').getPublicUrl(path)
-          imageUrls.push(urlData.publicUrl)
-        }
-      }
+      const imageUrls = await Promise.all(
+        images.map(async (img) => {
+          const ext = img.name.split('.').pop()
+          const path = `listings/public/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+          const { error: uploadError } = await supabase.storage.from('listing-images').upload(path, img)
+          if (!uploadError) {
+            const { data: urlData } = supabase.storage.from('listing-images').getPublicUrl(path)
+            return urlData.publicUrl
+          }
+          return null
+        })
+      ).then(urls => urls.filter(Boolean))
       const { error: e } = await supabase.from('listings').insert({ type: 'list_service', status: 'pending', user_id: userId, data: { ...form, imageUrls, email: userEmail } })
       if (e) throw e
       setSubmitted(true)

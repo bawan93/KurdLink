@@ -13,25 +13,24 @@ function getSupabase() {
 }
 
 const TABS = [
-  { id: 'all',           label: { en: 'All',       ku: 'هەموو',        fa: 'همه',      ar: 'الكل'     } },
   { id: 'list_service',  label: { en: 'Services',   ku: 'خزمەتگوزاری', fa: 'خدمات',    ar: 'الخدمات'  } },
-  { id: 'hire_staff',    label: { en: 'Jobs',       ku: 'کار',          fa: 'مشاغل',    ar: 'الوظائف'  } },
-  { id: 'sell_car',      label: { en: 'Cars',       ku: 'ئۆتۆمبێل',    fa: 'ماشین‌ها', ar: 'السيارات' } },
-  { id: 'sell_business', label: { en: 'Businesses', ku: 'بیزنس',        fa: 'الأعمال',  ar: 'الأعمال'  } },
+  { id: 'hire_staff',    label: { en: 'Jobs',        ku: 'کار',          fa: 'مشاغل',    ar: 'الوظائف'  } },
+  { id: 'sell_car',      label: { en: 'Cars',        ku: 'ئۆتۆمبێل',    fa: 'ماشین‌ها', ar: 'السيارات' } },
+  { id: 'sell_business', label: { en: 'Businesses',  ku: 'بیزنس',        fa: 'الأعمال',  ar: 'الأعمال'  } },
 ]
 
 const TYPE_META = {
-  list_service:  { icon: '🎯', color: '#FF006E', label: { en: 'Service',  ku: 'خزمەتگوزاری', fa: 'خدمت',       ar: 'خدمة'       } },
+  list_service:  { icon: '🎯', color: '#FF006E', label: { en: 'Service',  ku: 'خزمەتگوزاری', fa: 'خدمت',      ar: 'خدمة'       } },
   hire_staff:    { icon: '👥', color: '#06D6A0', label: { en: 'Job',      ku: 'کار',          fa: 'شغل',        ar: 'وظيفة'      } },
   sell_car:      { icon: '🚗', color: '#00B4D8', label: { en: 'Car',      ku: 'ئۆتۆمبێل',    fa: 'ماشین',      ar: 'سيارة'      } },
   sell_business: { icon: '💼', color: '#FFB703', label: { en: 'Business', ku: 'بیزنس',        fa: 'کسب‌وکار',   ar: 'عمل تجاري' } },
 }
 
 const TX = {
-  en: { noListings: 'No listings yet', noListingsSub: 'Be the first to post something', postSomething: '+ Post Something', loading: 'Loading…', guide: 'Your Guide', guideSub: 'Everything you need, step by step', call: 'Call', home: 'Home', post: 'Post', account: 'Account', sold: 'SOLD', filled: 'FILLED' },
-  ku: { noListings: 'هێشتا هیچ لیستێک نییە', noListingsSub: 'یەکەمین بە و شتێک پۆست بکە', postSomething: '+ شتێک پۆست بکە', loading: 'چاوەڕوانبە…', guide: 'ڕێنماکەت', guideSub: 'هەموو ئەوەی پێویستتە، هەنگاو بە هەنگاو', call: 'پەیوەندی', home: 'سەرەکی', post: 'پۆست', account: 'ئەکاونت', sold: 'فرۆشراوە', filled: 'پڕکراوە' },
-  fa: { noListings: 'هنوز آگهی‌ای نیست', noListingsSub: 'اولین نفر باش و چیزی پست کن', postSomething: '+ ثبت آگهی', loading: 'در حال بارگذاری…', guide: 'راهنمای تو', guideSub: 'هر آنچه نیاز داری، قدم به قدم', call: 'تماس', home: 'خانه', post: 'پست', account: 'حساب', sold: 'فروخته شد', filled: 'پر شد' },
-  ar: { noListings: 'لا توجد إعلانات بعد', noListingsSub: 'كن أول من ينشر شيئاً', postSomething: '+ نشر إعلان', loading: 'جاري التحميل…', guide: 'دليلك', guideSub: 'كل ما تحتاجه خطوة بخطوة', call: 'اتصال', home: 'الرئيسية', post: 'نشر', account: 'حسابي', sold: 'مُباع', filled: 'مكتمل' },
+  en: { noListings: 'No listings yet', noListingsSub: 'Be the first to post something', postSomething: '+ Post Something', loading: 'Loading…', call: 'Call', home: 'Home', post: 'Post', account: 'Account', sold: 'SOLD', filled: 'FILLED', reber: 'Rêber', reberSub: 'ڕێبەر — Your guide to life in the UK' },
+  ku: { noListings: 'هێشتا هیچ لیستێک نییە', noListingsSub: 'یەکەمین بە و شتێک پۆست بکە', postSomething: '+ شتێک پۆست بکە', loading: 'چاوەڕوانبە…', call: 'پەیوەندی', home: 'سەرەکی', post: 'پۆست', account: 'ئەکاونت', sold: 'فرۆشراوە', filled: 'پڕکراوە', reber: 'ڕێبەر', reberSub: 'ڕێنمای ژیانت لە UK' },
+  fa: { noListings: 'هنوز آگهی‌ای نیست', noListingsSub: 'اولین نفر باش و چیزی پست کن', postSomething: '+ ثبت آگهی', loading: 'در حال بارگذاری…', call: 'تماس', home: 'خانه', post: 'پست', account: 'حساب', sold: 'فروخته شد', filled: 'پر شد', reber: 'ڕێبەر', reberSub: 'راهنمای زندگی در بریتانیا' },
+  ar: { noListings: 'لا توجد إعلانات بعد', noListingsSub: 'كن أول من ينشر شيئاً', postSomething: '+ نشر إعلان', loading: 'جاري التحميل…', call: 'اتصال', home: 'الرئيسية', post: 'نشر', account: 'حسابي', sold: 'مُباع', filled: 'مكتمل', reber: 'ڕێبەر', reberSub: 'دليلك للحياة في المملكة المتحدة' },
 }
 
 function getTitle(type, data) {
@@ -84,22 +83,21 @@ export default function Home() {
     { id: 'account', icon: '👤', action: () => { setActiveNav('account'); router.push('/account') } },
   ]
 
-  // direction is ALWAYS ltr — layout never flips, only text content translates
   return (
     <div style={{ minHeight: '100vh', minHeight: '100dvh', background: '#f7f7f5', fontFamily: FONT, direction: 'ltr', paddingBottom: 80 }}>
 
-      {/* Header — always LTR */}
+      {/* Header */}
       <div style={{ background: NAVY, position: 'sticky', top: 0, zIndex: 20, direction: 'ltr' }}>
         <div style={{ padding: '14px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ fontSize: 20, fontWeight: 900, background: ORANGE, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>KurdLink</div>
           <LangDropdown lang={lang} onChange={setLang} />
         </div>
 
-        {/* Category tabs */}
-        <div style={{ display: 'flex', overflowX: 'auto', padding: '0 16px 0', scrollbarWidth: 'none', direction: 'ltr' }}>
+        {/* Tab bar — Services Jobs Cars Businesses Rêber */}
+        <div style={{ display: 'flex', overflowX: 'auto', padding: '0 12px 0', scrollbarWidth: 'none', direction: 'ltr' }}>
           {TABS.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
-              padding: '8px 16px',
+              padding: '8px 14px',
               background: activeTab === tab.id ? 'rgba(255,255,255,0.15)' : 'transparent',
               border: 'none', borderRadius: 20,
               color: activeTab === tab.id ? '#fff' : 'rgba(255,255,255,0.55)',
@@ -111,28 +109,28 @@ export default function Home() {
               {tab.label[lang] || tab.label.en}
             </button>
           ))}
-        </div>
 
-        {/* Guide Banner */}
-        <div style={{ padding: '10px 16px 14px', direction: 'ltr' }}>
-          <button onClick={() => router.push('/journey')} style={{
-            width: '100%', padding: '11px 18px',
-            background: 'linear-gradient(135deg, #FF6B35, #FF8C61)',
-            border: 'none', borderRadius: 14, color: '#fff',
-            fontWeight: 800, fontSize: 14, cursor: 'pointer', fontFamily: FONT,
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            boxShadow: '0 4px 16px rgba(255,107,53,0.35)', boxSizing: 'border-box',
-          }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 20 }}>🗺️</span>
-              <span>
-                <span style={{ display: 'block', fontSize: 14, fontWeight: 900 }}>{t.guide}</span>
-                <span style={{ display: 'block', fontSize: 11, fontWeight: 500, opacity: 0.85 }}>{t.guideSub}</span>
-              </span>
-            </span>
-            <span style={{ fontSize: 18, opacity: 0.9 }}>›</span>
+          {/* Divider */}
+          <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.2)', margin: 'auto 6px', flexShrink: 0 }} />
+
+          {/* Rêber tab — distinct style */}
+          <button
+            onClick={() => { setActiveTab('reber'); router.push('/reber') }}
+            style={{
+              padding: '8px 14px',
+              background: activeTab === 'reber' ? 'rgba(255,107,53,0.3)' : 'transparent',
+              border: 'none', borderRadius: 20,
+              color: '#FF8C61',
+              fontWeight: 800, fontSize: 13,
+              cursor: 'pointer', fontFamily: FONT, whiteSpace: 'nowrap', flexShrink: 0,
+              borderBottom: activeTab === 'reber' ? '2px solid #FF6B35' : '2px solid transparent',
+              transition: 'all 0.2s',
+            }}
+          >
+            🧭 {t.reber}
           </button>
         </div>
+        <div style={{ height: 12 }} />
       </div>
 
       {/* Listings */}
@@ -155,6 +153,7 @@ export default function Home() {
           listings.map(listing => {
             const d = listing.data || {}
             const meta = TYPE_META[listing.type]
+            if (!meta) return null
             const img = d.imageUrls?.[0]
             const title = getTitle(listing.type, d)
             const subtitle = getSubtitle(listing.type, d)
@@ -173,18 +172,13 @@ export default function Home() {
                     )
                   }
                   {isSold && img && (
-                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: '#EF4444', color: '#fff', fontWeight: 900, fontSize: 22, padding: '8px 24px', borderRadius: 10, letterSpacing: 2, boxShadow: '0 4px 16px rgba(0,0,0,0.3)', whiteSpace: 'nowrap' }}>
-                      {t.sold}
-                    </div>
+                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: '#EF4444', color: '#fff', fontWeight: 900, fontSize: 22, padding: '8px 24px', borderRadius: 10, letterSpacing: 2, boxShadow: '0 4px 16px rgba(0,0,0,0.3)', whiteSpace: 'nowrap' }}>{t.sold}</div>
                   )}
                   {isFilled && img && (
-                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: '#22C55E', color: '#fff', fontWeight: 900, fontSize: 22, padding: '8px 24px', borderRadius: 10, letterSpacing: 2, boxShadow: '0 4px 16px rgba(0,0,0,0.3)', whiteSpace: 'nowrap' }}>
-                      {t.filled}
-                    </div>
+                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: '#22C55E', color: '#fff', fontWeight: 900, fontSize: 22, padding: '8px 24px', borderRadius: 10, letterSpacing: 2, boxShadow: '0 4px 16px rgba(0,0,0,0.3)', whiteSpace: 'nowrap' }}>{t.filled}</div>
                   )}
                 </div>
 
-                {/* Type band */}
                 <div style={{ background: meta.color, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontSize: 20 }}>{meta.icon}</span>
                   <span style={{ fontSize: 13, fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: 1 }}>{meta.label[lang] || meta.label.en}</span>
