@@ -78,7 +78,7 @@ export default function Home() {
   }
 
   const NAV_ITEMS = [
-    { id: 'home',    icon: '🏠', action: () => setActiveNav('home') },
+    { id: 'home',    icon: '🏠', action: () => { setActiveNav('home'); setActiveTab('all'); window.scrollTo({ top: 0, behavior: 'smooth' }) } },
     { id: 'post',    icon: '➕', action: () => { setActiveNav('post'); router.push('/post') } },
     { id: 'account', icon: '👤', action: () => { setActiveNav('account'); router.push('/account') } },
   ]
@@ -93,16 +93,17 @@ export default function Home() {
           <LangDropdown lang={lang} onChange={setLang} />
         </div>
 
-        {/* Tab bar — Services Jobs Cars Businesses Rêber */}
-        <div style={{ display: 'flex', overflowX: 'auto', padding: '0 12px 0', scrollbarWidth: 'none', direction: 'ltr' }}>
+        {/* Tab bar — Services Jobs Cars Businesses Rêber — all fit without scrolling */}
+        <div style={{ display: 'flex', padding: '0 8px 0', direction: 'ltr' }}>
           {TABS.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
-              padding: '8px 14px',
+              flex: 1,
+              padding: '8px 4px',
               background: activeTab === tab.id ? 'rgba(255,255,255,0.15)' : 'transparent',
-              border: 'none', borderRadius: 20,
+              border: 'none',
               color: activeTab === tab.id ? '#fff' : 'rgba(255,255,255,0.55)',
-              fontWeight: activeTab === tab.id ? 700 : 600, fontSize: 13,
-              cursor: 'pointer', fontFamily: FONT, whiteSpace: 'nowrap', flexShrink: 0,
+              fontWeight: activeTab === tab.id ? 700 : 600, fontSize: 12,
+              cursor: 'pointer', fontFamily: FONT, whiteSpace: 'nowrap',
               borderBottom: activeTab === tab.id ? '2px solid #FF6B35' : '2px solid transparent',
               transition: 'all 0.2s',
             }}>
@@ -111,18 +112,19 @@ export default function Home() {
           ))}
 
           {/* Divider */}
-          <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.2)', margin: 'auto 6px', flexShrink: 0 }} />
+          <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.2)', margin: 'auto 4px', flexShrink: 0 }} />
 
-          {/* Rêber tab — distinct style */}
+          {/* Rêber tab */}
           <button
             onClick={() => { setActiveTab('reber'); router.push('/reber') }}
             style={{
-              padding: '8px 14px',
+              flex: 1,
+              padding: '8px 4px',
               background: activeTab === 'reber' ? 'rgba(255,107,53,0.3)' : 'transparent',
-              border: 'none', borderRadius: 20,
+              border: 'none',
               color: '#FF8C61',
-              fontWeight: 800, fontSize: 13,
-              cursor: 'pointer', fontFamily: FONT, whiteSpace: 'nowrap', flexShrink: 0,
+              fontWeight: 800, fontSize: 12,
+              cursor: 'pointer', fontFamily: FONT, whiteSpace: 'nowrap',
               borderBottom: activeTab === 'reber' ? '2px solid #FF6B35' : '2px solid transparent',
               transition: 'all 0.2s',
             }}
@@ -130,7 +132,7 @@ export default function Home() {
             🧭 {t.reber}
           </button>
         </div>
-        <div style={{ height: 12 }} />
+        <div style={{ height: 10 }} />
       </div>
 
       {/* Listings */}
