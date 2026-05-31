@@ -134,11 +134,11 @@ export default function Home() {
   }
 
   const GUIDE_ITEMS = [
-    { key: 'myStage',   route: '/reber?tab=stage' },
-    { key: 'infoHelp',  route: '/reber?tab=info'  },
-    { key: 'ask',       route: '/reber?tab=ask'   },
-    { key: 'explainer', route: '/journey/document-explainer' },
-  ]
+  { key: 'myStage',   route: '/reber/stage' },
+  { key: 'infoHelp',  route: '/reber/info'  },
+  { key: 'ask',       route: '/reber/ask'   },
+  { key: 'explainer', route: '/journey/document-explainer' },
+]
 
   const NAV_ITEMS = [
     { id: 'home',    icon: '🏠', action: () => { setActiveNav('home'); setActiveTab('all'); window.scrollTo({ top: 0, behavior: 'smooth' }) } },
