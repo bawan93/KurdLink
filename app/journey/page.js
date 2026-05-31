@@ -1,4 +1,5 @@
 "use client";
+import LangDropdown from '@/components/LangDropdown'
 import { useState, useEffect } from "react";
 
 const NAVY = "#1A2B5F";

@@ -1,4 +1,5 @@
 'use client'
+import LangDropdown from '@/components/LangDropdown'
 import { useEffect, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { useRouter } from 'next/navigation'
