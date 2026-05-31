@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
-import LangDropdown from '../../../components/LangDropdown'
 
 const NAVY = '#1A2B5F'
 const ORANGE = '#FF6B35'
@@ -38,6 +37,10 @@ export default function AskPage() {
     checkAdmin()
     const voted = JSON.parse(localStorage.getItem('reber_upvoted') || '{}')
     setUpvoted(voted)
+
+    const handler = (e) => setLang(e.detail)
+    window.addEventListener('langchange', handler)
+    return () => window.removeEventListener('langchange', handler)
   }, [])
 
   const checkAdmin = async () => {
@@ -87,22 +90,7 @@ export default function AskPage() {
   const isRtl = lang === 'ku' || lang === 'fa' || lang === 'ar'
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F0F4FF', fontFamily: FONT, direction: isRtl ? 'rtl' : 'ltr' }}>
-      <div style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #2D4A9E 100%)`, padding: '16px 16px 20px', position: 'sticky', top: 0, zIndex: 100 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <button onClick={() => router.push('/home')} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', fontSize: 22, cursor: 'pointer', padding: 0 }}>
-              {isRtl ? '→' : '←'}
-            </button>
-            <div>
-              <div style={{ fontSize: 18, fontWeight: 900, color: '#fff' }}>❓ {t.title}</div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 1 }}>KurdLink</div>
-            </div>
-          </div>
-          <LangDropdown lang={lang} onChange={(l) => { setLang(l); localStorage.setItem('kurdlink_lang', l) }} />
-        </div>
-      </div>
-
+    <div style={{ minHeight: '100vh', background: '#F0F4FF', fontFamily: FONT, direction: isRtl ? 'rtl' : 'ltr', paddingBottom: 80 }}>
       <div style={{ padding: '16px 16px 32px', maxWidth: 600, margin: '0 auto' }}>
         <div style={{ background: '#fff', borderRadius: 20, padding: '20px', marginBottom: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
           <div style={{ fontSize: 15, fontWeight: 700, color: NAVY, marginBottom: 6 }}>{t.title}</div>
