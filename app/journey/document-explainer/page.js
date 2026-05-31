@@ -1,7 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import LangDropdown from "../../../components/LangDropdown";
 
 const NAVY = "#1A2B5F";
 const GREEN = "#1DB87A";
@@ -22,6 +20,7 @@ const UI = {
     reset: "← نامەیەکی دیکە شی بکەرەوە",
     disclaimer: "گرنگ: ئەمە شیکارییەکی AI یە. بۆ بڕیارە یاساییەکان، هەموو کاتێک قسەی پیشەیی مەکە.",
     usageLabel: "بەکارهێنانی بەخۆڕایی ماوە",
+    resetLabel: "دووبارەدەبێتەوە لە",
     dropText: "وێنەی نامەکە بنێرە",
     dropSub: "کلیک بکە بۆ هەڵبژاردن",
     orCamera: "یان",
@@ -56,6 +55,7 @@ const UI = {
     reset: "← Explain Another Letter",
     disclaimer: "Important: This is an AI explanation. For legal decisions, always speak with a qualified professional.",
     usageLabel: "Free uses remaining",
+    resetLabel: "Resets in",
     dropText: "Upload a photo of your letter",
     dropSub: "Click to browse files",
     orCamera: "or",
@@ -90,6 +90,7 @@ const UI = {
     reset: "← نامه دیگری توضیح بده",
     disclaimer: "مهم: این توضیح AI است. برای تصمیمات حقوقی، همیشه با متخصص صحبت کن.",
     usageLabel: "استفاده رایگان باقی‌مانده",
+    resetLabel: "بازنشینی در",
     dropText: "عکس نامه را آپلود کن",
     dropSub: "کلیک کن برای مرور",
     orCamera: "یا",
@@ -124,6 +125,7 @@ const UI = {
     reset: "← اشرح رسالة أخرى",
     disclaimer: "مهم: هذا شرح بالذكاء الاصطناعي. للقرارات القانونية، تحدث مع متخصص.",
     usageLabel: "الاستخدامات المجانية المتبقية",
+    resetLabel: "يُعاد ضبطه في",
     dropText: "ارفع صورة الرسالة",
     dropSub: "انقر للتصفح",
     orCamera: "أو",
@@ -145,6 +147,14 @@ const UI = {
   },
 };
 
+function formatCountdown(ms) {
+  if (ms <= 0) return null;
+  const totalSeconds = Math.floor(ms / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  return `${hours}h ${minutes}m`;
+}
+
 function ResultBlock({ color, bg, label, text, isRtl }) {
   return (
     <div style={{ background: bg, borderRadius: 14, padding: "14px 16px", border: `1px solid ${color}25`, marginBottom: 12 }}>
@@ -157,7 +167,6 @@ function ResultBlock({ color, bg, label, text, isRtl }) {
 }
 
 export default function DocumentExplainerPage() {
-  const router = useRouter();
   const [lang, setLang] = useState("ku");
   const [inputMode, setInputMode] = useState("paste");
   const [letterText, setLetterText] = useState("");
@@ -167,35 +176,61 @@ export default function DocumentExplainerPage() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
   const [usesLeft, setUsesLeft] = useState(10);
+  const [resetAt, setResetAt] = useState(null);
+  const [countdown, setCountdown] = useState(null);
   const [copied, setCopied] = useState(false);
   const [dragging, setDragging] = useState(false);
 
+  // Load lang and usage state
   useEffect(() => {
     const saved = localStorage.getItem('kurdlink_lang');
     if (saved && UI[saved]) setLang(saved);
 
+    const handler = (e) => setLang(e.detail);
+    window.addEventListener('langchange', handler);
+
     const storedReset = localStorage.getItem('kurdlink_explainer_reset');
     const storedUses = localStorage.getItem('kurdlink_explainer_uses');
     if (storedReset && storedUses) {
-      const resetAt = parseInt(storedReset);
-      if (Date.now() < resetAt) {
+      const resetTime = parseInt(storedReset);
+      if (Date.now() < resetTime) {
         setUsesLeft(parseInt(storedUses));
+        setResetAt(resetTime);
       } else {
         localStorage.removeItem('kurdlink_explainer_reset');
         localStorage.removeItem('kurdlink_explainer_uses');
         setUsesLeft(10);
+        setResetAt(null);
       }
     }
+
+    return () => window.removeEventListener('langchange', handler);
   }, []);
+
+  // Live countdown ticker — updates every 30 seconds
+  useEffect(() => {
+    if (!resetAt) { setCountdown(null); return; }
+
+    const tick = () => {
+      const remaining = resetAt - Date.now();
+      if (remaining <= 0) {
+        setCountdown(null);
+        setResetAt(null);
+        setUsesLeft(10);
+        localStorage.removeItem('kurdlink_explainer_reset');
+        localStorage.removeItem('kurdlink_explainer_uses');
+      } else {
+        setCountdown(formatCountdown(remaining));
+      }
+    };
+
+    tick();
+    const interval = setInterval(tick, 30000);
+    return () => clearInterval(interval);
+  }, [resetAt]);
 
   const ui = UI[lang];
   const isRtl = lang === "ku" || lang === "fa" || lang === "ar";
-
-  const handleLangChange = (newLang) => {
-    setLang(newLang);
-    setResult(null);
-    setError("");
-  };
 
   const handleFile = (file) => {
     setUploadedFile(file);
@@ -255,8 +290,11 @@ export default function DocumentExplainerPage() {
 
       setUsesLeft(u => {
         const newVal = Math.max(0, u - 1);
+        let newResetAt = resetAt;
         if (!localStorage.getItem('kurdlink_explainer_reset')) {
-          localStorage.setItem('kurdlink_explainer_reset', String(Date.now() + 86400000));
+          newResetAt = Date.now() + 86400000;
+          localStorage.setItem('kurdlink_explainer_reset', String(newResetAt));
+          setResetAt(newResetAt);
         }
         localStorage.setItem('kurdlink_explainer_uses', String(newVal));
         return newVal;
@@ -286,28 +324,7 @@ export default function DocumentExplainerPage() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F0F4FF", fontFamily: "'Plus Jakarta Sans', sans-serif", direction: isRtl ? "rtl" : "ltr" }}>
-
-      <div style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #2D4A9E 100%)`, padding: "16px 16px 24px" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <button onClick={() => router.back()} style={{ background: "rgba(255,255,255,0.12)", border: "none", borderRadius: 10, width: 36, height: 36, color: "#fff", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              {isRtl ? "→" : "←"}
-            </button>
-            <div>
-              <div style={{ fontSize: 18, fontWeight: 900, color: "#fff" }}>📄 {ui.title}</div>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", marginTop: 2 }}>KurdLink</div>
-            </div>
-          </div>
-          <LangDropdown lang={lang} onChange={handleLangChange} />
-        </div>
-        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.65)", lineHeight: 1.5, marginBottom: 12 }}>{ui.subtitle}</div>
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-          {ui.chips.map(chip => (
-            <div key={chip} style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 20, padding: "4px 10px", fontSize: 11, color: "rgba(255,255,255,0.75)", fontWeight: 500 }}>{chip}</div>
-          ))}
-        </div>
-      </div>
+    <div style={{ minHeight: "100vh", background: "#F0F4FF", fontFamily: "'Plus Jakarta Sans', sans-serif", direction: isRtl ? "rtl" : "ltr", paddingBottom: 80 }}>
 
       <div style={{ padding: "20px 16px 40px", maxWidth: 600, margin: "0 auto" }}>
         <div style={{ background: "#fff", borderRadius: 20, boxShadow: "0 4px 32px rgba(0,0,0,0.08)", overflow: "hidden" }}>
@@ -395,21 +412,38 @@ export default function DocumentExplainerPage() {
 
           {loading && <div style={{ textAlign: "center", padding: "10px 16px 0", fontSize: 12, color: "#aaa" }}>{ui.loadingSub}</div>}
 
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", borderTop: "1px solid #f5f5f5", marginTop: 16 }}>
-            <span style={{ fontSize: 12, color: "#aaa", fontWeight: 500 }}>{ui.usageLabel}</span>
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <div style={{ display: "flex", gap: 3 }}>
-                {Array.from({ length: 10 }).map((_, i) => (
-                  <div key={i} style={{ width: 7, height: 7, borderRadius: "50%", background: i < usesLeft ? GREEN : "#e2e8f0" }} />
-                ))}
-              </div>
-              <span style={{ fontSize: 12, fontWeight: 700, color: "#555" }}>{usesLeft} / 10</span>
-              <span style={{ fontSize: 11, color: "#bbb" }}>· resets in 24h</span>
+          {/* Usage bar with countdown */}
+          <div style={{ margin: "16px 16px 0", padding: "14px 16px", background: "#f8fafc", borderRadius: 14, border: "1px solid #eef0f4" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: "#888" }}>{ui.usageLabel}</span>
+              <span style={{ fontSize: 13, fontWeight: 800, color: usesLeft === 0 ? "#dc2626" : "#333" }}>{usesLeft} / 10</span>
             </div>
+
+            {/* Dot progress bar */}
+            <div style={{ display: "flex", gap: 4, marginBottom: countdown ? 10 : 0 }}>
+              {Array.from({ length: 10 }).map((_, i) => (
+                <div key={i} style={{ flex: 1, height: 6, borderRadius: 99, background: i < usesLeft ? GREEN : "#e2e8f0", transition: "background 0.3s" }} />
+              ))}
+            </div>
+
+            {/* Countdown — only shows after first use */}
+            {countdown && (
+              <div style={{ display: "flex", alignItems: "center", gap: 8, paddingTop: 10, borderTop: "1px solid #eef0f4" }}>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: usesLeft === 0 ? "#fff1f2" : "#fff8f0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>
+                  ⏱️
+                </div>
+                <div>
+                  <div style={{ fontSize: 11, color: "#aaa", fontWeight: 600 }}>{ui.resetLabel}</div>
+                  <div style={{ fontSize: 15, fontWeight: 900, color: usesLeft === 0 ? "#dc2626" : "#FF6B35", letterSpacing: 0.5 }}>
+                    {countdown}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {result && (
-            <div style={{ borderTop: "1px solid #f0f0f0", padding: "20px 16px" }}>
+            <div style={{ borderTop: "1px solid #f0f0f0", padding: "20px 16px", marginTop: 16 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#f0fdf9", border: "1px solid rgba(29,184,122,0.25)", borderRadius: 10, padding: "8px 12px" }}>
                   <div style={{ width: 8, height: 8, background: GREEN, borderRadius: "50%" }} />
