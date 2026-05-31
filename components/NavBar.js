@@ -42,8 +42,6 @@ const GUIDE_ITEMS = {
   ],
 }
 
-const HIDDEN_ON = ['/', '/account', '/post', '/onboarding', '/auth']
-
 export default function NavBar() {
   const router = useRouter()
   const pathname = usePathname()
@@ -65,9 +63,8 @@ export default function NavBar() {
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
-  // Hide on certain pages
-  const shouldHide = HIDDEN_ON.some(p => pathname?.startsWith(p))
-  if (shouldHide) return null
+  // Only hide on the welcome/browse page
+  if (pathname === '/') return null
 
   const isGuideActive = pathname?.startsWith('/reber') || pathname?.startsWith('/journey')
   const guideItems = GUIDE_ITEMS[lang] || GUIDE_ITEMS.en
@@ -85,7 +82,12 @@ export default function NavBar() {
       {/* Tab bar */}
       <div style={{ display: 'flex', padding: '0 8px', direction: 'ltr' }}>
         {TABS.map(tab => (
-          <button key={tab.id} onClick={() => { setActiveTab(tab.id); setShowGuide(false); router.push('/home') }} style={{
+          <button key={tab.id} onClick={() => {
+            setActiveTab(tab.id)
+            setShowGuide(false)
+            window.dispatchEvent(new CustomEvent('tabchange', { detail: tab.id }))
+            router.push('/home')
+          }} style={{
             flex: 1, padding: '8px 4px',
             background: activeTab === tab.id && !isGuideActive ? 'rgba(255,255,255,0.15)' : 'transparent',
             border: 'none',
