@@ -11,56 +11,27 @@ const FONT = "'Plus Jakarta Sans', 'Sora', sans-serif"
 const ORANGE = 'linear-gradient(135deg, #FF6B35, #FF8C61)'
 const NAVY = '#1A2B5F'
 
-const TABS = [
-  { id: 'list_service',  label: { en: 'Services',   ku: 'خزمەتگوزاری', fa: 'خدمات',    ar: 'الخدمات'  } },
-  { id: 'hire_staff',    label: { en: 'Jobs',        ku: 'کار',          fa: 'مشاغل',    ar: 'الوظائف'  } },
-  { id: 'sell_car',      label: { en: 'Cars',        ku: 'ئۆتۆمبێل',    fa: 'ماشین‌ها', ar: 'السيارات' } },
-  { id: 'sell_business', label: { en: 'Businesses',  ku: 'بیزنس',        fa: 'الأعمال',  ar: 'الأعمال'  } },
-]
-
 const TYPE_META = {
-  list_service:  { icon: '🎯', color: '#FF006E', label: { en: 'Service',  ku: 'خزمەتگوزاری', fa: 'خدمت',      ar: 'خدمة'       } },
-  hire_staff:    { icon: '👥', color: '#06D6A0', label: { en: 'Job',      ku: 'کار',          fa: 'شغل',        ar: 'وظيفة'      } },
-  sell_car:      { icon: '🚗', color: '#00B4D8', label: { en: 'Car',      ku: 'ئۆتۆمبێل',    fa: 'ماشین',      ar: 'سيارة'      } },
-  sell_business: { icon: '💼', color: '#FFB703', label: { en: 'Business', ku: 'بیزنس',        fa: 'کسب‌وکار',   ar: 'عمل تجاري' } },
+  list_service: { icon: '🎯', color: '#FF006E', label: { en: 'Service', ku: 'خزمەتگوزاری', fa: 'خدمت',    ar: 'خدمة'    } },
+  hire_staff:   { icon: '👥', color: '#06D6A0', label: { en: 'Job',     ku: 'کار',         fa: 'شغل',      ar: 'وظيفة'   } },
 }
 
 const TX = {
-  en: {
-    noListings: 'No listings yet', noListingsSub: 'Be the first to post something',
-    postSomething: '+ Post Something', loading: 'Loading…', call: 'Call',
-    sold: 'SOLD', filled: 'FILLED',
-  },
-  ku: {
-    noListings: 'هێشتا هیچ لیستێک نییە', noListingsSub: 'یەکەمین بە و شتێک پۆست بکە',
-    postSomething: '+ شتێک پۆست بکە', loading: 'چاوەڕوانبە…', call: 'پەیوەندی',
-    sold: 'فرۆشراوە', filled: 'پڕکراوە',
-  },
-  fa: {
-    noListings: 'هنوز آگهی‌ای نیست', noListingsSub: 'اولین نفر باش و چیزی پست کن',
-    postSomething: '+ ثبت آگهی', loading: 'در حال بارگذاری…', call: 'تماس',
-    sold: 'فروخته شد', filled: 'پر شد',
-  },
-  ar: {
-    noListings: 'لا توجد إعلانات بعد', noListingsSub: 'كن أول من ينشر شيئاً',
-    postSomething: '+ نشر إعلان', loading: 'جاري التحميل…', call: 'اتصال',
-    sold: 'مُباع', filled: 'مكتمل',
-  },
+  en: { noListings: 'No listings yet', noListingsSub: 'Be the first to post something', postSomething: '+ Post Something', loading: 'Loading…', call: 'Call', sold: 'SOLD', filled: 'FILLED' },
+  ku: { noListings: 'هێشتا هیچ لیستێک نییە', noListingsSub: 'یەکەمین بە و شتێک پۆست بکە', postSomething: '+ شتێک پۆست بکە', loading: 'چاوەڕوانبە…', call: 'پەیوەندی', sold: 'فرۆشراوە', filled: 'پڕکراوە' },
+  fa: { noListings: 'هنوز آگهی‌ای نیست', noListingsSub: 'اولین نفر باش و چیزی پست کن', postSomething: '+ ثبت آگهی', loading: 'در حال بارگذاری…', call: 'تماس', sold: 'فروخته شد', filled: 'پر شد' },
+  ar: { noListings: 'لا توجد إعلانات بعد', noListingsSub: 'كن أول من ينشر شيئاً', postSomething: '+ نشر إعلان', loading: 'جاري التحميل…', call: 'اتصال', sold: 'مُباع', filled: 'مكتمل' },
 }
 
 function getTitle(type, data) {
   if (type === 'list_service') return data.fullName
   if (type === 'hire_staff') return data.jobTitle
-  if (type === 'sell_car') return `${data.make} ${data.model}`
-  if (type === 'sell_business') return data.businessName
   return 'Listing'
 }
 
 function getSubtitle(type, data) {
   if (type === 'list_service') return data.category
   if (type === 'hire_staff') return data.salary ? `💰 ${data.salary}` : ''
-  if (type === 'sell_car') return `${data.year} · ${Number(data.mileage).toLocaleString()} mi · ${data.condition}`
-  if (type === 'sell_business') return `£${Number(data.askingPrice).toLocaleString()}`
   return ''
 }
 
@@ -72,21 +43,16 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const t = TX[lang] || TX.en
 
-  // Sync lang from NavBar via custom event
   useEffect(() => {
     const saved = localStorage.getItem('kurdlink_lang')
     if (saved) setLang(saved)
-
     const handler = (e) => setLang(e.detail)
     window.addEventListener('langchange', handler)
     return () => window.removeEventListener('langchange', handler)
   }, [])
 
-  // Sync active tab from NavBar via custom event
   useEffect(() => {
-    const handler = (e) => {
-      setActiveTab(e.detail)
-    }
+    const handler = (e) => setActiveTab(e.detail)
     window.addEventListener('tabchange', handler)
     return () => window.removeEventListener('tabchange', handler)
   }, [])
@@ -101,6 +67,7 @@ export default function Home() {
     let query = supabase
       .from('listings')
       .select('*')
+      .in('type', ['list_service', 'hire_staff'])
       .in('status', ['approved', 'sold', 'filled'])
       .order('created_at', { ascending: false })
     if (activeTab !== 'all') query = query.eq('type', activeTab)
@@ -111,8 +78,6 @@ export default function Home() {
 
   return (
     <div style={{ minHeight: '100vh', minHeight: '100dvh', background: '#f7f7f5', fontFamily: FONT, direction: 'ltr', paddingBottom: 80 }}>
-
-      {/* Listings */}
       <div style={{ maxWidth: 600, margin: '0 auto', padding: '16px 16px 20px', boxSizing: 'border-box' }}>
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px 20px' }}>
