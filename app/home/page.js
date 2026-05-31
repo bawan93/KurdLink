@@ -4,9 +4,9 @@ import { useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
 import LangDropdown from '../../components/LangDropdown'
 
-function getSupabase() {
-  return createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
-}
+const FONT = "'Plus Jakarta Sans', 'Sora', sans-serif"
+const ORANGE = 'linear-gradient(135deg, #FF6B35, #FF8C61)'
+const NAVY = '#1A2B5F'
 
 const TABS = [
   { id: 'list_service',  label: { en: 'Services',   ku: 'خزمەتگوزاری', fa: 'خدمات',    ar: 'الخدمات'  } },
