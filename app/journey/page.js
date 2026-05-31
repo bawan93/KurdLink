@@ -262,3 +262,11 @@ export default function JourneyPage() {
     </div>
   );
 }
+{
+  id: "explainer",
+  icon: "📄",
+  color: "#1DB87A",
+  title: { en: "Letter Explainer", ku: "شیکردنەوەی نامە", fa: "توضیح نامه", ar: "شرح الرسالة" },
+  cards: [],
+  link: "/journey/document-explainer"
+}
