@@ -1,7 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import LangDropdown from '../../../components/LangDropdown'
 
 const NAVY = '#1A2B5F'
 const FONT = "'Plus Jakarta Sans', 'Sora', sans-serif"
@@ -24,7 +23,7 @@ const INFO_SECTIONS = [
       en: ['All children aged 5-16 must be in school by law', 'Contact your local council to find a school place — they must provide one', 'Schools cannot refuse a child based on immigration status', 'EAL (English as Additional Language) support is available at most schools', 'Free school meals available if you receive asylum support or Universal Credit', 'ESOL (English for Speakers of Other Languages) classes are free — find them at esol.org.uk', 'Adults can access free college courses — ask your local college'],
       ku: ['هەموو منداڵی ٥-١٦ ساڵ بە یاسا دەبێت لە قوتابخانە بن', 'پەیوەندی بە شارداریی ناوچەکەت بکە بۆ دۆزینەوەی شوێنی قوتابخانە', 'قوتابخانەکان ناتوانن منداڵێک ڕەت بکەنەوە بەهۆی مافی کۆچبەریەوە', 'پشتگیری EAL لە زۆربەی قوتابخانەکان بەردەستە', 'خواردنی قوتابخانەی بەخۆڕایی بەردەستە ئەگەر پشتگیری ئامادەیی یان Universal Credit وەردەگریت', 'پۆلەکانی ESOL بەخۆڕایین — لە esol.org.uk بیدۆزەرەوە', 'گەورەسالان دەتوانن دەستبگەن بە کۆرسی کۆلێجی بەخۆڕایی'],
       fa: ['تمام کودکان ۵ تا ۱۶ ساله باید طبق قانون در مدرسه باشند', 'با شورای محلی‌ات تماس بگیر تا جای مدرسه پیدا کنی', 'مدارس نمی‌توانند کودکی را بر اساس وضعیت مهاجرتی رد کنند', 'حمایت EAL در اکثر مدارس موجود است', 'وعده غذایی رایگان مدرسه اگر حمایت پناهندگی یا Universal Credit دریافت می‌کنی', 'کلاس‌های ESOL رایگان هستند — در esol.org.uk پیدا کن', 'بزرگسالان می‌توانند به دوره‌های رایگان کالج دسترسی داشته باشند'],
-      ar: ['يجب أن يكون جميع الأطفال من 5-16 في المدرسة بموجب القانون', 'تواصل مع مجلسك المحلي للعثور على مكان في المدرسة', 'لا يمكن للمدارس رفض طفل بسبب وضع هجرته', 'دعم EAL متاح في معظم المدارس', 'وجبات مدرسية مجانية إذا كنت تتلقى دعم اللجوء أو Universal Credit', 'دروس ESOL مجانية — اعثر عليها على esol.org.uk', 'يمكن للبالغين الوصول إلى دورات الكلية المجانية'],
+      ar: ['يجب أن يكون جميع الأطفال من 5-16 في المدرسة بموجب القانون', 'تواصل مع مجلسك المحلي للعثور على مكان في المدرسة', 'لا يمكن للمدارس رفض طفل بسبب وضع هجرته', 'دعم EAL متاح في معظم المدارس', 'وجبات مدرسية مجانية للأطفال إذا كان دخلك منخفضاً', 'دروس ESOL مجانية — اعثر عليها على esol.org.uk', 'يمكن للبالغين الوصول إلى دورات الكلية المجانية'],
     }
   },
   {
@@ -91,34 +90,21 @@ function InfoCard({ section, lang }) {
 }
 
 export default function InfoHelpPage() {
-  const router = useRouter()
   const [lang, setLang] = useState('en')
 
   useEffect(() => {
     const saved = localStorage.getItem('kurdlink_lang')
     if (saved && TX[saved]) setLang(saved)
+
+    const handler = (e) => setLang(e.detail)
+    window.addEventListener('langchange', handler)
+    return () => window.removeEventListener('langchange', handler)
   }, [])
 
-  const t = TX[lang] || TX.en
   const isRtl = lang === 'ku' || lang === 'fa' || lang === 'ar'
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F0F4FF', fontFamily: FONT, direction: isRtl ? 'rtl' : 'ltr' }}>
-      <div style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #2D4A9E 100%)`, padding: '16px 16px 20px', position: 'sticky', top: 0, zIndex: 100 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <button onClick={() => router.push('/home')} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', fontSize: 22, cursor: 'pointer', padding: 0 }}>
-              {isRtl ? '→' : '←'}
-            </button>
-            <div>
-              <div style={{ fontSize: 18, fontWeight: 900, color: '#fff' }}>📋 {t.title}</div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 1 }}>KurdLink</div>
-            </div>
-          </div>
-          <LangDropdown lang={lang} onChange={(l) => { setLang(l); localStorage.setItem('kurdlink_lang', l) }} />
-        </div>
-      </div>
-
+    <div style={{ minHeight: '100vh', background: '#F0F4FF', fontFamily: FONT, direction: isRtl ? 'rtl' : 'ltr', paddingBottom: 80 }}>
       <div style={{ padding: '16px 16px 32px', maxWidth: 600, margin: '0 auto' }}>
         {INFO_SECTIONS.map((section) => (
           <InfoCard key={section.id} section={section} lang={lang} />
