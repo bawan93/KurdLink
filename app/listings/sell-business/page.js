@@ -2,7 +2,6 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
-'
 
 const FONT = "'Plus Jakarta Sans', 'Sora', sans-serif"
 const ORANGE = 'linear-gradient(135deg, #FF6B35, #FF8C61)'

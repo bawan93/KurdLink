@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { useRouter } from 'next/navigation'
-'
 
 const NAVY = '#1A2B5F'
 const ORANGE = '#FF6B35'
