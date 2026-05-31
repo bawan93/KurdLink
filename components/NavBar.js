@@ -42,7 +42,7 @@ const GUIDE_ITEMS = {
   ],
 }
 
-const HIDDEN_ON = ['/account', '/post', '/onboarding', '/auth']
+const HIDDEN_ON = ['/', '/account', '/post', '/onboarding', '/auth']
 
 export default function NavBar() {
   const router = useRouter()

@@ -29,6 +29,8 @@ export default function BottomNav() {
   const isHome = pathname === '/home'
   const isPost = pathname === '/post'
   const isAccount = pathname === '/account'
+  const shouldHide = ['/', '/account', '/post', '/onboarding', '/auth'].some(p => pathname?.startsWith(p))
+if (shouldHide) return null
 
   return (
     <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#fff', borderTop: '1px solid rgba(0,0,0,0.08)', display: 'flex', zIndex: 500, paddingBottom: 'env(safe-area-inset-bottom)', boxShadow: '0 -4px 20px rgba(0,0,0,0.06)', direction: 'ltr' }}>
