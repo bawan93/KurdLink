@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
+import LangDropdown from "../../../components/LangDropdown"
 import { createBrowserClient } from '@supabase/ssr'
 
 const FONT = "'Plus Jakarta Sans', 'Sora', sans-serif"
