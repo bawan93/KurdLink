@@ -269,4 +269,4 @@ export default function JourneyPage() {
   title: { en: "Letter Explainer", ku: "شیکردنەوەی نامە", fa: "توضیح نامه", ar: "شرح الرسالة" },
   cards: [],
   link: "/journey/document-explainer"
-}
+} 
