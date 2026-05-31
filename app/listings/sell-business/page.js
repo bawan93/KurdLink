@@ -3,7 +3,6 @@ import LangDropdown from '@/components/LangDropdown'
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
-import LangDropdown from "../../components/LangDropdown"
 '
 
 const FONT = "'Plus Jakarta Sans', 'Sora', sans-serif"
