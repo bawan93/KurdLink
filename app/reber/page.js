@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import LangDropdown from "../../components/LangDropdown"
 import { createBrowserClient } from '@supabase/ssr'
-const NAVY = '#1A2B5F'
 const ORANGE = '#FF6B35'
 const FONT = "'Plus Jakarta Sans', 'Sora', sans-serif"
 

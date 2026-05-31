@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import LangDropdown from "../../components/LangDropdown"
 import { useRouter } from 'next/navigation'
-
 const NAVY = '#1A2B5F'
 const ORANGE = '#FF6B35'
 const LIGHT_BG = '#F7F8FC'
