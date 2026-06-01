@@ -2,9 +2,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 
-const NAVY = '#1A2B5F'
-const ORANGE = '#FF6B35'
-const FONT = "'Plus Jakarta Sans', 'Sora', sans-serif"
+const INDIGO = '#3730A3'
+const INDIGO_LIGHT = '#6366F1'
+const MINT = '#34D399'
+const SOFT = '#EDE9FE'
+const FONT = "'Nunito', 'Plus Jakarta Sans', sans-serif"
 
 const TABS = [
   { id: 'list_service', label: { en: 'Services', ku: 'خزمەتگوزاری', fa: 'خدمات', ar: 'الخدمات' } },
@@ -49,7 +51,7 @@ export default function NavBar() {
   const guideRef = useRef(null)
 
   useEffect(() => {
-    const saved = localStorage.getItem('kurdlink_lang')
+    const saved = localStorage.getItem('komek_lang')
     if (saved) setLang(saved)
   }, [])
 
@@ -67,15 +69,22 @@ export default function NavBar() {
   const guideItems = GUIDE_ITEMS[lang] || GUIDE_ITEMS.en
 
   return (
-    <div style={{ background: NAVY, position: 'sticky', top: 0, zIndex: 200, direction: 'ltr' }}>
-      <div style={{ padding: '14px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div onClick={() => router.push('/home')} style={{ fontSize: 20, fontWeight: 900, background: `linear-gradient(135deg, ${ORANGE}, #FF8C61)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', cursor: 'pointer' }}>
-          KurdLink
+    <div style={{ background: '#fff', position: 'sticky', top: 0, zIndex: 200, direction: 'ltr', borderBottom: '1px solid #EDE9FE', boxShadow: '0 2px 16px rgba(55,48,163,0.08)' }}>
+      {/* Top bar */}
+      <div style={{ padding: '12px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div onClick={() => router.push('/home')} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+          <div style={{ width: 32, height: 32, borderRadius: 10, background: `linear-gradient(135deg, ${INDIGO}, ${INDIGO_LIGHT})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>
+            🤝
+          </div>
+          <span style={{ fontSize: 20, fontWeight: 900, color: INDIGO, fontFamily: FONT, letterSpacing: -0.5 }}>
+            Komek
+          </span>
         </div>
-        <LangSelector lang={lang} onChange={(l) => { setLang(l); localStorage.setItem('kurdlink_lang', l); window.dispatchEvent(new CustomEvent('langchange', { detail: l })) }} />
+        <LangSelector lang={lang} onChange={(l) => { setLang(l); localStorage.setItem('komek_lang', l); window.dispatchEvent(new CustomEvent('langchange', { detail: l })) }} />
       </div>
 
-      <div style={{ display: 'flex', padding: '0 8px', direction: 'ltr' }}>
+      {/* Tab bar */}
+      <div style={{ display: 'flex', padding: '0 12px', direction: 'ltr', gap: 4 }}>
         {TABS.map(tab => (
           <button key={tab.id} onClick={() => {
             setActiveTab(tab.id)
@@ -83,66 +92,78 @@ export default function NavBar() {
             window.dispatchEvent(new CustomEvent('tabchange', { detail: tab.id }))
             router.push('/home')
           }} style={{
-            flex: 1, padding: '8px 4px',
-            background: activeTab === tab.id && !isGuideActive ? 'rgba(255,255,255,0.15)' : 'transparent',
+            flex: 1, padding: '10px 8px',
+            background: activeTab === tab.id && !isGuideActive ? SOFT : 'transparent',
             border: 'none',
-            color: activeTab === tab.id && !isGuideActive ? '#fff' : 'rgba(255,255,255,0.55)',
-            fontWeight: activeTab === tab.id && !isGuideActive ? 700 : 600, fontSize: 12,
+            color: activeTab === tab.id && !isGuideActive ? INDIGO : '#9CA3AF',
+            fontWeight: activeTab === tab.id && !isGuideActive ? 800 : 600,
+            fontSize: 13,
             cursor: 'pointer', fontFamily: FONT, whiteSpace: 'nowrap',
-            borderBottom: activeTab === tab.id && !isGuideActive ? '2px solid #FF6B35' : '2px solid transparent',
+            borderBottom: activeTab === tab.id && !isGuideActive ? `2px solid ${INDIGO}` : '2px solid transparent',
+            borderRadius: '8px 8px 0 0',
             transition: 'all 0.2s',
           }}>
             {tab.label[lang] || tab.label.en}
           </button>
         ))}
 
-        <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.2)', margin: 'auto 4px', flexShrink: 0 }} />
+        <div style={{ width: 1, height: 20, background: '#EDE9FE', margin: 'auto 4px', flexShrink: 0 }} />
 
+        {/* Guide button */}
         <div ref={guideRef} style={{ position: 'relative', flex: 1 }}>
           <button onClick={() => setShowGuide(o => !o)} style={{
-            width: '100%', padding: '8px 4px',
-            background: isGuideActive || showGuide ? 'rgba(255,107,53,0.3)' : 'transparent',
-            border: 'none', color: '#FF8C61', fontWeight: 800, fontSize: 12,
+            width: '100%', padding: '10px 8px',
+            background: isGuideActive || showGuide ? SOFT : 'transparent',
+            border: 'none',
+            color: isGuideActive || showGuide ? INDIGO : '#9CA3AF',
+            fontWeight: isGuideActive || showGuide ? 800 : 600,
+            fontSize: 13,
             cursor: 'pointer', fontFamily: FONT, whiteSpace: 'nowrap',
-            borderBottom: isGuideActive || showGuide ? '2px solid #FF6B35' : '2px solid transparent',
+            borderBottom: isGuideActive || showGuide ? `2px solid ${MINT}` : '2px solid transparent',
+            borderRadius: '8px 8px 0 0',
             transition: 'all 0.2s',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
           }}>
-            🧭 {GUIDE_LABELS[lang] || GUIDE_LABELS.en} <span style={{ fontSize: 8, opacity: 0.7 }}>{showGuide ? '▲' : '▼'}</span>
+            🧭 {GUIDE_LABELS[lang] || GUIDE_LABELS.en}
+            <span style={{ fontSize: 8, opacity: 0.6 }}>{showGuide ? '▲' : '▼'}</span>
           </button>
 
           {showGuide && (
             <div style={{
-              position: 'absolute', top: 'calc(100% + 10px)', right: 0,
-              background: '#fff', borderRadius: 16, overflow: 'hidden',
-              boxShadow: '0 8px 40px rgba(0,0,0,0.18)', zIndex: 300, minWidth: 240,
-              border: '1px solid rgba(0,0,0,0.08)',
+              position: 'absolute', top: 'calc(100% + 8px)', right: 0,
+              background: '#fff', borderRadius: 20, overflow: 'hidden',
+              boxShadow: '0 8px 40px rgba(55,48,163,0.15)', zIndex: 300, minWidth: 260,
+              border: '1px solid #EDE9FE',
             }}>
-              <div style={{ background: `linear-gradient(135deg, ${NAVY}, #2D4A9E)`, padding: '14px 16px' }}>
-                <div style={{ fontSize: 14, fontWeight: 800, color: '#fff' }}>🧭 {GUIDE_LABELS[lang]}</div>
+              <div style={{ background: `linear-gradient(135deg, ${INDIGO}, ${INDIGO_LIGHT})`, padding: '16px 18px' }}>
+                <div style={{ fontSize: 15, fontWeight: 900, color: '#fff', fontFamily: FONT }}>🧭 {GUIDE_LABELS[lang]}</div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 3, fontFamily: FONT }}>Your guide to life in the UK</div>
               </div>
               {guideItems.map((item, i) => (
                 <button key={i} onClick={() => { setShowGuide(false); router.push(item.route) }} style={{
                   width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-                  padding: '14px 16px', background: '#fff', border: 'none',
-                  borderBottom: i < guideItems.length - 1 ? '1px solid rgba(0,0,0,0.06)' : 'none',
+                  padding: '14px 18px', background: '#fff', border: 'none',
+                  borderBottom: i < guideItems.length - 1 ? '1px solid #F5F4FF' : 'none',
                   cursor: 'pointer', textAlign: 'left', fontFamily: FONT,
-                }}>
-                  <div style={{ width: 40, height: 40, borderRadius: 12, background: '#f0f4ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>
+                  transition: 'background 0.15s',
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = '#F5F4FF'}
+                onMouseLeave={e => e.currentTarget.style.background = '#fff'}
+                >
+                  <div style={{ width: 40, height: 40, borderRadius: 12, background: SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>
                     {item.icon}
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: NAVY }}>{item.label}</div>
-                    <div style={{ fontSize: 11, color: '#aaa', marginTop: 2 }}>{item.sub}</div>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: INDIGO }}>{item.label}</div>
+                    <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>{item.sub}</div>
                   </div>
-                  <span style={{ fontSize: 16, color: '#ddd' }}>›</span>
+                  <span style={{ fontSize: 16, color: '#C4B5FD' }}>›</span>
                 </button>
               ))}
             </div>
           )}
         </div>
       </div>
-      <div style={{ height: 10 }} />
     </div>
   )
 }
@@ -152,7 +173,7 @@ function LangSelector({ lang, onChange }) {
   const ref = useRef(null)
   const LANGS = [
     { id: 'en', flag: '🇬🇧', name: 'EN', full: 'English' },
-    { id: 'ku', flag: null, name: 'کوردی', full: 'Kurdish' },
+    { id: 'ku', flag: null,   name: 'کوردی', full: 'Kurdish' },
     { id: 'fa', flag: '🇮🇷', name: 'فارسی', full: 'Farsi' },
     { id: 'ar', flag: '🇮🇶', name: 'عربي', full: 'Arabic' },
   ]
@@ -167,28 +188,29 @@ function LangSelector({ lang, onChange }) {
   return (
     <div ref={ref} style={{ position: 'relative', userSelect: 'none' }}>
       <button onClick={() => setOpen(o => !o)} style={{
-        display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px',
-        background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.25)',
-        borderRadius: 20, color: '#fff', fontWeight: 700, fontSize: 12, cursor: 'pointer', fontFamily: FONT,
+        display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px',
+        background: SOFT, border: `1.5px solid #C4B5FD`,
+        borderRadius: 20, color: INDIGO, fontWeight: 800, fontSize: 12,
+        cursor: 'pointer', fontFamily: FONT,
       }}>
-        {current.id === 'ku' ? <KurdFlag size={16} /> : <span style={{ fontSize: 16 }}>{current.flag}</span>}
+        {current.id === 'ku' ? <KurdFlag size={14} /> : <span style={{ fontSize: 14 }}>{current.flag}</span>}
         <span>{current.name}</span>
-        <span style={{ fontSize: 9, opacity: 0.7 }}>{open ? '▲' : '▼'}</span>
+        <span style={{ fontSize: 9, opacity: 0.6 }}>{open ? '▲' : '▼'}</span>
       </button>
       {open && (
-        <div style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, background: '#fff', borderRadius: 14, overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.18)', zIndex: 400, minWidth: 160, border: '1px solid rgba(0,0,0,0.08)' }}>
+        <div style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 8px 32px rgba(55,48,163,0.15)', zIndex: 400, minWidth: 160, border: '1px solid #EDE9FE' }}>
           {LANGS.map(l => (
             <button key={l.id} onClick={() => { onChange(l.id); setOpen(false) }} style={{
               width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '11px 16px',
-              background: lang === l.id ? '#FFF4F0' : '#fff', border: 'none',
-              borderBottom: '1px solid rgba(0,0,0,0.05)', cursor: 'pointer', textAlign: 'left', fontFamily: FONT,
+              background: lang === l.id ? SOFT : '#fff', border: 'none',
+              borderBottom: '1px solid #F5F4FF', cursor: 'pointer', textAlign: 'left', fontFamily: FONT,
             }}>
-              {l.id === 'ku' ? <KurdFlag size={22} /> : <span style={{ fontSize: 22, flexShrink: 0 }}>{l.flag}</span>}
+              {l.id === 'ku' ? <KurdFlag size={20} /> : <span style={{ fontSize: 20, flexShrink: 0 }}>{l.flag}</span>}
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: lang === l.id ? ORANGE : '#1a1a1a' }}>{l.name}</div>
-                <div style={{ fontSize: 11, color: '#aaa' }}>{l.full}</div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: lang === l.id ? INDIGO : '#1a1a1a' }}>{l.name}</div>
+                <div style={{ fontSize: 11, color: '#9CA3AF' }}>{l.full}</div>
               </div>
-              {lang === l.id && <span style={{ color: ORANGE, fontSize: 14 }}>✓</span>}
+              {lang === l.id && <span style={{ color: MINT, fontSize: 14, fontWeight: 900 }}>✓</span>}
             </button>
           ))}
         </div>
@@ -199,9 +221,8 @@ function LangSelector({ lang, onChange }) {
 
 function KurdFlag({ size = 22 }) {
   const w = size * 1.5
-  const h = size
   return (
-    <svg width={w} height={h} viewBox="0 0 90 60" style={{ borderRadius: 3, display: 'block', flexShrink: 0 }}>
+    <svg width={w} height={size} viewBox="0 0 90 60" style={{ borderRadius: 3, display: 'block', flexShrink: 0 }}>
       <rect width="90" height="20" fill="#E30A17" />
       <rect y="20" width="90" height="20" fill="#FFFFFF" />
       <rect y="40" width="90" height="20" fill="#009C3B" />
