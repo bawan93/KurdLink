@@ -10,14 +10,15 @@ export const viewport = {
 }
 
 export const metadata = {
-  title: 'KurdLink',
-  description: 'Your trusted Kurdish community platform'
+  title: 'Komek',
+  description: 'Your helping hand in the UK'
 }
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet" />
       </head>
       <body style={{ margin: 0, padding: 0, overflowX: 'hidden', paddingBottom: 80 }}>
