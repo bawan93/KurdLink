@@ -1,4 +1,4 @@
-'use client' xs
+'use client'
 import { useState, useEffect } from "react"
 
 const FONT = "'Nunito', 'Plus Jakarta Sans', sans-serif"
