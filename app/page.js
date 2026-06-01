@@ -1,5 +1,6 @@
 'use client'
-import { useState, useEffect } from "react"
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 const FONT = "'Nunito', 'Plus Jakarta Sans', sans-serif"
 const INDIGO = '#4F46E5'
@@ -14,6 +15,33 @@ const LANGUAGES = [
   { id: 'fa', flag: '🇮🇷', name: 'فارسی',  nameEn: 'Farsi',   isKurdish: false },
   { id: 'ar', flag: '🇮🇶', name: 'عربي',   nameEn: 'Arabic',  isKurdish: false },
 ]
+
+const TX = {
+  en: {
+    tagline: 'Your helping hand in the UK',
+    sub: 'Find jobs, get guidance, understand your letters — all in one place, all in your language.',
+    browse: "Let's Go",
+    choose: 'Choose your language',
+  },
+  ku: {
+    tagline: 'دەستگیرەکەت لە UK',
+    sub: 'کار بدۆزەرەوە، ڕێنمایی وەربگرە، نامەکانت تێبگە — هەموو لەک شوێنەوە، بە زمانی خۆت.',
+    browse: 'با بچینە',
+    choose: 'زمانەکەت هەڵبژێرە',
+  },
+  fa: {
+    tagline: 'دست یاری‌ات در بریتانیا',
+    sub: 'کار پیدا کن، راهنمایی بگیر، نامه‌هایت را بفهم — همه جا، به زبان خودت.',
+    browse: 'بریم',
+    choose: 'زبانت را انتخاب کن',
+  },
+  ar: {
+    tagline: 'يد العون في بريطانيا',
+    sub: 'ابحث عن عمل، احصل على توجيه، افهم رسائلك — كل شيء في مكان واحد، بلغتك.',
+    browse: 'هيا نبدأ',
+    choose: 'اختر لغتك للبدء',
+  },
+}
 
 function SproutLogo({ size = 56 }) {
   return (
@@ -52,117 +80,191 @@ function KurdFlag({ size = 20 }) {
       <circle cx="45" cy="30" r="9" fill="#F7C200" />
       {Array.from({ length: 21 }).map((_, i) => {
         const angle = (i * 360 / 21) * Math.PI / 180
-        return <line key={i} x1={45 + Math.cos(angle) * 9} y1={30 + Math.sin(angle) * 9} x2={45 + Math.cos(angle) * 14} y2={30 + Math.sin(angle) * 14} stroke="#F7C200" strokeWidth="1.5" />
+        const x1 = 45 + Math.cos(angle) * 9
+        const y1 = 30 + Math.sin(angle) * 9
+        const x2 = 45 + Math.cos(angle) * 14
+        const y2 = 30 + Math.sin(angle) * 14
+        return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#F7C200" strokeWidth="1.5" />
       })}
       <circle cx="45" cy="30" r="5" fill="#E30A17" />
     </svg>
   )
 }
 
-export default function WelcomePreview() {
-  const [lang, setLang] = useState('en')
+export default function Welcome() {
+  const router = useRouter()
+  const [lang, setLang] = useState('ku')
   const [pressed, setPressed] = useState(false)
   const [visible, setVisible] = useState(false)
+  const t = TX[lang] || TX.en
   const isRtl = lang === 'ku' || lang === 'fa' || lang === 'ar'
 
-  const TX = {
-    en: { tagline: 'Your helping hand in the UK', sub: 'Find jobs, get guidance, understand your letters — all in one place, all in your language.', browse: "Let's Go", choose: 'Choose your language' },
-    ku: { tagline: 'دەستگیرەکەت لە UK', sub: 'کار بدۆزەرەوە، ڕێنمایی وەربگرە، نامەکانت تێبگە — هەموو لەک شوێنەوە.', browse: 'با بچینە', choose: 'زمانەکەت هەڵبژێرە' },
-    fa: { tagline: 'دست یاری‌ات در بریتانیا', sub: 'کار پیدا کن، راهنمایی بگیر، نامه‌هایت را بفهم.', browse: 'بریم', choose: 'زبانت را انتخاب کن' },
-    ar: { tagline: 'يد العون في بريطانيا', sub: 'ابحث عن عمل، احصل على توجيه، افهم رسائلك.', browse: 'هيا نبدأ', choose: 'اختر لغتك للبدء' },
-  }
-  const t = TX[lang]
+  useEffect(() => {
+    const saved = localStorage.getItem('komek_lang')
+    if (saved && TX[saved]) setLang(saved)
+    setTimeout(() => setVisible(true), 60)
+  }, [])
 
-  useEffect(() => { setTimeout(() => setVisible(true), 60) }, [])
+  const handleSelectLang = (id) => {
+    setLang(id)
+    localStorage.setItem('komek_lang', id)
+  }
+
+  const handleBrowse = () => {
+    localStorage.setItem('komek_lang', lang)
+    router.push('/home')
+  }
 
   return (
-    <div style={{ minHeight: '100vh', background: BG, fontFamily: FONT, direction: 'ltr', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
+    <div style={{
+      minHeight: '100vh',
+      minHeight: '100dvh',
+      background: BG,
+      fontFamily: FONT,
+      direction: 'ltr',
+      display: 'flex',
+      flexDirection: 'column',
+      position: 'relative',
+      overflow: 'hidden',
+    }}>
 
       <div style={{ position: 'absolute', top: -100, right: -80, width: 340, height: 340, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.18), transparent 70%)', pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', bottom: -60, left: -60, width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle, rgba(52,211,153,0.15), transparent 70%)', pointerEvents: 'none' }} />
 
       <div style={{
-        flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center',
-        alignItems: 'center', padding: '48px 28px 24px', textAlign: 'center',
-        opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(24px)',
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '48px 28px 24px',
+        textAlign: 'center',
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0)' : 'translateY(24px)',
         transition: 'all 0.7s cubic-bezier(0.22, 1, 0.36, 1)',
       }}>
 
         {/* Handshake hero */}
         <div style={{ fontSize: 64, lineHeight: 1, marginBottom: 20 }}>🤝</div>
 
-        {/* Sprout + name */}
+        {/* Sprout logo + name */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
           <SproutLogo size={56} />
-          <span style={{ fontSize: 48, fontWeight: 900, color: INDIGO, letterSpacing: -1.5, lineHeight: 1 }}>Komek</span>
+          <span style={{ fontSize: 48, fontWeight: 900, color: INDIGO, letterSpacing: -1.5, lineHeight: 1 }}>
+            Komek
+          </span>
         </div>
 
         {/* Tagline */}
-        <div style={{ fontSize: 16, fontWeight: 700, color: INDIGO_LIGHT, marginBottom: 12, direction: isRtl ? 'rtl' : 'ltr' }}>
+        <div style={{
+          fontSize: 16, fontWeight: 700, color: INDIGO_LIGHT,
+          marginBottom: 12, direction: isRtl ? 'rtl' : 'ltr',
+        }}>
           {t.tagline}
         </div>
 
         {/* Description */}
-        <p style={{ fontSize: 14, color: '#6B7280', margin: '0 0 28px', lineHeight: 1.7, maxWidth: 300, fontWeight: 500, direction: isRtl ? 'rtl' : 'ltr' }}>
+        <p style={{
+          fontSize: 14, color: '#6B7280', margin: '0 0 28px',
+          lineHeight: 1.7, maxWidth: 300, fontWeight: 500,
+          direction: isRtl ? 'rtl' : 'ltr',
+        }}>
           {t.sub}
         </p>
 
-        {/* Pills */}
+        {/* Feature pills */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 28, flexWrap: 'wrap', justifyContent: 'center' }}>
           {['🧭 Guidance', '💼 Jobs', '🎯 Services', '📄 Letters'].map(pill => (
-            <div key={pill} style={{ background: SOFT, borderRadius: 20, padding: '6px 14px', fontSize: 12, fontWeight: 700, color: INDIGO }}>{pill}</div>
+            <div key={pill} style={{
+              background: SOFT, borderRadius: 20,
+              padding: '6px 14px', fontSize: 12, fontWeight: 700, color: INDIGO,
+            }}>
+              {pill}
+            </div>
           ))}
         </div>
 
         {/* Language label */}
-        <p style={{ fontSize: 11, fontWeight: 800, color: '#9CA3AF', letterSpacing: 1.5, textTransform: 'uppercase', margin: '0 0 14px' }}>{t.choose}</p>
+        <p style={{
+          fontSize: 11, fontWeight: 800, color: '#9CA3AF',
+          letterSpacing: 1.5, textTransform: 'uppercase', margin: '0 0 14px',
+        }}>
+          {t.choose}
+        </p>
 
         {/* Language grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, width: '100%', maxWidth: 320, marginBottom: 28, direction: 'ltr' }}>
+        <div style={{
+          display: 'grid', gridTemplateColumns: '1fr 1fr',
+          gap: 10, width: '100%', maxWidth: 320, marginBottom: 28, direction: 'ltr',
+        }}>
           {LANGUAGES.map((l) => {
             const isSelected = lang === l.id
             return (
-              <button key={l.id} onClick={() => setLang(l.id)} style={{
-                display: 'flex', alignItems: 'center', gap: 10, padding: '13px 14px',
-                background: isSelected ? SOFT : '#fff',
-                border: isSelected ? `2px solid ${INDIGO}` : '2px solid #E5E7EB',
-                borderRadius: 16, cursor: 'pointer', fontFamily: FONT, transition: 'all 0.2s',
-                boxShadow: isSelected ? '0 4px 20px rgba(79,70,229,0.15)' : '0 2px 8px rgba(0,0,0,0.04)',
-                transform: isSelected ? 'scale(1.02)' : 'scale(1)', textAlign: 'left',
-              }}>
-                <div style={{ width: 36, height: 36, borderRadius: 10, background: isSelected ? 'rgba(79,70,229,0.1)' : '#F9FAFB', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <button
+                key={l.id}
+                onClick={() => handleSelectLang(l.id)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  padding: '13px 14px',
+                  background: isSelected ? SOFT : '#fff',
+                  border: isSelected ? `2px solid ${INDIGO}` : '2px solid #E5E7EB',
+                  borderRadius: 16, cursor: 'pointer', fontFamily: FONT,
+                  transition: 'all 0.2s',
+                  boxShadow: isSelected ? '0 4px 20px rgba(79,70,229,0.15)' : '0 2px 8px rgba(0,0,0,0.04)',
+                  transform: isSelected ? 'scale(1.02)' : 'scale(1)',
+                  textAlign: 'left',
+                }}
+              >
+                <div style={{
+                  width: 36, height: 36, borderRadius: 10,
+                  background: isSelected ? 'rgba(79,70,229,0.1)' : '#F9FAFB',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                }}>
                   {l.isKurdish ? <KurdFlag size={20} /> : <span style={{ fontSize: 22 }}>{l.flag}</span>}
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 14, fontWeight: 800, color: isSelected ? INDIGO : '#1A1A2E' }}>{l.name}</div>
                   <div style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 600 }}>{l.nameEn}</div>
                 </div>
-                {isSelected && <div style={{ width: 20, height: 20, borderRadius: '50%', background: INDIGO, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: '#fff', fontWeight: 900, flexShrink: 0 }}>✓</div>}
+                {isSelected && (
+                  <div style={{
+                    width: 20, height: 20, borderRadius: '50%', background: INDIGO,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 10, color: '#fff', fontWeight: 900, flexShrink: 0,
+                  }}>✓</div>
+                )}
               </button>
             )
           })}
         </div>
 
-        {/* CTA */}
+        {/* CTA Button */}
         <button
           onPointerDown={() => setPressed(true)}
           onPointerUp={() => setPressed(false)}
           onPointerLeave={() => setPressed(false)}
+          onClick={handleBrowse}
           style={{
             width: '100%', maxWidth: 320, padding: '17px',
             background: `linear-gradient(135deg, ${INDIGO}, ${INDIGO_LIGHT})`,
-            border: 'none', borderRadius: 18, fontSize: 17, fontWeight: 900, color: '#fff',
+            border: 'none', borderRadius: 18,
+            fontSize: 17, fontWeight: 900, color: '#fff',
             cursor: 'pointer', fontFamily: FONT,
             boxShadow: pressed ? '0 4px 16px rgba(79,70,229,0.3)' : '0 10px 32px rgba(79,70,229,0.35)',
-            transform: pressed ? 'scale(0.97)' : 'scale(1)', transition: 'all 0.15s',
+            transform: pressed ? 'scale(0.97)' : 'scale(1)',
+            transition: 'all 0.15s', letterSpacing: 0.3,
             direction: isRtl ? 'rtl' : 'ltr',
           }}
         >
           {t.browse} →
         </button>
+
       </div>
 
-      <div style={{ textAlign: 'center', padding: '0 20px 28px', fontSize: 11, color: '#C4B5FD', fontWeight: 700, letterSpacing: 0.8 }}>
+      <div style={{
+        textAlign: 'center', padding: '0 20px 28px',
+        fontSize: 11, color: '#C4B5FD', fontWeight: 700, letterSpacing: 0.8,
+      }}>
         KOMEK · FOR THE KURDISH COMMUNITY · UK
       </div>
     </div>
