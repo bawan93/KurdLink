@@ -2,8 +2,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 
-const INDIGO = '#3730A3'
-const INDIGO_LIGHT = '#6366F1'
+const INDIGO = '#4F46E5'
+const INDIGO_LIGHT = '#818CF8'
 const MINT = '#34D399'
 const SOFT = '#EDE9FE'
 const FONT = "'Nunito', 'Plus Jakarta Sans', sans-serif"
@@ -42,6 +42,33 @@ const GUIDE_ITEMS = {
   ],
 }
 
+function SproutLogo({ size = 32 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100">
+      <defs>
+        <linearGradient id="nbg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={INDIGO} />
+          <stop offset="100%" stopColor={INDIGO_LIGHT} />
+        </linearGradient>
+        <linearGradient id="nleaf" x1="0%" y1="100%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#059669" />
+          <stop offset="100%" stopColor="#6EE7B7" />
+        </linearGradient>
+      </defs>
+      <circle cx="50" cy="50" r="46" fill="url(#nbg)" />
+      <ellipse cx="50" cy="76" rx="30" ry="10" fill="rgba(255,255,255,0.2)" />
+      <path d="M 42 76 Q 36 84 32 90" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.35" />
+      <path d="M 50 76 L 50 90" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.35" />
+      <path d="M 58 76 Q 64 84 68 90" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.35" />
+      <path d="M 50 76 L 50 45" stroke="white" strokeWidth="5" strokeLinecap="round" fill="none" />
+      <path d="M 50 60 Q 26 55 22 34 Q 44 28 52 56 Z" fill="url(#nleaf)" />
+      <path d="M 50 50 Q 72 44 76 23 Q 56 17 48 46 Z" fill="url(#nleaf)" opacity="0.85" />
+      <ellipse cx="50" cy="40" rx="6" ry="9" fill={MINT} />
+      <ellipse cx="50" cy="37" rx="3" ry="4" fill="white" opacity="0.8" />
+    </svg>
+  )
+}
+
 export default function NavBar() {
   const router = useRouter()
   const pathname = usePathname()
@@ -69,16 +96,13 @@ export default function NavBar() {
   const guideItems = GUIDE_ITEMS[lang] || GUIDE_ITEMS.en
 
   return (
-    <div style={{ background: '#fff', position: 'sticky', top: 0, zIndex: 200, direction: 'ltr', borderBottom: '1px solid #EDE9FE', boxShadow: '0 2px 16px rgba(55,48,163,0.08)' }}>
+    <div style={{ background: '#fff', position: 'sticky', top: 0, zIndex: 200, direction: 'ltr', borderBottom: '1px solid #EDE9FE', boxShadow: '0 2px 16px rgba(79,70,229,0.08)' }}>
+
       {/* Top bar */}
-      <div style={{ padding: '12px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ padding: '10px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div onClick={() => router.push('/home')} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-          <div style={{ width: 32, height: 32, borderRadius: 10, background: `linear-gradient(135deg, ${INDIGO}, ${INDIGO_LIGHT})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>
-            🤝
-          </div>
-          <span style={{ fontSize: 20, fontWeight: 900, color: INDIGO, fontFamily: FONT, letterSpacing: -0.5 }}>
-            Komek
-          </span>
+          <SproutLogo size={34} />
+          <span style={{ fontSize: 20, fontWeight: 900, color: INDIGO, fontFamily: FONT, letterSpacing: -0.5 }}>Komek</span>
         </div>
         <LangSelector lang={lang} onChange={(l) => { setLang(l); localStorage.setItem('komek_lang', l); window.dispatchEvent(new CustomEvent('langchange', { detail: l })) }} />
       </div>
@@ -97,11 +121,9 @@ export default function NavBar() {
             border: 'none',
             color: activeTab === tab.id && !isGuideActive ? INDIGO : '#9CA3AF',
             fontWeight: activeTab === tab.id && !isGuideActive ? 800 : 600,
-            fontSize: 13,
-            cursor: 'pointer', fontFamily: FONT, whiteSpace: 'nowrap',
+            fontSize: 13, cursor: 'pointer', fontFamily: FONT, whiteSpace: 'nowrap',
             borderBottom: activeTab === tab.id && !isGuideActive ? `2px solid ${INDIGO}` : '2px solid transparent',
-            borderRadius: '8px 8px 0 0',
-            transition: 'all 0.2s',
+            borderRadius: '8px 8px 0 0', transition: 'all 0.2s',
           }}>
             {tab.label[lang] || tab.label.en}
           </button>
@@ -117,11 +139,9 @@ export default function NavBar() {
             border: 'none',
             color: isGuideActive || showGuide ? INDIGO : '#9CA3AF',
             fontWeight: isGuideActive || showGuide ? 800 : 600,
-            fontSize: 13,
-            cursor: 'pointer', fontFamily: FONT, whiteSpace: 'nowrap',
+            fontSize: 13, cursor: 'pointer', fontFamily: FONT, whiteSpace: 'nowrap',
             borderBottom: isGuideActive || showGuide ? `2px solid ${MINT}` : '2px solid transparent',
-            borderRadius: '8px 8px 0 0',
-            transition: 'all 0.2s',
+            borderRadius: '8px 8px 0 0', transition: 'all 0.2s',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
           }}>
             🧭 {GUIDE_LABELS[lang] || GUIDE_LABELS.en}
@@ -132,12 +152,15 @@ export default function NavBar() {
             <div style={{
               position: 'absolute', top: 'calc(100% + 8px)', right: 0,
               background: '#fff', borderRadius: 20, overflow: 'hidden',
-              boxShadow: '0 8px 40px rgba(55,48,163,0.15)', zIndex: 300, minWidth: 260,
+              boxShadow: '0 8px 40px rgba(79,70,229,0.15)', zIndex: 300, minWidth: 260,
               border: '1px solid #EDE9FE',
             }}>
-              <div style={{ background: `linear-gradient(135deg, ${INDIGO}, ${INDIGO_LIGHT})`, padding: '16px 18px' }}>
-                <div style={{ fontSize: 15, fontWeight: 900, color: '#fff', fontFamily: FONT }}>🧭 {GUIDE_LABELS[lang]}</div>
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 3, fontFamily: FONT }}>Your guide to life in the UK</div>
+              <div style={{ background: `linear-gradient(135deg, ${INDIGO}, ${INDIGO_LIGHT})`, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ fontSize: 22 }}>🤝</span>
+                <div>
+                  <div style={{ fontSize: 15, fontWeight: 900, color: '#fff', fontFamily: FONT }}>🧭 {GUIDE_LABELS[lang]}</div>
+                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2, fontFamily: FONT }}>Your guide to life in the UK</div>
+                </div>
               </div>
               {guideItems.map((item, i) => (
                 <button key={i} onClick={() => { setShowGuide(false); router.push(item.route) }} style={{
@@ -198,7 +221,7 @@ function LangSelector({ lang, onChange }) {
         <span style={{ fontSize: 9, opacity: 0.6 }}>{open ? '▲' : '▼'}</span>
       </button>
       {open && (
-        <div style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 8px 32px rgba(55,48,163,0.15)', zIndex: 400, minWidth: 160, border: '1px solid #EDE9FE' }}>
+        <div style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 8px 32px rgba(79,70,229,0.15)', zIndex: 400, minWidth: 160, border: '1px solid #EDE9FE' }}>
           {LANGS.map(l => (
             <button key={l.id} onClick={() => { onChange(l.id); setOpen(false) }} style={{
               width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '11px 16px',
