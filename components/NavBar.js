@@ -8,6 +8,37 @@ const MINT = '#34D399'
 const SOFT = '#EDE9FE'
 const FONT = "'Nunito', 'Plus Jakarta Sans', sans-serif"
 
+const TABS = [
+  {
+    id: 'guide',
+    icon: '🧭',
+    label: { en: 'Guide', ku: 'ڕێبەر', fa: 'راهنما', ar: 'الدليل' },
+    route: '/reber/coming-to-uk',
+    match: (p) => p?.startsWith('/reber'),
+  },
+  {
+    id: 'letters',
+    icon: '📄',
+    label: { en: 'Letters', ku: 'نامەکان', fa: 'نامه‌ها', ar: 'الرسائل' },
+    route: '/journey/document-explainer',
+    match: (p) => p?.startsWith('/journey'),
+  },
+  {
+    id: 'ask',
+    icon: '❓',
+    label: { en: 'Ask', ku: 'پرسیار', fa: 'سوال', ar: 'اسأل' },
+    route: '/reber/ask',
+    match: (p) => p === '/reber/ask',
+  },
+  {
+    id: 'find',
+    icon: '🔍',
+    label: { en: 'Find', ku: 'بدۆزەرەوە', fa: 'جستجو', ar: 'ابحث' },
+    route: '/home',
+    match: (p) => p === '/home' || p?.startsWith('/listing') || p?.startsWith('/services'),
+  },
+]
+
 function SproutLogo({ size = 32 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 100 100">
@@ -53,16 +84,46 @@ export default function NavBar() {
       direction: 'ltr', borderBottom: '1px solid #EDE9FE',
       boxShadow: '0 2px 16px rgba(79,70,229,0.08)',
     }}>
-      <div style={{ padding: '10px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      {/* Top row — logo + lang */}
+      <div style={{ padding: '10px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div onClick={() => router.push('/home')} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-          <SproutLogo size={34} />
-          <span style={{ fontSize: 20, fontWeight: 900, color: INDIGO, fontFamily: FONT, letterSpacing: -0.5 }}>Komek</span>
+          <SproutLogo size={32} />
+          <span style={{ fontSize: 19, fontWeight: 900, color: INDIGO, fontFamily: FONT, letterSpacing: -0.5 }}>Komek</span>
         </div>
         <LangSelector lang={lang} onChange={(l) => {
           setLang(l)
           localStorage.setItem('komek_lang', l)
           window.dispatchEvent(new CustomEvent('langchange', { detail: l }))
         }} />
+      </div>
+
+      {/* Tab row */}
+      <div style={{ display: 'flex', padding: '0 8px', direction: 'ltr' }}>
+        {TABS.map(tab => {
+          const active = tab.match(pathname)
+          const label = tab.label[lang] || tab.label.en
+          return (
+            <button
+              key={tab.id}
+              onClick={() => router.push(tab.route)}
+              style={{
+                flex: 1, padding: '9px 4px',
+                background: active ? SOFT : 'transparent',
+                border: 'none',
+                color: active ? INDIGO : '#9CA3AF',
+                fontWeight: active ? 800 : 600,
+                fontSize: 12, cursor: 'pointer', fontFamily: FONT,
+                borderBottom: active ? `2px solid ${INDIGO}` : '2px solid transparent',
+                borderRadius: '8px 8px 0 0', transition: 'all 0.2s',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <span style={{ fontSize: 14 }}>{tab.icon}</span>
+              <span>{label}</span>
+            </button>
+          )
+        })}
       </div>
     </div>
   )
