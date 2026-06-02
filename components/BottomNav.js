@@ -4,13 +4,15 @@ import { useState, useEffect } from 'react'
 
 const INDIGO = '#4F46E5'
 const INDIGO_LIGHT = '#818CF8'
+const MINT = '#34D399'
+const SOFT = '#EDE9FE'
 const FONT = "'Nunito', 'Plus Jakarta Sans', sans-serif"
 
 const TX = {
-  en: { home: 'Home', post: 'Post', account: 'Account' },
-  ku: { home: 'سەرەکی', post: 'پۆست', account: 'ئەکاونت' },
-  fa: { home: 'خانه', post: 'پست', account: 'حساب' },
-  ar: { home: 'الرئيسية', post: 'نشر', account: 'حسابي' },
+  en: { letters: 'Letters', ask: 'Ask', guide: 'Guide', services: 'Services' },
+  ku: { letters: 'نامەکان', ask: 'پرسیار', guide: 'ڕێبەر', services: 'خزمەتگوزاری' },
+  fa: { letters: 'نامه‌ها', ask: 'سوال', guide: 'راهنما', services: 'خدمات' },
+  ar: { letters: 'الرسائل', ask: 'سؤال', guide: 'الدليل', services: 'الخدمات' },
 }
 
 export default function BottomNav() {
@@ -29,9 +31,70 @@ export default function BottomNav() {
   if (pathname === '/') return null
 
   const t = TX[lang] || TX.en
-  const isHome = pathname === '/home'
-  const isPost = pathname === '/post'
-  const isAccount = pathname === '/account'
+
+  const isLetters = pathname?.startsWith('/journey')
+  const isAsk = pathname === '/reber/ask'
+  const isGuide = pathname?.startsWith('/reber') && !isAsk
+  const isServices = pathname === '/home' || pathname?.startsWith('/listing') || pathname?.startsWith('/services') || pathname?.startsWith('/post')
+
+  const tabs = [
+    {
+      id: 'letters',
+      label: t.letters,
+      active: isLetters,
+      color: MINT,
+      icon: (active) => (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="5" width="18" height="14" rx="2" stroke={active ? MINT : '#9CA3AF'} strokeWidth="2" />
+          <path d="M3 9l9 5 9-5" stroke={active ? MINT : '#9CA3AF'} strokeWidth="2" strokeLinecap="round" />
+        </svg>
+      ),
+      onPress: () => router.push('/journey/document-explainer'),
+    },
+    {
+      id: 'ask',
+      label: t.ask,
+      active: isAsk,
+      color: '#F59E0B',
+      icon: (active) => (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="9" stroke={active ? '#F59E0B' : '#9CA3AF'} strokeWidth="2" />
+          <path d="M9.5 9.5a2.5 2.5 0 015 .5c0 2-2.5 2.5-2.5 4" stroke={active ? '#F59E0B' : '#9CA3AF'} strokeWidth="2" strokeLinecap="round" />
+          <circle cx="12" cy="17.5" r="0.75" fill={active ? '#F59E0B' : '#9CA3AF'} />
+        </svg>
+      ),
+      onPress: () => router.push('/reber/ask'),
+    },
+    {
+      id: 'guide',
+      label: t.guide,
+      active: isGuide,
+      color: INDIGO,
+      icon: (active) => (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M4 19V6a2 2 0 012-2h12a2 2 0 012 2v13" stroke={active ? INDIGO : '#9CA3AF'} strokeWidth="2" strokeLinecap="round" />
+          <path d="M4 19a2 2 0 002 2h12a2 2 0 002-2" stroke={active ? INDIGO : '#9CA3AF'} strokeWidth="2" />
+          <path d="M9 8h6M9 12h6M9 16h4" stroke={active ? INDIGO : '#9CA3AF'} strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+      ),
+      onPress: () => router.push('/reber/coming-to-uk'),
+    },
+    {
+      id: 'services',
+      label: t.services,
+      active: isServices,
+      color: '#059669',
+      icon: (active) => (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="8" height="8" rx="2" stroke={active ? '#059669' : '#9CA3AF'} strokeWidth="2" />
+          <rect x="13" y="3" width="8" height="8" rx="2" stroke={active ? '#059669' : '#9CA3AF'} strokeWidth="2" />
+          <rect x="3" y="13" width="8" height="8" rx="2" stroke={active ? '#059669' : '#9CA3AF'} strokeWidth="2" />
+          <rect x="13" y="13" width="8" height="8" rx="2" stroke={active ? '#059669' : '#9CA3AF'} strokeWidth="2" />
+        </svg>
+      ),
+      onPress: () => router.push('/home'),
+    },
+  ]
 
   return (
     <div style={{
@@ -44,68 +107,32 @@ export default function BottomNav() {
       boxShadow: '0 -4px 24px rgba(79,70,229,0.08)',
       direction: 'ltr',
     }}>
-
-      {/* Home */}
-      <button onClick={() => router.push('/home')} style={{
-        flex: 1, padding: '10px 0 8px', background: 'none', border: 'none',
-        cursor: 'pointer', display: 'flex', flexDirection: 'column',
-        alignItems: 'center', gap: 3, fontFamily: FONT,
-      }}>
-        <div style={{
-          width: 28, height: 28, borderRadius: 8,
-          background: isHome ? '#EDE9FE' : 'transparent',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          transition: 'all 0.2s',
-        }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M3 9.5L12 3L21 9.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z" stroke={isHome ? INDIGO : '#9CA3AF'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M9 21V12h6v9" stroke={isHome ? INDIGO : '#9CA3AF'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-        <span style={{ fontSize: 10, fontWeight: 800, color: isHome ? INDIGO : '#9CA3AF' }}>{t.home}</span>
-      </button>
-
-      {/* Post — centre elevated button */}
-      <button onClick={() => router.push('/post')} style={{
-        flex: 1, padding: '10px 0 8px', background: 'none', border: 'none',
-        cursor: 'pointer', display: 'flex', flexDirection: 'column',
-        alignItems: 'center', gap: 3, fontFamily: FONT,
-      }}>
-        <div style={{
-          width: 48, height: 48,
-          background: `linear-gradient(135deg, ${INDIGO}, ${INDIGO_LIGHT})`,
-          borderRadius: '50%',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          marginTop: -22,
-          boxShadow: '0 4px 20px rgba(79,70,229,0.45)',
-          transition: 'all 0.2s',
-        }}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M12 5v14M5 12h14" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-          </svg>
-        </div>
-        <span style={{ fontSize: 10, fontWeight: 800, color: isPost ? INDIGO : '#9CA3AF', marginTop: 2 }}>{t.post}</span>
-      </button>
-
-      {/* Account */}
-      <button onClick={() => router.push('/account')} style={{
-        flex: 1, padding: '10px 0 8px', background: 'none', border: 'none',
-        cursor: 'pointer', display: 'flex', flexDirection: 'column',
-        alignItems: 'center', gap: 3, fontFamily: FONT,
-      }}>
-        <div style={{
-          width: 28, height: 28, borderRadius: 8,
-          background: isAccount ? '#EDE9FE' : 'transparent',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          transition: 'all 0.2s',
-        }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="8" r="4" stroke={isAccount ? INDIGO : '#9CA3AF'} strokeWidth="2" />
-            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke={isAccount ? INDIGO : '#9CA3AF'} strokeWidth="2" strokeLinecap="round" />
-          </svg>
-        </div>
-        <span style={{ fontSize: 10, fontWeight: 800, color: isAccount ? INDIGO : '#9CA3AF' }}>{t.account}</span>
-      </button>
+      {tabs.map(tab => (
+        <button
+          key={tab.id}
+          onClick={tab.onPress}
+          style={{
+            flex: 1, padding: '10px 0 8px', background: 'none', border: 'none',
+            cursor: 'pointer', display: 'flex', flexDirection: 'column',
+            alignItems: 'center', gap: 3, fontFamily: FONT,
+          }}
+        >
+          <div style={{
+            width: 36, height: 36, borderRadius: 10,
+            background: tab.active ? `${tab.color}18` : 'transparent',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transition: 'all 0.2s',
+          }}>
+            {tab.icon(tab.active)}
+          </div>
+          <span style={{
+            fontSize: 10, fontWeight: 800,
+            color: tab.active ? tab.color : '#9CA3AF',
+          }}>
+            {tab.label}
+          </span>
+        </button>
+      ))}
     </div>
   )
 }

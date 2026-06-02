@@ -10,182 +10,331 @@ function getSupabase() {
 const FONT = "'Nunito', 'Plus Jakarta Sans', sans-serif"
 const INDIGO = '#4F46E5'
 const INDIGO_LIGHT = '#818CF8'
+const INDIGO_DARK = '#1C1A4F'
 const MINT = '#34D399'
 const SOFT = '#EDE9FE'
 const BG = '#F5F4FF'
 
-const TYPE_META = {
-  list_service: { icon: '🎯', color: INDIGO,       label: { en: 'Service', ku: 'خزمەتگوزاری', fa: 'خدمت', ar: 'خدمة'  } },
-  hire_staff:   { icon: '💼', color: '#059669',     label: { en: 'Job',     ku: 'کار',         fa: 'شغل',  ar: 'وظيفة' } },
-}
-
 const TX = {
-  en: { noListings: 'No listings yet', noListingsSub: 'Be the first to post something', postSomething: '+ Post Something', loading: 'Loading…', call: 'Call', sold: 'SOLD', filled: 'FILLED' },
-  ku: { noListings: 'هێشتا هیچ لیستێک نییە', noListingsSub: 'یەکەمین بە و شتێک پۆست بکە', postSomething: '+ شتێک پۆست بکە', loading: 'چاوەڕوانبە…', call: 'پەیوەندی', sold: 'فرۆشراوە', filled: 'پڕکراوە' },
-  fa: { noListings: 'هنوز آگهی‌ای نیست', noListingsSub: 'اولین نفر باش و چیزی پست کن', postSomething: '+ ثبت آگهی', loading: 'در حال بارگذاری…', call: 'تماس', sold: 'فروخته شد', filled: 'پر شد' },
-  ar: { noListings: 'لا توجد إعلانات بعد', noListingsSub: 'كن أول من ينشر شيئاً', postSomething: '+ نشر إعلان', loading: 'جاري التحميل…', call: 'اتصال', sold: 'مُباع', filled: 'مكتمل' },
+  en: {
+    heroLabel: 'FREE · AI POWERED',
+    heroTitle: 'Got a letter from the Home Office?',
+    heroSub: 'Upload any UK official letter and understand it instantly — in your language.',
+    heroCta: 'Explain My Letter',
+    usesLeft: 'free uses left today',
+    guideTitle: 'Your Journey Guide',
+    guideSub: 'Step by step from arrival to citizenship',
+    stages: [
+      { label: 'New to UK', color: INDIGO, route: '/reber/new-to-uk', icon: '✈️' },
+      { label: 'Leave to Remain', color: '#059669', route: '/reber/leave-to-remain', icon: '✅' },
+      { label: 'Citizenship', color: '#7C3AED', route: '/reber/citizenship', icon: '🇬🇧' },
+    ],
+    askTitle: 'Ask the Community',
+    askSub: 'Real questions from people like you',
+    askCta: 'Ask a Question',
+    servicesTitle: 'Services & Jobs',
+    servicesSub: 'Find Kurdish businesses and job opportunities',
+    noListings: 'No listings yet',
+    loading: 'Loading…',
+    call: 'Call',
+  },
+  ku: {
+    heroLabel: 'بەخۆڕایی · AI',
+    heroTitle: 'نامەیەکت لە ئۆفیسی ناوخۆ هەیە؟',
+    heroSub: 'هەر نامەیەکی فەرمیی UK بار بکە و فەوری تێبگە — بە زمانی خۆت.',
+    heroCta: 'نامەکەم شیبکە',
+    usesLeft: 'بەکارهێنانی بەخۆڕایی ئەمڕۆ ماون',
+    guideTitle: 'ڕێنمای گەشتەکەت',
+    guideSub: 'هەنگاو بە هەنگاو لە گەیشتن تا هاووڵاتیی',
+    stages: [
+      { label: 'تازە گەیشتوویت', color: INDIGO, route: '/reber/new-to-uk', icon: '✈️' },
+      { label: 'مۆڵەتی مانەوە', color: '#059669', route: '/reber/leave-to-remain', icon: '✅' },
+      { label: 'هاووڵاتیی', color: '#7C3AED', route: '/reber/citizenship', icon: '🇬🇧' },
+    ],
+    askTitle: 'پرسیار لە کۆمیونیتی',
+    askSub: 'پرسیارە راستەقینەکان لە کەسانی وەک تۆ',
+    askCta: 'پرسیار بکە',
+    servicesTitle: 'خزمەتگوزاری و کار',
+    servicesSub: 'کارو بارێکی کوردی و دەرفەتی کار بدۆزەرەوە',
+    noListings: 'هێشتا هیچ لیستێک نییە',
+    loading: 'چاوەڕوانبە…',
+    call: 'پەیوەندی',
+  },
+  fa: {
+    heroLabel: 'رایگان · هوش مصنوعی',
+    heroTitle: 'نامه‌ای از Home Office داری؟',
+    heroSub: 'هر نامه رسمی UK را آپلود کن و فوری بفهم — به زبان خودت.',
+    heroCta: 'نامه‌ام را توضیح بده',
+    usesLeft: 'استفاده رایگان امروز باقی مانده',
+    guideTitle: 'راهنمای سفر تو',
+    guideSub: 'گام به گام از ورود تا شهروندی',
+    stages: [
+      { label: 'تازه رسیدی', color: INDIGO, route: '/reber/new-to-uk', icon: '✈️' },
+      { label: 'اجازه اقامت', color: '#059669', route: '/reber/leave-to-remain', icon: '✅' },
+      { label: 'شهروندی', color: '#7C3AED', route: '/reber/citizenship', icon: '🇬🇧' },
+    ],
+    askTitle: 'از جامعه بپرس',
+    askSub: 'سوالات واقعی از افرادی مثل تو',
+    askCta: 'سوال بپرس',
+    servicesTitle: 'خدمات و مشاغل',
+    servicesSub: 'کسب‌وکارهای کردی و فرصت‌های شغلی',
+    noListings: 'هنوز آگهی‌ای نیست',
+    loading: 'در حال بارگذاری…',
+    call: 'تماس',
+  },
+  ar: {
+    heroLabel: 'مجاني · ذكاء اصطناعي',
+    heroTitle: 'لديك رسالة من وزارة الداخلية؟',
+    heroSub: 'ارفع أي رسالة رسمية بريطانية وافهمها فوراً — بلغتك.',
+    heroCta: 'اشرح رسالتي',
+    usesLeft: 'استخدامات مجانية متبقية اليوم',
+    guideTitle: 'دليل رحلتك',
+    guideSub: 'خطوة بخطوة من الوصول إلى الجنسية',
+    stages: [
+      { label: 'وصلت للتو', color: INDIGO, route: '/reber/new-to-uk', icon: '✈️' },
+      { label: 'الإذن بالبقاء', color: '#059669', route: '/reber/leave-to-remain', icon: '✅' },
+      { label: 'الجنسية', color: '#7C3AED', route: '/reber/citizenship', icon: '🇬🇧' },
+    ],
+    askTitle: 'اسأل المجتمع',
+    askSub: 'أسئلة حقيقية من أشخاص مثلك',
+    askCta: 'اطرح سؤالاً',
+    servicesTitle: 'الخدمات والوظائف',
+    servicesSub: 'اعثر على أعمال كردية وفرص عمل',
+    noListings: 'لا توجد إعلانات بعد',
+    loading: 'جاري التحميل…',
+    call: 'اتصال',
+  },
 }
 
-function getTitle(type, data) {
-  if (type === 'list_service') return data.fullName
-  if (type === 'hire_staff') return data.jobTitle
-  return 'Listing'
-}
-
-function getSubtitle(type, data) {
-  if (type === 'list_service') return data.category
-  if (type === 'hire_staff') return data.salary ? `💰 ${data.salary}` : ''
-  return ''
+function SectionHeader({ label, sub, cta, onCta, ctaColor }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 }}>
+      <div>
+        <div style={{ fontSize: 17, fontWeight: 900, color: INDIGO_DARK, letterSpacing: -0.3 }}>{label}</div>
+        {sub && <div style={{ fontSize: 12, color: '#9CA3AF', fontWeight: 500, marginTop: 2 }}>{sub}</div>}
+      </div>
+      {cta && (
+        <button onClick={onCta} style={{ fontSize: 12, fontWeight: 800, color: ctaColor || INDIGO, background: SOFT, border: 'none', borderRadius: 20, padding: '6px 14px', cursor: 'pointer', fontFamily: FONT, whiteSpace: 'nowrap' }}>
+          {cta} →
+        </button>
+      )}
+    </div>
+  )
 }
 
 export default function Home() {
   const router = useRouter()
   const [lang, setLang] = useState('en')
-  const [activeTab, setActiveTab] = useState('all')
   const [listings, setListings] = useState([])
   const [loading, setLoading] = useState(true)
+  const [usesLeft, setUsesLeft] = useState(10)
   const t = TX[lang] || TX.en
   const isRtl = lang === 'ku' || lang === 'fa' || lang === 'ar'
 
   useEffect(() => {
     const saved = localStorage.getItem('komek_lang')
-    if (saved) setLang(saved)
-    const handler = (e) => setLang(e.detail)
+    if (saved && TX[saved]) setLang(saved)
+    const handler = (e) => { if (TX[e.detail]) setLang(e.detail) }
     window.addEventListener('langchange', handler)
+
+    // Check document explainer uses left
+    const key = 'doc_explainer_uses'
+    const dateKey = 'doc_explainer_date'
+    const today = new Date().toDateString()
+    const savedDate = localStorage.getItem(dateKey)
+    if (savedDate !== today) {
+      localStorage.setItem(dateKey, today)
+      localStorage.setItem(key, '10')
+      setUsesLeft(10)
+    } else {
+      const uses = parseInt(localStorage.getItem(key) || '10')
+      setUsesLeft(uses)
+    }
+
     return () => window.removeEventListener('langchange', handler)
   }, [])
 
   useEffect(() => {
-    const handler = (e) => setActiveTab(e.detail)
-    window.addEventListener('tabchange', handler)
-    return () => window.removeEventListener('tabchange', handler)
-  }, [])
-
-  useEffect(() => {
     fetchListings()
-  }, [activeTab])
+  }, [])
 
   const fetchListings = async () => {
     setLoading(true)
-    const supabase = getSupabase()
-    let query = supabase
-      .from('listings')
-      .select('*')
-      .in('type', ['list_service', 'hire_staff'])
-      .in('status', ['approved', 'sold', 'filled'])
-      .order('created_at', { ascending: false })
-    if (activeTab !== 'all') query = query.eq('type', activeTab)
-    const { data } = await query
-    setListings(data || [])
+    try {
+      const supabase = getSupabase()
+      const { data } = await supabase
+        .from('listings')
+        .select('*')
+        .in('type', ['list_service', 'hire_staff'])
+        .in('status', ['approved', 'sold', 'filled'])
+        .order('created_at', { ascending: false })
+        .limit(4)
+      setListings(data || [])
+    } catch (e) {
+      setListings([])
+    }
     setLoading(false)
   }
 
   return (
-    <div style={{ minHeight: '100vh', minHeight: '100dvh', background: BG, fontFamily: FONT, direction: isRtl ? 'rtl' : 'ltr', paddingBottom: 80 }}>
-      <div style={{ maxWidth: 600, margin: '0 auto', padding: '16px 16px 20px', boxSizing: 'border-box' }}>
+    <div style={{ minHeight: '100vh', minHeight: '100dvh', background: BG, fontFamily: FONT, direction: isRtl ? 'rtl' : 'ltr', paddingBottom: 90 }}>
+
+      {/* ── DOCUMENT EXPLAINER HERO ── */}
+      <div style={{ background: `linear-gradient(135deg, ${INDIGO_DARK} 0%, #2D2B6B 100%)`, padding: '28px 20px 32px' }}>
+        <div style={{ maxWidth: 480, margin: '0 auto' }}>
+
+          {/* Label */}
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(52,211,153,0.15)', border: '1px solid rgba(52,211,153,0.3)', borderRadius: 20, padding: '4px 12px', marginBottom: 16 }}>
+            <span style={{ fontSize: 10, fontWeight: 800, color: MINT, letterSpacing: 1.5 }}>{t.heroLabel}</span>
+          </div>
+
+          <h1 style={{ fontSize: 24, fontWeight: 900, color: '#fff', margin: '0 0 10px', lineHeight: 1.25, letterSpacing: -0.5 }}>{t.heroTitle}</h1>
+          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.65)', margin: '0 0 22px', lineHeight: 1.65, fontWeight: 500 }}>{t.heroSub}</p>
+
+          {/* CTA button */}
+          <button
+            onClick={() => router.push('/journey/document-explainer')}
+            style={{
+              width: '100%', padding: '16px', borderRadius: 16,
+              background: `linear-gradient(135deg, ${MINT}, #059669)`,
+              border: 'none', fontSize: 16, fontWeight: 900, color: '#fff',
+              cursor: 'pointer', fontFamily: FONT,
+              boxShadow: '0 8px 28px rgba(52,211,153,0.4)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+            }}
+          >
+            <span style={{ fontSize: 20 }}>📄</span>
+            {t.heroCta}
+          </button>
+
+          {/* Uses left indicator */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 12 }}>
+            <div style={{ display: 'flex', gap: 3 }}>
+              {Array.from({ length: 10 }).map((_, i) => (
+                <div key={i} style={{ width: 18, height: 4, borderRadius: 2, background: i < usesLeft ? MINT : 'rgba(255,255,255,0.15)', transition: 'background 0.3s' }} />
+              ))}
+            </div>
+            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>{usesLeft} {t.usesLeft}</span>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ maxWidth: 480, margin: '0 auto', padding: '20px 20px 0' }}>
+
+        {/* ── JOURNEY GUIDE SECTION ── */}
+        <SectionHeader
+          label={t.guideTitle}
+          sub={t.guideSub}
+          cta="View all"
+          onCta={() => router.push('/reber/coming-to-uk')}
+        />
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 28 }}>
+          {t.stages.map((stage, i) => (
+            <button
+              key={i}
+              onClick={() => router.push(stage.route)}
+              style={{
+                background: '#fff', borderRadius: 16, padding: '16px 10px',
+                border: `1.5px solid ${stage.color}20`, cursor: 'pointer',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+                fontFamily: FONT, boxShadow: `0 4px 16px ${stage.color}10`,
+                transition: 'all 0.15s',
+              }}
+            >
+              <div style={{ width: 44, height: 44, borderRadius: 14, background: `${stage.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>
+                {stage.icon}
+              </div>
+              <div style={{ fontSize: 11, fontWeight: 800, color: stage.color, textAlign: 'center', lineHeight: 1.3 }}>{stage.label}</div>
+            </button>
+          ))}
+        </div>
+
+        {/* ── ASK A QUESTION ── */}
+        <SectionHeader
+          label={t.askTitle}
+          sub={t.askSub}
+        />
+
+        <button
+          onClick={() => router.push('/reber/ask')}
+          style={{
+            width: '100%', background: '#fff', borderRadius: 16, padding: '16px 18px',
+            border: `1.5px solid ${SOFT}`, cursor: 'pointer', fontFamily: FONT,
+            display: 'flex', alignItems: 'center', gap: 14, marginBottom: 28,
+            boxShadow: '0 2px 12px rgba(79,70,229,0.06)',
+            textAlign: isRtl ? 'right' : 'left',
+          }}
+        >
+          <div style={{ width: 46, height: 46, borderRadius: 14, background: SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>❓</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 800, color: INDIGO }}>{t.askCta}</div>
+            <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2, fontWeight: 500 }}>{t.askSub}</div>
+          </div>
+          <span style={{ fontSize: 20, color: '#C4B5FD', flexShrink: 0 }}>{isRtl ? '←' : '→'}</span>
+        </button>
+
+        {/* ── SERVICES & JOBS ── */}
+        <SectionHeader
+          label={t.servicesTitle}
+          sub={t.servicesSub}
+          cta="View all"
+          onCta={() => router.push('/services')}
+        />
 
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '80px 20px' }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>🌱</div>
-            <p style={{ color: '#9CA3AF', fontSize: 14, fontWeight: 600 }}>{t.loading}</p>
+          <div style={{ textAlign: 'center', padding: '32px 0', color: '#9CA3AF', fontSize: 13, fontWeight: 600 }}>
+            🌱 {t.loading}
           </div>
-
         ) : listings.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '80px 20px' }}>
-            <div style={{ fontSize: 64, marginBottom: 16 }}>🤝</div>
-            <p style={{ fontSize: 18, fontWeight: 900, color: INDIGO, margin: '0 0 8px' }}>{t.noListings}</p>
-            <p style={{ fontSize: 14, color: '#9CA3AF', margin: '0 0 28px', fontWeight: 500 }}>{t.noListingsSub}</p>
-            <button onClick={() => router.push('/post')} style={{
-              background: `linear-gradient(135deg, ${INDIGO}, ${INDIGO_LIGHT})`,
-              border: 'none', borderRadius: 14, padding: '14px 28px',
-              color: '#fff', fontWeight: 800, fontSize: 14,
-              cursor: 'pointer', fontFamily: FONT,
-              boxShadow: '0 8px 24px rgba(79,70,229,0.3)',
-            }}>
-              {t.postSomething}
-            </button>
+          <div style={{ textAlign: 'center', padding: '32px 0' }}>
+            <div style={{ fontSize: 40, marginBottom: 10 }}>🤝</div>
+            <div style={{ fontSize: 14, color: '#9CA3AF', fontWeight: 600 }}>{t.noListings}</div>
           </div>
-
         ) : (
           listings.map(listing => {
             const d = listing.data || {}
-            const meta = TYPE_META[listing.type]
-            if (!meta) return null
-            const img = d.imageUrls?.[0]
-            const title = getTitle(listing.type, d)
-            const subtitle = getSubtitle(listing.type, d)
-            const isSold = listing.status === 'sold'
-            const isFilled = listing.status === 'filled'
+            const isService = listing.type === 'list_service'
+            const title = isService ? d.fullName : d.jobTitle
+            const sub = isService ? d.category : d.salary ? `💰 ${d.salary}` : ''
+            const color = isService ? INDIGO : '#059669'
+            const icon = isService ? '🎯' : '💼'
 
             return (
               <div
                 key={listing.id}
                 onClick={() => router.push(`/listing/${listing.id}`)}
                 style={{
-                  background: '#fff', borderRadius: 20, marginBottom: 14,
+                  background: '#fff', borderRadius: 16, marginBottom: 10,
                   cursor: 'pointer', border: '1.5px solid #EDE9FE',
-                  boxShadow: '0 2px 16px rgba(79,70,229,0.06)', overflow: 'hidden',
-                  transition: 'transform 0.15s, box-shadow 0.15s',
+                  boxShadow: '0 2px 12px rgba(79,70,229,0.05)', overflow: 'hidden',
                 }}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(79,70,229,0.12)' }}
-                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 16px rgba(79,70,229,0.06)' }}
               >
-                {/* Image */}
-                {img && (
-                  <div style={{ position: 'relative' }}>
-                    <img src={img} alt={title} style={{ width: '100%', height: 180, objectFit: 'cover', filter: isSold || isFilled ? 'brightness(0.5)' : 'none' }} />
-                    {isSold && (
-                      <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: '#EF4444', color: '#fff', fontWeight: 900, fontSize: 20, padding: '8px 24px', borderRadius: 10, letterSpacing: 2, boxShadow: '0 4px 16px rgba(0,0,0,0.3)' }}>{t.sold}</div>
-                    )}
-                    {isFilled && (
-                      <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: '#059669', color: '#fff', fontWeight: 900, fontSize: 20, padding: '8px 24px', borderRadius: 10, letterSpacing: 2, boxShadow: '0 4px 16px rgba(0,0,0,0.3)' }}>{t.filled}</div>
-                    )}
+                <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12, flexDirection: isRtl ? 'row-reverse' : 'row' }}>
+                  <div style={{ width: 42, height: 42, borderRadius: 12, background: `${color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>
+                    {icon}
                   </div>
-                )}
-
-                {/* Type badge */}
-                <div style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8, borderBottom: '1px solid #F5F4FF' }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 10, background: `${meta.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>
-                    {meta.icon}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: INDIGO_DARK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</div>
+                    {sub && <div style={{ fontSize: 12, color, fontWeight: 700, marginTop: 2 }}>{sub}</div>}
+                    {d.city && <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>📍 {d.city}</div>}
                   </div>
-                  <span style={{ fontSize: 12, fontWeight: 800, color: meta.color, textTransform: 'uppercase', letterSpacing: 0.8 }}>
-                    {meta.label[lang] || meta.label.en}
-                  </span>
-                  {d.city && (
-                    <span style={{ fontSize: 12, color: '#9CA3AF', marginLeft: 'auto', fontWeight: 600 }}>📍 {d.city}</span>
-                  )}
-                </div>
-
-                {/* Content */}
-                <div style={{ padding: '12px 16px 14px' }}>
-                  <h3 style={{ fontSize: 16, fontWeight: 900, color: INDIGO, margin: '0 0 4px', lineHeight: 1.3 }}>{title}</h3>
-                  {subtitle && (
-                    <p style={{ fontSize: 13, fontWeight: 700, color: MINT, margin: '0 0 8px' }}>{subtitle}</p>
-                  )}
-                  {d.description && (
-                    <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 12px', lineHeight: 1.6, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', fontWeight: 500 }}>
-                      {d.description}
-                    </p>
-                  )}
-                  <div style={{ display: 'flex', gap: 8 }}>
+                  <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
                     {(d.phone || d.applyPhone) && (
                       <a href={`tel:${d.phone || d.applyPhone}`} onClick={e => e.stopPropagation()} style={{
-                        flex: 1, background: `linear-gradient(135deg, ${INDIGO}, ${INDIGO_LIGHT})`,
-                        borderRadius: 12, padding: '10px', color: '#fff', fontWeight: 700,
-                        fontSize: 13, textAlign: 'center', textDecoration: 'none', display: 'block',
-                        boxShadow: '0 4px 12px rgba(79,70,229,0.25)',
+                        background: `linear-gradient(135deg, ${INDIGO}, ${INDIGO_LIGHT})`,
+                        borderRadius: 10, padding: '7px 12px', color: '#fff',
+                        fontWeight: 700, fontSize: 12, textDecoration: 'none',
                       }}>
-                        📞 {t.call}
+                        📞
                       </a>
                     )}
                     {d.whatsapp && (
                       <a href={`https://wa.me/${d.whatsapp.replace(/\D/g, '')}`} onClick={e => e.stopPropagation()} target="_blank" style={{
-                        flex: 1, background: '#25D366', borderRadius: 12, padding: '10px',
-                        color: '#fff', fontWeight: 700, fontSize: 13, textAlign: 'center',
-                        textDecoration: 'none', display: 'block',
-                        boxShadow: '0 4px 12px rgba(37,211,102,0.25)',
+                        background: '#25D366', borderRadius: 10, padding: '7px 12px',
+                        color: '#fff', fontWeight: 700, fontSize: 12, textDecoration: 'none',
                       }}>
-                        💬 WhatsApp
+                        💬
                       </a>
                     )}
                   </div>
