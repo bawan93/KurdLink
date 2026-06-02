@@ -1,3 +1,4 @@
+'use client'
 import { useState } from "react"
 
 const INDIGO = '#4F46E5'
