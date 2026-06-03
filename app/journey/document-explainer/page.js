@@ -186,17 +186,32 @@ export default function DocumentExplainerPage() {
     if (!file) return
     const isImage = file.type.startsWith('image/')
     if (isImage) {
-      // Convert any image format (incl. AVIF, HEIC) to JPEG via canvas
       const reader = new FileReader()
       reader.onload = (e) => {
         const img = new Image()
         img.onload = () => {
+          // Max dimension 1000px — keeps text readable but cuts tokens dramatically
+          const MAX_DIM = 1000
+          let { width, height } = img
+          if (width > MAX_DIM || height > MAX_DIM) {
+            if (width > height) {
+              height = Math.round((height / width) * MAX_DIM)
+              width = MAX_DIM
+            } else {
+              width = Math.round((width / height) * MAX_DIM)
+              height = MAX_DIM
+            }
+          }
           const canvas = document.createElement('canvas')
-          canvas.width = img.width
-          canvas.height = img.height
+          canvas.width = width
+          canvas.height = height
           const ctx = canvas.getContext('2d')
-          ctx.drawImage(img, 0, 0)
-          const jpegDataUrl = canvas.toDataURL('image/jpeg', 0.92)
+          // White background (in case of transparency)
+          ctx.fillStyle = '#ffffff'
+          ctx.fillRect(0, 0, width, height)
+          ctx.drawImage(img, 0, 0, width, height)
+          // 0.7 quality — good enough for reading text, ~60-70% smaller
+          const jpegDataUrl = canvas.toDataURL('image/jpeg', 0.7)
           const base64 = jpegDataUrl.split(',')[1]
           setImageData(base64)
           setImageType('image/jpeg')
