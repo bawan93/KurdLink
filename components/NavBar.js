@@ -34,8 +34,8 @@ const TABS = [
     id: 'find',
     icon: '🔍',
     label: { en: 'Find', ku: 'بدۆزەرەوە', fa: 'جستجو', ar: 'ابحث' },
-    route: '/home',
-    match: (p) => p === '/home' || p?.startsWith('/listing') || p?.startsWith('/services'),
+    route: '/find',
+    match: (p) => p?.startsWith('/find'),
   },
 ]
 
