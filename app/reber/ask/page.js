@@ -1,148 +1,221 @@
 'use client'
+
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
 
-const NAVY = '#1A2B5F'
-const ORANGE = '#FF6B35'
-const FONT = "'Plus Jakarta Sans', 'Sora', sans-serif"
+const INDIGO = '#4F46E5'
+const INDIGO_DARK = '#1C1A4F'
+const INDIGO_LIGHT = '#818CF8'
+const MINT = '#34D399'
+const SOFT = '#EDE9FE'
+const BG = '#F5F4FF'
 const ADMIN_EMAIL = 'bawanhozhin@outlook.com'
 
-function getSupabase() {
-  return createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
-}
+const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+)
 
-const TX = {
-  en: { title: 'Ask a Question', sub: 'Ask anything about life in the UK. Bawan will answer personally.', placeholder: 'Type your question here...', btn: 'Submit Question', success: 'Your question has been submitted!', awaiting: 'Awaiting answer...', answeredBy: 'Answered by Bawan', upvote: 'Helpful', questions: 'Questions', noQuestions: 'No questions yet — be the first to ask!' },
-  ku: { title: 'پرسیار بکە', sub: 'هەر شتێک بپرسە دەربارەی ژیان لە UK. باوان بە خۆی وەڵام دەداتەوە.', placeholder: 'پرسیارەکەت ئێرە بنووسە...', btn: 'پرسیار بنێرە', success: 'پرسیارەکەت نێردرا!', awaiting: 'چاوەڕوانی وەڵامە...', answeredBy: 'وەڵامدراوەتەوە لەلایەن باوان', upvote: 'یارمەتیدەر', questions: 'پرسیارەکان', noQuestions: 'هێشتا هیچ پرسیارێک نییە — یەکەمین بە!' },
-  fa: { title: 'سوال بپرس', sub: 'هر چیزی درباره زندگی در UK بپرس. باوان شخصاً پاسخ می‌دهد.', placeholder: 'سوالت را اینجا بنویس...', btn: 'ارسال سوال', success: 'سوالت ارسال شد!', awaiting: 'در انتظار پاسخ...', answeredBy: 'پاسخ داده شده توسط باوان', upvote: 'مفید', questions: 'سوالات', noQuestions: 'هنوز سوالی نیست — اولین نفر باش!' },
-  ar: { title: 'اطرح سؤالاً', sub: 'اسأل أي شيء عن الحياة في المملكة المتحدة. سيجيب باوان شخصياً.', placeholder: 'اكتب سؤالك هنا...', btn: 'إرسال السؤال', success: 'تم إرسال سؤالك!', awaiting: 'في انتظار الإجابة...', answeredBy: 'أجاب عليه باوان', upvote: 'مفيد', questions: 'الأسئلة', noQuestions: 'لا توجد أسئلة بعد — كن الأول!' },
+const translations = {
+  en: {
+    heroTitle: 'Ask a Question',
+    heroSub: 'Get answers from the Komek community and team',
+    placeholder: 'What do you want to know?',
+    btn: 'Ask',
+    posting: 'Posting...',
+    awaiting: 'Awaiting answer',
+    answered: 'Answered',
+    upvote: 'Helpful',
+    answerPlaceholder: 'Write your answer...',
+    answerBtn: 'Post Answer',
+    empty: 'No questions yet. Be the first to ask!',
+    answerPosting: 'Posting...',
+  },
+  ku: {
+    heroTitle: 'پرسیار بکە',
+    heroSub: 'وەڵام وەربگرە لە کۆمەڵگای کۆمەک',
+    placeholder: 'چیت دەوێ بزانیت؟',
+    btn: 'بپرسە',
+    posting: 'دەنێردرێت...',
+    awaiting: 'چاوەڕێی وەڵام',
+    answered: 'وەڵامدراوە',
+    upvote: 'باشە',
+    answerPlaceholder: 'وەڵامەکەت بنووسە...',
+    answerBtn: 'وەڵام بنێرە',
+    empty: 'هیچ پرسیارێک نییە. یەکەمین بە!',
+    answerPosting: 'دەنێردرێت...',
+  },
+  fa: {
+    heroTitle: 'سوال بپرس',
+    heroSub: 'از جامعه و تیم کومک پاسخ بگیر',
+    placeholder: 'می‌خواهی چه بدانی؟',
+    btn: 'بپرس',
+    posting: 'در حال ارسال...',
+    awaiting: 'در انتظار پاسخ',
+    answered: 'پاسخ داده شده',
+    upvote: 'مفید بود',
+    answerPlaceholder: 'پاسخت را بنویس...',
+    answerBtn: 'ارسال پاسخ',
+    empty: 'هنوز سوالی نیست. اولین باش!',
+    answerPosting: 'در حال ارسال...',
+  },
+  ar: {
+    heroTitle: 'اطرح سؤالاً',
+    heroSub: 'احصل على إجابات من مجتمع وفريق كومك',
+    placeholder: 'ماذا تريد أن تعرف؟',
+    btn: 'اسأل',
+    posting: 'جارٍ النشر...',
+    awaiting: 'في انتظار الإجابة',
+    answered: 'تمت الإجابة',
+    upvote: 'مفيد',
+    answerPlaceholder: 'اكتب إجابتك...',
+    answerBtn: 'نشر الإجابة',
+    empty: 'لا توجد أسئلة بعد. كن الأول!',
+    answerPosting: 'جارٍ النشر...',
+  },
 }
 
 export default function AskPage() {
-  const router = useRouter()
   const [lang, setLang] = useState('en')
+  const [question, setQuestion] = useState('')
+  const [posting, setPosting] = useState(false)
   const [questions, setQuestions] = useState([])
-  const [newQuestion, setNewQuestion] = useState('')
-  const [submitting, setSubmitting] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
-  const [upvoted, setUpvoted] = useState({})
-  const [isAdmin, setIsAdmin] = useState(false)
+  const [voted, setVoted] = useState({})
   const [adminAnswer, setAdminAnswer] = useState({})
+  const [answerPosting, setAnswerPosting] = useState({})
+  const [user, setUser] = useState(null)
+  const t = translations[lang] || translations.en
+  const isRTL = ['ku', 'fa', 'ar'].includes(lang)
+  const isAdmin = user?.email === ADMIN_EMAIL
 
   useEffect(() => {
-    const saved = localStorage.getItem('kurdlink_lang')
-    if (saved && TX[saved]) setLang(saved)
-    fetchQuestions()
-    checkAdmin()
-    const voted = JSON.parse(localStorage.getItem('reber_upvoted') || '{}')
-    setUpvoted(voted)
-
+    const stored = localStorage.getItem('komek_lang')
+    if (stored) setLang(stored)
     const handler = (e) => setLang(e.detail)
     window.addEventListener('langchange', handler)
+    fetchQuestions()
+    supabase.auth.getUser().then(({ data }) => setUser(data?.user || null))
     return () => window.removeEventListener('langchange', handler)
   }, [])
 
-  const checkAdmin = async () => {
-    const supabase = getSupabase()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user?.email === ADMIN_EMAIL) setIsAdmin(true)
+  async function fetchQuestions() {
+    const { data } = await supabase
+      .from('questions')
+      .select('*')
+      .order('upvotes', { ascending: false })
+    if (data) setQuestions(data)
   }
 
-  const fetchQuestions = async () => {
-    const supabase = getSupabase()
-    const { data } = await supabase.from('questions').select('*').order('upvotes', { ascending: false })
-    setQuestions(data || [])
-  }
-
-  const handleSubmit = async () => {
-    if (!newQuestion.trim()) return
-    setSubmitting(true)
-    const supabase = getSupabase()
-    await supabase.from('questions').insert({ question: newQuestion.trim() })
-    setNewQuestion('')
-    setSubmitted(true)
-    setSubmitting(false)
+  async function handlePost() {
+    if (!question.trim()) return
+    setPosting(true)
+    await supabase.from('questions').insert({ question: question.trim() })
+    setQuestion('')
+    setPosting(false)
     fetchQuestions()
-    setTimeout(() => setSubmitted(false), 4000)
   }
 
-  const handleUpvote = async (q) => {
-    if (upvoted[q.id]) return
-    const supabase = getSupabase()
+  async function handleUpvote(q) {
+    if (voted[q.id]) return
+    setVoted(v => ({ ...v, [q.id]: true }))
     await supabase.from('questions').update({ upvotes: (q.upvotes || 0) + 1 }).eq('id', q.id)
-    const newVoted = { ...upvoted, [q.id]: true }
-    setUpvoted(newVoted)
-    localStorage.setItem('reber_upvoted', JSON.stringify(newVoted))
     fetchQuestions()
   }
 
-  const handleAdminAnswer = async (questionId) => {
-    const answer = adminAnswer[questionId]
-    if (!answer?.trim()) return
-    const supabase = getSupabase()
-    await supabase.from('questions').update({ answer: answer.trim(), status: 'answered', answered_at: new Date().toISOString() }).eq('id', questionId)
-    setAdminAnswer(prev => ({ ...prev, [questionId]: '' }))
+  async function handleAnswer(q) {
+    const ans = adminAnswer[q.id]
+    if (!ans?.trim()) return
+    setAnswerPosting(v => ({ ...v, [q.id]: true }))
+    await supabase.from('questions').update({ answer: ans.trim(), status: 'answered', answered_at: new Date().toISOString() }).eq('id', q.id)
+    setAdminAnswer(v => ({ ...v, [q.id]: '' }))
+    setAnswerPosting(v => ({ ...v, [q.id]: false }))
     fetchQuestions()
   }
-
-  const t = TX[lang] || TX.en
-  const isRtl = lang === 'ku' || lang === 'fa' || lang === 'ar'
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F0F4FF', fontFamily: FONT, direction: isRtl ? 'rtl' : 'ltr', paddingBottom: 80 }}>
-      <div style={{ padding: '16px 16px 32px', maxWidth: 600, margin: '0 auto' }}>
-        <div style={{ background: '#fff', borderRadius: 20, padding: '20px', marginBottom: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-          <div style={{ fontSize: 15, fontWeight: 700, color: NAVY, marginBottom: 6 }}>{t.title}</div>
-          <div style={{ fontSize: 13, color: '#888', marginBottom: 16, lineHeight: 1.5 }}>{t.sub}</div>
-          <textarea value={newQuestion} onChange={e => setNewQuestion(e.target.value)} placeholder={t.placeholder} rows={3}
-            style={{ width: '100%', padding: '12px 14px', border: '1.5px solid rgba(0,0,0,0.1)', borderRadius: 12, fontSize: 14, fontFamily: FONT, outline: 'none', resize: 'vertical', lineHeight: 1.5, boxSizing: 'border-box' }} />
-          {submitted && (
-            <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 10, padding: '10px 14px', marginTop: 10, color: '#166534', fontSize: 13, fontWeight: 600 }}>
-              ✅ {t.success}
-            </div>
-          )}
-          <button onClick={handleSubmit} disabled={submitting || !newQuestion.trim()}
-            style={{ width: '100%', marginTop: 12, padding: '13px', background: newQuestion.trim() ? `linear-gradient(135deg, ${ORANGE}, #FF8C61)` : '#e5e7eb', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 700, color: newQuestion.trim() ? '#fff' : '#9ca3af', cursor: newQuestion.trim() ? 'pointer' : 'default', fontFamily: FONT }}>
-            {submitting ? '...' : t.btn}
+    <div style={{ fontFamily: 'Nunito, sans-serif', background: BG, minHeight: '100vh', paddingBottom: 80, direction: isRTL ? 'rtl' : 'ltr' }}>
+      {/* Hero */}
+      <div style={{ background: `linear-gradient(135deg, ${INDIGO_DARK} 0%, #2D2A7A 100%)`, padding: '40px 20px 48px', textAlign: 'center' }}>
+        <div style={{ fontSize: 44, marginBottom: 12 }}>❓</div>
+        <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 900, margin: '0 0 10px' }}>{t.heroTitle}</h1>
+        <p style={{ color: INDIGO_LIGHT, fontSize: 14, fontWeight: 500, margin: 0 }}>{t.heroSub}</p>
+      </div>
+
+      <div style={{ padding: '0 16px', marginTop: -20 }}>
+        {/* Ask card */}
+        <div style={{ background: '#fff', borderRadius: 20, boxShadow: '0 4px 24px rgba(79,70,229,0.10)', padding: 20, marginBottom: 20 }}>
+          <textarea
+            value={question}
+            onChange={e => setQuestion(e.target.value)}
+            placeholder={t.placeholder}
+            rows={3}
+            style={{ width: '100%', border: `1.5px solid ${SOFT}`, borderRadius: 12, padding: 14, fontFamily: 'Nunito, sans-serif', fontSize: 14, color: INDIGO_DARK, resize: 'none', outline: 'none', background: BG, boxSizing: 'border-box' }}
+          />
+          <button
+            onClick={handlePost}
+            disabled={posting || !question.trim()}
+            style={{ width: '100%', marginTop: 12, padding: '14px', background: !question.trim() ? '#E5E7EB' : INDIGO, color: !question.trim() ? '#9CA3AF' : '#fff', border: 'none', borderRadius: 14, fontFamily: 'Nunito, sans-serif', fontSize: 15, fontWeight: 800, cursor: !question.trim() ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}
+          >
+            {posting ? t.posting : t.btn}
           </button>
         </div>
 
-        <div style={{ fontSize: 15, fontWeight: 800, color: NAVY, marginBottom: 14 }}>💬 {t.questions}</div>
+        {/* Questions list */}
         {questions.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px 20px', color: '#aaa', fontSize: 14 }}>{t.noQuestions}</div>
+          <div style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 14, fontWeight: 600, marginTop: 40 }}>{t.empty}</div>
         ) : (
-          questions.map(q => (
-            <div key={q.id} style={{ background: '#fff', borderRadius: 16, padding: '16px', marginBottom: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-              <p style={{ fontSize: 15, fontWeight: 600, color: '#1a1a1a', margin: '0 0 12px', lineHeight: 1.5 }}>{q.question}</p>
-              {q.answer ? (
-                <div style={{ background: '#F0F9FF', borderRadius: 12, padding: '12px 14px', marginBottom: 12, borderLeft: `3px solid ${NAVY}` }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: NAVY, marginBottom: 6, textTransform: 'uppercase' }}>🧭 {t.answeredBy}</div>
-                  <p style={{ fontSize: 14, color: '#1a1a1a', margin: 0, lineHeight: 1.6 }}>{q.answer}</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {questions.map(q => (
+              <div key={q.id} style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px rgba(79,70,229,0.07)', overflow: 'hidden' }}>
+                {/* Status bar */}
+                <div style={{ background: q.status === 'answered' ? '#F0FDF4' : SOFT, padding: '6px 16px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <div style={{ width: 7, height: 7, borderRadius: '50%', background: q.status === 'answered' ? MINT : INDIGO_LIGHT }} />
+                  <span style={{ fontSize: 11, fontWeight: 800, color: q.status === 'answered' ? '#059669' : INDIGO, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                    {q.status === 'answered' ? t.answered : t.awaiting}
+                  </span>
                 </div>
-              ) : (
-                <div style={{ background: '#FFFBEB', borderRadius: 10, padding: '8px 12px', marginBottom: 12, display: 'inline-block' }}>
-                  <span style={{ fontSize: 12, color: '#92400E', fontWeight: 600 }}>⏳ {t.awaiting}</span>
-                </div>
-              )}
-              {isAdmin && !q.answer && (
-                <div style={{ marginBottom: 12 }}>
-                  <textarea placeholder="Type your answer..." value={adminAnswer[q.id] || ''} onChange={e => setAdminAnswer(prev => ({ ...prev, [q.id]: e.target.value }))} rows={2}
-                    style={{ width: '100%', padding: '10px 12px', border: `1.5px solid rgba(26,43,95,0.2)`, borderRadius: 10, fontSize: 13, fontFamily: FONT, outline: 'none', resize: 'vertical', boxSizing: 'border-box', marginBottom: 6 }} />
-                  <button onClick={() => handleAdminAnswer(q.id)}
-                    style={{ padding: '8px 16px', background: NAVY, border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: FONT }}>
-                    Post Answer
+
+                <div style={{ padding: '14px 16px' }}>
+                  <p style={{ fontSize: 15, fontWeight: 700, color: INDIGO_DARK, margin: '0 0 10px', lineHeight: 1.4 }}>{q.question}</p>
+
+                  {q.answer && (
+                    <div style={{ background: '#F0FDF4', borderRadius: 10, padding: '10px 14px', marginBottom: 10 }}>
+                      <div style={{ fontSize: 11, fontWeight: 800, color: '#059669', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>Komek</div>
+                      <p style={{ fontSize: 13, color: '#065F46', margin: 0, lineHeight: 1.5 }}>{q.answer}</p>
+                    </div>
+                  )}
+
+                  {/* Upvote */}
+                  <button
+                    onClick={() => handleUpvote(q)}
+                    style={{ display: 'flex', alignItems: 'center', gap: 6, background: voted[q.id] ? SOFT : 'transparent', border: `1.5px solid ${voted[q.id] ? INDIGO : '#E5E7EB'}`, borderRadius: 20, padding: '6px 14px', fontFamily: 'Nunito, sans-serif', fontSize: 12, fontWeight: 700, color: voted[q.id] ? INDIGO : '#6B7280', cursor: 'pointer', transition: 'all 0.2s' }}
+                  >
+                    👍 {t.upvote} · {q.upvotes || 0}
                   </button>
+
+                  {/* Admin answer input */}
+                  {isAdmin && q.status !== 'answered' && (
+                    <div style={{ marginTop: 12 }}>
+                      <textarea
+                        value={adminAnswer[q.id] || ''}
+                        onChange={e => setAdminAnswer(v => ({ ...v, [q.id]: e.target.value }))}
+                        placeholder={t.answerPlaceholder}
+                        rows={2}
+                        style={{ width: '100%', border: `1.5px solid ${SOFT}`, borderRadius: 10, padding: 10, fontFamily: 'Nunito, sans-serif', fontSize: 13, color: INDIGO_DARK, resize: 'none', outline: 'none', background: BG, boxSizing: 'border-box' }}
+                      />
+                      <button
+                        onClick={() => handleAnswer(q)}
+                        disabled={answerPosting[q.id]}
+                        style={{ marginTop: 8, padding: '8px 18px', background: MINT, color: '#fff', border: 'none', borderRadius: 10, fontFamily: 'Nunito, sans-serif', fontSize: 13, fontWeight: 800, cursor: 'pointer' }}
+                      >
+                        {answerPosting[q.id] ? t.answerPosting : t.answerBtn}
+                      </button>
+                    </div>
+                  )}
                 </div>
-              )}
-              <button onClick={() => handleUpvote(q)} disabled={upvoted[q.id]}
-                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', background: upvoted[q.id] ? '#FFF4F0' : '#f5f5f5', border: upvoted[q.id] ? `1px solid ${ORANGE}` : '1px solid rgba(0,0,0,0.08)', borderRadius: 20, cursor: upvoted[q.id] ? 'default' : 'pointer', fontFamily: FONT }}>
-                <span style={{ fontSize: 14 }}>👍</span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: upvoted[q.id] ? ORANGE : '#666' }}>{q.upvotes || 0}</span>
-                <span style={{ fontSize: 11, color: upvoted[q.id] ? ORANGE : '#888' }}>{t.upvote}</span>
-              </button>
-            </div>
-          ))
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>

@@ -1,485 +1,326 @@
-"use client";
-import { useState, useEffect } from "react";
+'use client'
 
-const NAVY = "#1A2B5F";
-const GREEN = "#1DB87A";
+import { useState, useEffect, useRef } from 'react'
 
-const UI = {
-  ku: {
-    title: "نامەکەت شیبکە",
-    subtitle: "هەر نامەیەکی فەرمیت لە UK بنێرە — ئێمە بە کوردی ڕوونت دەکەینەوە",
-    pasteTab: "دەقی نامەکە بنووسە",
-    uploadTab: "وێنە بنێرە / کامێرا",
-    placeholder: "دەقی نامەکەت لێرە بنووسە...\n\nبۆ نموونە: 'Dear Sir/Madam, We are writing to inform you...'",
-    submitBtn: "نامەکە شی بکەرەوە",
-    loading: "نامەکەت دەخوێنرێتەوە...",
-    loadingSub: "باشی ١٠-٢٠ چرکە دەخایەنێت",
-    ready: "ڕوونکردنەوەکە ئامادەیە",
-    copy: "کۆپی بکە",
-    copied: "✓ کۆپی کرا",
-    reset: "← نامەیەکی دیکە شی بکەرەوە",
-    disclaimer: "گرنگ: ئەمە شیکارییەکی AI یە. بۆ بڕیارە یاساییەکان، هەموو کاتێک قسەی پیشەیی مەکە.",
-    usageLabel: "بەکارهێنانی بەخۆڕایی ماوە",
-    resetLabel: "دووبارەدەبێتەوە لە",
-    dropText: "وێنەی نامەکە بنێرە",
-    dropSub: "کلیک بکە بۆ هەڵبژاردن",
-    orCamera: "یان",
-    cameraBtn: "📷 وێنە بکە",
-    formats: "JPG، PNG، PDF قبووڵ دەکرێت",
-    errorEmpty: "تکایە دەقی نامەکەت بنووسە.",
-    errorFile: "تکایە وێنەیەک بنێرە.",
-    errorUsage: "بەکارهێنانی بەخۆڕاییت تەواوبوو. دووبارە ٢٤ کاتژمێر دواتر هەوڵبدەرەوە.",
-    errorGeneral: "هەڵەیەک ڕوویدا. تکایە دووبارە هەوڵبدەرەوە.",
-    chips: ["هەر نامەیەک"],
-    labels: {
-      letterType: "📋 جۆری نامە",
-      summary: "📖 مانای نامەکە",
-      deadlines: "📅 بەروار و ماوەکان",
-      whatToDo: "✅ چی دەکەیت",
-      important: "⚠️ گرنگ",
-    },
-    apiLang: "sorani",
-  },
+const INDIGO = '#4F46E5'
+const INDIGO_DARK = '#1C1A4F'
+const INDIGO_LIGHT = '#818CF8'
+const MINT = '#34D399'
+const SOFT = '#EDE9FE'
+const BG = '#F5F4FF'
+const MAX_USES = 10
+const STORAGE_KEY = 'komek_explainer_uses'
+const RESET_KEY = 'komek_explainer_reset'
+
+const translations = {
   en: {
-    title: "Understand Your Letter",
-    subtitle: "Paste or photograph any official UK letter — we'll explain it clearly",
-    pasteTab: "Paste Text",
-    uploadTab: "Upload / Take Photo",
-    placeholder: "Paste the text from your letter here...\n\nFor example: 'Dear Sir/Madam, We are writing to inform you that your Universal Credit claim...'",
-    submitBtn: "Explain This Letter",
-    loading: "Reading your letter...",
-    loadingSub: "This usually takes 10–20 seconds",
-    ready: "Explanation Ready",
-    copy: "Copy",
-    copied: "✓ Copied",
-    reset: "← Explain Another Letter",
-    disclaimer: "Important: This is an AI explanation. For legal decisions, always speak with a qualified professional.",
-    usageLabel: "Free uses remaining",
-    resetLabel: "Resets in",
-    dropText: "Upload a photo of your letter",
-    dropSub: "Click to browse files",
-    orCamera: "or",
-    cameraBtn: "📷 Take Photo",
-    formats: "JPG, PNG, PDF accepted",
-    errorEmpty: "Please paste the text from your letter first.",
-    errorFile: "Please upload a photo of your letter.",
-    errorUsage: "You've used all 10 free uses. Come back in 24 hours.",
-    errorGeneral: "Something went wrong. Please try again.",
-    chips: ["Any Official Letter"],
-    labels: {
-      letterType: "📋 Letter Type",
-      summary: "📖 What This Letter Means",
-      deadlines: "📅 Important Dates & Deadlines",
-      whatToDo: "✅ What You Should Do",
-      important: "⚠️ Important Warning",
-    },
-    apiLang: "english",
+    heroTitle: 'Understand Your Letter',
+    heroSub: 'Paste or upload any official letter and we\'ll explain it in plain language',
+    usesLeft: 'uses left today',
+    resetsIn: 'Resets in',
+    tab_paste: 'Paste Text',
+    tab_upload: 'Upload / Photo',
+    placeholder: 'Paste your letter here...',
+    dragDrop: 'Drag & drop your letter image or',
+    browse: 'browse',
+    camera: '📷 Take Photo',
+    btn: 'Explain This Letter',
+    explaining: 'Explaining...',
+    letterType: 'Letter Type',
+    summary: 'Summary',
+    deadlines: 'Deadlines',
+    whatToDo: 'What To Do',
+    warning: '⚠️ Warning',
+    limitReached: 'Daily limit reached. Come back tomorrow.',
+    errorMsg: 'Something went wrong. Please try again.',
+  },
+  ku: {
+    heroTitle: 'نامەکەت تێبگە',
+    heroSub: 'نامەی فەرمی بنووسە یان بار بکە، ئێمەش بە زمانێکی ئاسان ڕوونی دەکەینەوە',
+    usesLeft: 'جار ئەمڕۆ ماوە',
+    resetsIn: 'دەگەڕێتەوە لە',
+    tab_paste: 'دەقی بنووسە',
+    tab_upload: 'بار بکە / وێنە',
+    placeholder: 'نامەکەت لێرە بنووسە...',
+    dragDrop: 'وێنەی نامەکە بخە یان',
+    browse: 'گەڕان',
+    camera: '📷 وێنە بکە',
+    btn: 'نامەکە ڕوون بکەرەوە',
+    explaining: 'ڕوونکردنەوە...',
+    letterType: 'جۆری نامە',
+    summary: 'کورتە',
+    deadlines: 'ماوەکان',
+    whatToDo: 'چی بکەیت',
+    warning: '⚠️ ئاگادارکردنەوە',
+    limitReached: 'سنووری ڕۆژانە تەواو بوو. سبەی دەگەڕێیتەوە.',
+    errorMsg: 'هەڵەیەک ڕوویدا. دووبارە هەوڵ بدەوە.',
   },
   fa: {
-    title: "نامه‌ات را بفهم",
-    subtitle: "هر نامه رسمی از UK را بفرست — ما به فارسی توضیح می‌دهیم",
-    pasteTab: "متن نامه را paste کن",
-    uploadTab: "آپلود / عکس بگیر",
-    placeholder: "متن نامه‌ات را اینجا paste کن...",
-    submitBtn: "نامه را توضیح بده",
-    loading: "نامه‌ات در حال خواندن است...",
-    loadingSub: "معمولاً ۱۰-۲۰ ثانیه طول می‌کشد",
-    ready: "توضیح آماده است",
-    copy: "کپی کن",
-    copied: "✓ کپی شد",
-    reset: "← نامه دیگری توضیح بده",
-    disclaimer: "مهم: این توضیح AI است. برای تصمیمات حقوقی، همیشه با متخصص صحبت کن.",
-    usageLabel: "استفاده رایگان باقی‌مانده",
-    resetLabel: "بازنشینی در",
-    dropText: "عکس نامه را آپلود کن",
-    dropSub: "کلیک کن برای مرور",
-    orCamera: "یا",
-    cameraBtn: "📷 عکس بگیر",
-    formats: "JPG، PNG، PDF قبول می‌شود",
-    errorEmpty: "لطفاً ابتدا متن نامه را paste کن.",
-    errorFile: "لطفاً یک عکس آپلود کن.",
-    errorUsage: "۱۰ استفاده رایگان تمام شد. ۲۴ ساعت دیگر برگرد.",
-    errorGeneral: "مشکلی پیش آمد. دوباره امتحان کن.",
-    chips: ["هر نامه رسمی"],
-    labels: {
-      letterType: "📋 نوع نامه",
-      summary: "📖 معنای نامه",
-      deadlines: "📅 تاریخ‌ها و مهلت‌ها",
-      whatToDo: "✅ چه باید بکنی",
-      important: "⚠️ مهم",
-    },
-    apiLang: "farsi",
+    heroTitle: 'نامه‌ات را بفهم',
+    heroSub: 'هر نامه رسمی را بچسبان یا آپلود کن، ما آن را به زبان ساده توضیح می‌دهیم',
+    usesLeft: 'بار امروز باقی مانده',
+    resetsIn: 'بازنشینی در',
+    tab_paste: 'متن را بچسبان',
+    tab_upload: 'آپلود / عکس',
+    placeholder: 'نامه‌ات را اینجا بچسبان...',
+    dragDrop: 'تصویر نامه را بکش یا',
+    browse: 'مرور',
+    camera: '📷 عکس بگیر',
+    btn: 'این نامه را توضیح بده',
+    explaining: 'در حال توضیح...',
+    letterType: 'نوع نامه',
+    summary: 'خلاصه',
+    deadlines: 'مهلت‌ها',
+    whatToDo: 'چه کاری انجام دهید',
+    warning: '⚠️ هشدار',
+    limitReached: 'محدودیت روزانه تمام شد. فردا برگردید.',
+    errorMsg: 'مشکلی پیش آمد. دوباره تلاش کنید.',
   },
   ar: {
-    title: "افهم رسالتك",
-    subtitle: "أرسل أي رسالة رسمية من UK — سنشرحها بالعربية",
-    pasteTab: "الصق نص الرسالة",
-    uploadTab: "ارفع / التقط صورة",
-    placeholder: "الصق نص رسالتك هنا...",
-    submitBtn: "اشرح هذه الرسالة",
-    loading: "جاري قراءة رسالتك...",
-    loadingSub: "عادةً يستغرق ١٠-٢٠ ثانية",
-    ready: "الشرح جاهز",
-    copy: "انسخ",
-    copied: "✓ تم النسخ",
-    reset: "← اشرح رسالة أخرى",
-    disclaimer: "مهم: هذا شرح بالذكاء الاصطناعي. للقرارات القانونية، تحدث مع متخصص.",
-    usageLabel: "الاستخدامات المجانية المتبقية",
-    resetLabel: "يُعاد ضبطه في",
-    dropText: "ارفع صورة الرسالة",
-    dropSub: "انقر للتصفح",
-    orCamera: "أو",
-    cameraBtn: "📷 التقط صورة",
-    formats: "JPG، PNG، PDF مقبولة",
-    errorEmpty: "يرجى لصق نص رسالتك أولاً.",
-    errorFile: "يرجى رفع صورة للرسالة.",
-    errorUsage: "استنفدت 10 استخدامات مجانية. عد بعد 24 ساعة.",
-    errorGeneral: "حدث خطأ. يرجى المحاولة مرة أخرى.",
-    chips: ["أي رسالة رسمية"],
-    labels: {
-      letterType: "📋 نوع الرسالة",
-      summary: "📖 معنى الرسالة",
-      deadlines: "📅 التواريخ والمواعيد",
-      whatToDo: "✅ ماذا يجب أن تفعل",
-      important: "⚠️ تحذير مهم",
-    },
-    apiLang: "arabic",
+    heroTitle: 'افهم رسالتك',
+    heroSub: 'الصق أو أرسل أي رسالة رسمية وسنشرحها بلغة بسيطة',
+    usesLeft: 'استخدامات متبقية اليوم',
+    resetsIn: 'يُعاد الضبط في',
+    tab_paste: 'الصق النص',
+    tab_upload: 'رفع / صورة',
+    placeholder: 'الصق رسالتك هنا...',
+    dragDrop: 'اسحب صورة الرسالة أو',
+    browse: 'تصفح',
+    camera: '📷 التقط صورة',
+    btn: 'اشرح هذه الرسالة',
+    explaining: 'جارٍ الشرح...',
+    letterType: 'نوع الرسالة',
+    summary: 'ملخص',
+    deadlines: 'المواعيد النهائية',
+    whatToDo: 'ماذا تفعل',
+    warning: '⚠️ تحذير',
+    limitReached: 'تم الوصول إلى الحد اليومي. ارجع غداً.',
+    errorMsg: 'حدث خطأ. حاول مرة أخرى.',
   },
-};
-
-function formatCountdown(ms) {
-  if (ms <= 0) return null;
-  const totalSeconds = Math.floor(ms / 1000);
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  return `${hours}h ${minutes}m`;
 }
 
-function ResultBlock({ color, bg, label, text, isRtl }) {
-  return (
-    <div style={{ background: bg, borderRadius: 14, padding: "14px 16px", border: `1px solid ${color}25`, marginBottom: 12 }}>
-      <div style={{ fontSize: 11, fontWeight: 800, color, textTransform: "uppercase", letterSpacing: 0.7, marginBottom: 8 }}>{label}</div>
-      <div style={{ fontSize: 14, lineHeight: 1.75, color: "#1a2b5f", direction: isRtl ? "rtl" : "ltr", fontFamily: isRtl ? "'Noto Sans Arabic', sans-serif" : "inherit" }}>
-        {text}
-      </div>
-    </div>
-  );
+function getUsageData() {
+  if (typeof window === 'undefined') return { uses: 0, resetTime: null }
+  try {
+    const uses = parseInt(localStorage.getItem(STORAGE_KEY) || '0')
+    const resetTime = localStorage.getItem(RESET_KEY)
+    if (resetTime && Date.now() > parseInt(resetTime)) {
+      localStorage.setItem(STORAGE_KEY, '0')
+      localStorage.removeItem(RESET_KEY)
+      return { uses: 0, resetTime: null }
+    }
+    return { uses, resetTime: resetTime ? parseInt(resetTime) : null }
+  } catch { return { uses: 0, resetTime: null } }
+}
+
+function incrementUsage() {
+  try {
+    const uses = parseInt(localStorage.getItem(STORAGE_KEY) || '0') + 1
+    localStorage.setItem(STORAGE_KEY, uses.toString())
+    if (!localStorage.getItem(RESET_KEY)) {
+      localStorage.setItem(RESET_KEY, (Date.now() + 24 * 60 * 60 * 1000).toString())
+    }
+    return uses
+  } catch { return 1 }
 }
 
 export default function DocumentExplainerPage() {
-  const [lang, setLang] = useState("ku");
-  const [inputMode, setInputMode] = useState("paste");
-  const [letterText, setLetterText] = useState("");
-  const [uploadedFile, setUploadedFile] = useState(null);
-  const [uploadedFileData, setUploadedFileData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
-  const [error, setError] = useState("");
-  const [usesLeft, setUsesLeft] = useState(10);
-  const [resetAt, setResetAt] = useState(null);
-  const [countdown, setCountdown] = useState(null);
-  const [copied, setCopied] = useState(false);
-  const [dragging, setDragging] = useState(false);
+  const [lang, setLang] = useState('en')
+  const [tab, setTab] = useState('paste')
+  const [text, setText] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [result, setResult] = useState(null)
+  const [error, setError] = useState('')
+  const [uses, setUses] = useState(0)
+  const [resetTime, setResetTime] = useState(null)
+  const [countdown, setCountdown] = useState('')
+  const [dragOver, setDragOver] = useState(false)
+  const fileRef = useRef(null)
+  const cameraRef = useRef(null)
+  const t = translations[lang] || translations.en
+  const isRTL = ['ku', 'fa', 'ar'].includes(lang)
 
-  // Load lang and usage state
   useEffect(() => {
-    const saved = localStorage.getItem('kurdlink_lang');
-    if (saved && UI[saved]) setLang(saved);
+    const stored = localStorage.getItem('komek_lang')
+    if (stored) setLang(stored)
+    const { uses: u, resetTime: r } = getUsageData()
+    setUses(u)
+    setResetTime(r)
+    const handler = (e) => setLang(e.detail)
+    window.addEventListener('langchange', handler)
+    return () => window.removeEventListener('langchange', handler)
+  }, [])
 
-    const handler = (e) => setLang(e.detail);
-    window.addEventListener('langchange', handler);
-
-    const storedReset = localStorage.getItem('kurdlink_explainer_reset');
-    const storedUses = localStorage.getItem('kurdlink_explainer_uses');
-    if (storedReset && storedUses) {
-      const resetTime = parseInt(storedReset);
-      if (Date.now() < resetTime) {
-        setUsesLeft(parseInt(storedUses));
-        setResetAt(resetTime);
-      } else {
-        localStorage.removeItem('kurdlink_explainer_reset');
-        localStorage.removeItem('kurdlink_explainer_uses');
-        setUsesLeft(10);
-        setResetAt(null);
-      }
-    }
-
-    return () => window.removeEventListener('langchange', handler);
-  }, []);
-
-  // Live countdown ticker — updates every 30 seconds
   useEffect(() => {
-    if (!resetAt) { setCountdown(null); return; }
-
-    const tick = () => {
-      const remaining = resetAt - Date.now();
-      if (remaining <= 0) {
-        setCountdown(null);
-        setResetAt(null);
-        setUsesLeft(10);
-        localStorage.removeItem('kurdlink_explainer_reset');
-        localStorage.removeItem('kurdlink_explainer_uses');
-      } else {
-        setCountdown(formatCountdown(remaining));
+    if (!resetTime) return
+    const interval = setInterval(() => {
+      const diff = resetTime - Date.now()
+      if (diff <= 0) {
+        setUses(0)
+        setResetTime(null)
+        setCountdown('')
+        clearInterval(interval)
+        return
       }
-    };
+      const h = Math.floor(diff / 3600000)
+      const m = Math.floor((diff % 3600000) / 60000)
+      setCountdown(`${h}h ${m}m`)
+    }, 60000)
+    const diff = resetTime - Date.now()
+    const h = Math.floor(diff / 3600000)
+    const m = Math.floor((diff % 3600000) / 60000)
+    setCountdown(`${h}h ${m}m`)
+    return () => clearInterval(interval)
+  }, [resetTime])
 
-    tick();
-    const interval = setInterval(tick, 30000);
-    return () => clearInterval(interval);
-  }, [resetAt]);
+  const usesLeft = MAX_USES - uses
+  const limitReached = uses >= MAX_USES
 
-  const ui = UI[lang];
-  const isRtl = lang === "ku" || lang === "fa" || lang === "ar";
-
-  const handleFile = (file) => {
-    setUploadedFile(file);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const base64 = e.target.result.split(',')[1];
-      const mediaType = file.type || 'image/jpeg';
-      setUploadedFileData({ base64, mediaType });
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const removeFile = () => {
-    setUploadedFile(null);
-    setUploadedFileData(null);
-    const input = document.getElementById("file-input");
-    if (input) input.value = "";
-    const cam = document.getElementById("camera-input");
-    if (cam) cam.value = "";
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setDragging(false);
-    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
-  };
-
-  const submit = async () => {
-    setError("");
-    if (inputMode === "paste" && !letterText.trim()) { setError(ui.errorEmpty); return; }
-    if (inputMode === "upload" && !uploadedFile) { setError(ui.errorFile); return; }
-    if (usesLeft <= 0) { setError(ui.errorUsage); return; }
-
-    setLoading(true);
-    setResult(null);
-
+  async function handleExplain() {
+    if (!text.trim() || limitReached) return
+    setLoading(true)
+    setError('')
+    setResult(null)
     try {
-      const body = { language: ui.apiLang, inputMode };
-      if (inputMode === "paste") {
-        body.letterContent = letterText;
-      } else {
-        body.imageData = uploadedFileData.base64;
-        body.mediaType = ['image/jpeg','image/png','image/gif','image/webp'].includes(uploadedFileData.mediaType)
-          ? uploadedFileData.mediaType
-          : 'image/jpeg';
-      }
-
-      const res = await fetch("/api/explain", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      if (!res.ok) throw new Error("API error");
-      const data = await res.json();
-      setResult(data);
-
-      setUsesLeft(u => {
-        const newVal = Math.max(0, u - 1);
-        let newResetAt = resetAt;
-        if (!localStorage.getItem('kurdlink_explainer_reset')) {
-          newResetAt = Date.now() + 86400000;
-          localStorage.setItem('kurdlink_explainer_reset', String(newResetAt));
-          setResetAt(newResetAt);
-        }
-        localStorage.setItem('kurdlink_explainer_uses', String(newVal));
-        return newVal;
-      });
-
-    } catch {
-      setError(ui.errorGeneral);
+      const res = await fetch('/api/explain', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, lang }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed')
+      const newUses = incrementUsage()
+      setUses(newUses)
+      const { resetTime: r } = getUsageData()
+      setResetTime(r)
+      setResult(data)
+    } catch (e) {
+      setError(t.errorMsg)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const copyResult = () => {
-    if (!result) return;
-    const text = [result.letterType, result.summary, result.deadlines, result.whatToDo, result.important].filter(Boolean).join("\n\n");
-    navigator.clipboard.writeText(text).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  };
-
-  const reset = () => {
-    setResult(null);
-    setError("");
-    setLetterText("");
-    removeFile();
-  };
+  function handleFile(file) {
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (e) => setText(e.target.result)
+    reader.readAsText(file)
+  }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F0F4FF", fontFamily: "'Plus Jakarta Sans', sans-serif", direction: isRtl ? "rtl" : "ltr", paddingBottom: 80 }}>
+    <div style={{ fontFamily: 'Nunito, sans-serif', background: BG, minHeight: '100vh', paddingBottom: 80, direction: isRTL ? 'rtl' : 'ltr' }}>
+      {/* Hero */}
+      <div style={{ background: `linear-gradient(135deg, ${INDIGO_DARK} 0%, #2D2A7A 100%)`, padding: '40px 20px 48px', textAlign: 'center' }}>
+        <div style={{ fontSize: 44, marginBottom: 12 }}>📄</div>
+        <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 900, margin: '0 0 10px', lineHeight: 1.2 }}>{t.heroTitle}</h1>
+        <p style={{ color: INDIGO_LIGHT, fontSize: 14, fontWeight: 500, margin: '0 0 24px', maxWidth: 320, marginLeft: 'auto', marginRight: 'auto' }}>{t.heroSub}</p>
 
-      <div style={{ padding: "20px 16px 40px", maxWidth: 600, margin: "0 auto" }}>
-        <div style={{ background: "#fff", borderRadius: 20, boxShadow: "0 4px 32px rgba(0,0,0,0.08)", overflow: "hidden" }}>
+        {/* Usage dots */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, flexWrap: 'wrap' }}>
+          {Array.from({ length: MAX_USES }).map((_, i) => (
+            <div key={i} style={{ width: 10, height: 10, borderRadius: '50%', background: i < uses ? '#6366F1' : MINT, opacity: i < uses ? 0.4 : 1, transition: 'all 0.3s' }} />
+          ))}
+        </div>
+        <div style={{ color: INDIGO_LIGHT, fontSize: 12, fontWeight: 600, marginTop: 8 }}>
+          {limitReached
+            ? (countdown ? `${t.resetsIn} ${countdown}` : t.limitReached)
+            : `${usesLeft} ${t.usesLeft}`}
+        </div>
+      </div>
 
-          <div style={{ display: "flex", borderBottom: "1px solid #f0f0f0" }}>
-            {["paste", "upload"].map(mode => (
-              <button key={mode} onClick={() => setInputMode(mode)}
-                style={{ flex: 1, padding: "14px 16px", border: "none", borderBottom: inputMode === mode ? `2px solid ${GREEN}` : "2px solid transparent", background: inputMode === mode ? "#f0fdf9" : "#fff", color: inputMode === mode ? "#17a066" : "#888", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s" }}>
-                {mode === "paste" ? `✏️ ${ui.pasteTab}` : `📷 ${ui.uploadTab}`}
+      {/* Main card */}
+      <div style={{ padding: '0 16px', marginTop: -20 }}>
+        <div style={{ background: '#fff', borderRadius: 20, boxShadow: '0 4px 24px rgba(79,70,229,0.10)', overflow: 'hidden' }}>
+          {/* Tabs */}
+          <div style={{ display: 'flex', borderBottom: `1px solid ${SOFT}` }}>
+            {['paste', 'upload'].map(t2 => (
+              <button key={t2} onClick={() => setTab(t2)} style={{ flex: 1, padding: '14px 0', background: 'none', border: 'none', fontFamily: 'Nunito, sans-serif', fontSize: 14, fontWeight: 700, color: tab === t2 ? INDIGO : '#9CA3AF', borderBottom: tab === t2 ? `2px solid ${INDIGO}` : '2px solid transparent', cursor: 'pointer', transition: 'all 0.2s' }}>
+                {t2 === 'paste' ? t.tab_paste : t.tab_upload}
               </button>
             ))}
           </div>
 
-          <div style={{ padding: "20px 16px 0" }}>
-            {inputMode === "paste" && (
+          <div style={{ padding: 20 }}>
+            {tab === 'paste' ? (
               <textarea
-                value={letterText}
-                onChange={e => setLetterText(e.target.value)}
-                placeholder={ui.placeholder}
-                rows={7}
-                style={{ width: "100%", border: "1.5px solid #e2e8f0", borderRadius: 14, padding: 14, fontSize: 14, lineHeight: 1.6, color: "#0f1923", fontFamily: "inherit", resize: "vertical", outline: "none", direction: "ltr", boxSizing: "border-box" }}
+                value={text}
+                onChange={e => setText(e.target.value)}
+                placeholder={t.placeholder}
+                style={{ width: '100%', minHeight: 160, border: `1.5px solid ${SOFT}`, borderRadius: 12, padding: 14, fontFamily: 'Nunito, sans-serif', fontSize: 14, color: '#1C1A4F', resize: 'vertical', outline: 'none', background: BG, boxSizing: 'border-box', direction: 'ltr' }}
               />
+            ) : (
+              <div
+                onDragOver={e => { e.preventDefault(); setDragOver(true) }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={e => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]) }}
+                style={{ border: `2px dashed ${dragOver ? INDIGO : SOFT}`, borderRadius: 14, padding: '32px 20px', textAlign: 'center', background: dragOver ? SOFT : BG, transition: 'all 0.2s', cursor: 'pointer' }}
+                onClick={() => fileRef.current?.click()}
+              >
+                <div style={{ fontSize: 32, marginBottom: 8 }}>📎</div>
+                <p style={{ color: '#6B7280', fontSize: 13, margin: '0 0 12px' }}>
+                  {t.dragDrop} <span style={{ color: INDIGO, fontWeight: 700 }}>{t.browse}</span>
+                </p>
+                <button onClick={e => { e.stopPropagation(); cameraRef.current?.click() }} style={{ background: SOFT, color: INDIGO, border: 'none', borderRadius: 10, padding: '10px 20px', fontFamily: 'Nunito, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+                  {t.camera}
+                </button>
+                <input ref={fileRef} type="file" accept="image/*,.pdf,.txt" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
+                <input ref={cameraRef} type="file" accept="image/*" capture="environment" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
+              </div>
             )}
 
-            {inputMode === "upload" && (
-              <>
-                {!uploadedFile ? (
-                  <div>
-                    <div
-                      onDragOver={e => { e.preventDefault(); setDragging(true); }}
-                      onDragLeave={() => setDragging(false)}
-                      onDrop={handleDrop}
-                      onClick={() => document.getElementById("file-input").click()}
-                      style={{ border: `2px dashed ${dragging ? GREEN : "#e2e8f0"}`, borderRadius: 14, padding: "28px 20px", textAlign: "center", cursor: "pointer", background: dragging ? "#f0fdf9" : "#fafafa", marginBottom: 12 }}>
-                      <div style={{ fontSize: 32, marginBottom: 8 }}>🖼️</div>
-                      <div style={{ fontWeight: 700, fontSize: 14, color: "#1a2b5f", marginBottom: 4 }}>{ui.dropText}</div>
-                      <div style={{ fontSize: 12, color: "#aaa" }}>{ui.dropSub}</div>
-                      <div style={{ fontSize: 11, color: "#ccc", marginTop: 4 }}>{ui.formats}</div>
-                      <input id="file-input" type="file" accept="image/jpeg,image/png,image/gif,image/webp,.pdf" style={{ display: "none" }}
-                        onChange={e => e.target.files[0] && handleFile(e.target.files[0])} />
-                    </div>
+            {error && <p style={{ color: '#EF4444', fontSize: 13, fontWeight: 600, marginTop: 10 }}>{error}</p>}
 
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-                      <div style={{ flex: 1, height: 1, background: "#e2e8f0" }} />
-                      <span style={{ fontSize: 12, color: "#aaa", fontWeight: 600 }}>{ui.orCamera}</span>
-                      <div style={{ flex: 1, height: 1, background: "#e2e8f0" }} />
-                    </div>
-
-                    <button onClick={() => document.getElementById("camera-input").click()}
-                      style={{ width: "100%", padding: "13px", border: `1.5px solid ${GREEN}`, borderRadius: 14, background: "#f0fdf9", color: "#17a066", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "inherit" }}>
-                      {ui.cameraBtn}
-                    </button>
-                    <input id="camera-input" type="file" accept="image/*" capture="environment" style={{ display: "none" }}
-                      onChange={e => e.target.files[0] && handleFile(e.target.files[0])} />
-                  </div>
-                ) : (
-                  <div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "#f0fdf9", border: "1.5px solid rgba(29,184,122,0.3)", borderRadius: 12 }}>
-                      <span style={{ fontSize: 22 }}>📄</span>
-                      <span style={{ fontSize: 13, fontWeight: 600, color: "#17a066", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{uploadedFile.name}</span>
-                      <button onClick={removeFile} style={{ width: 26, height: 26, borderRadius: "50%", border: "none", background: "rgba(29,184,122,0.15)", color: "#17a066", cursor: "pointer", fontWeight: 700 }}>✕</button>
-                    </div>
-                    {uploadedFile.type && uploadedFile.type.startsWith('image/') && uploadedFileData && (
-                      <img src={`data:${uploadedFile.type};base64,${uploadedFileData.base64}`} alt="preview"
-                        style={{ width: "100%", borderRadius: 12, marginTop: 10, maxHeight: 200, objectFit: "cover" }} />
-                    )}
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-
-          {error && (
-            <div style={{ margin: "12px 16px 0", padding: "12px 14px", background: "#fff1f2", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 12, fontSize: 13, color: "#dc2626", fontWeight: 500 }}>
-              ⚠️ {error}
-            </div>
-          )}
-
-          <div style={{ padding: "16px 16px 0" }}>
-            <button onClick={submit} disabled={loading}
-              style={{ width: "100%", padding: 15, background: loading ? "#a0d9bc" : `linear-gradient(135deg, ${GREEN}, #0fa86a)`, color: "#fff", fontSize: 15, fontWeight: 800, border: "none", borderRadius: 14, cursor: loading ? "not-allowed" : "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: loading ? "none" : "0 4px 20px rgba(29,184,122,0.3)" }}>
-              {loading ? <span>{ui.loading}</span> : <><span>✨</span><span>{ui.submitBtn}</span></>}
+            <button
+              onClick={handleExplain}
+              disabled={loading || limitReached || !text.trim()}
+              style={{ width: '100%', marginTop: 16, padding: '15px', background: limitReached || !text.trim() ? '#E5E7EB' : INDIGO, color: limitReached || !text.trim() ? '#9CA3AF' : '#fff', border: 'none', borderRadius: 14, fontFamily: 'Nunito, sans-serif', fontSize: 16, fontWeight: 800, cursor: limitReached || !text.trim() ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}
+            >
+              {loading ? t.explaining : limitReached ? t.limitReached : t.btn}
             </button>
           </div>
+        </div>
 
-          {loading && <div style={{ textAlign: "center", padding: "10px 16px 0", fontSize: 12, color: "#aaa" }}>{ui.loadingSub}</div>}
-
-          {/* Usage bar with countdown */}
-          <div style={{ margin: "16px 16px 0", padding: "14px 16px", background: "#f8fafc", borderRadius: 14, border: "1px solid #eef0f4" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-              <span style={{ fontSize: 12, fontWeight: 600, color: "#888" }}>{ui.usageLabel}</span>
-              <span style={{ fontSize: 13, fontWeight: 800, color: usesLeft === 0 ? "#dc2626" : "#333" }}>{usesLeft} / 10</span>
-            </div>
-
-            {/* Dot progress bar */}
-            <div style={{ display: "flex", gap: 4, marginBottom: countdown ? 10 : 0 }}>
-              {Array.from({ length: 10 }).map((_, i) => (
-                <div key={i} style={{ flex: 1, height: 6, borderRadius: 99, background: i < usesLeft ? GREEN : "#e2e8f0", transition: "background 0.3s" }} />
-              ))}
-            </div>
-
-            {/* Countdown — only shows after first use */}
-            {countdown && (
-              <div style={{ display: "flex", alignItems: "center", gap: 8, paddingTop: 10, borderTop: "1px solid #eef0f4" }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, background: usesLeft === 0 ? "#fff1f2" : "#fff8f0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>
-                  ⏱️
-                </div>
-                <div>
-                  <div style={{ fontSize: 11, color: "#aaa", fontWeight: 600 }}>{ui.resetLabel}</div>
-                  <div style={{ fontSize: 15, fontWeight: 900, color: usesLeft === 0 ? "#dc2626" : "#FF6B35", letterSpacing: 0.5 }}>
-                    {countdown}
-                  </div>
-                </div>
+        {/* Results */}
+        {result && (
+          <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {result.letterType && (
+              <div style={{ background: '#fff', borderRadius: 16, padding: 18, boxShadow: '0 2px 12px rgba(79,70,229,0.08)' }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: INDIGO, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>{t.letterType}</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: INDIGO_DARK }}>{result.letterType}</div>
+              </div>
+            )}
+            {result.summary && (
+              <div style={{ background: SOFT, borderRadius: 16, padding: 18 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: INDIGO, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>{t.summary}</div>
+                <div style={{ fontSize: 14, color: INDIGO_DARK, lineHeight: 1.6 }}>{result.summary}</div>
+              </div>
+            )}
+            {result.deadlines && result.deadlines.length > 0 && (
+              <div style={{ background: '#FFF7ED', borderRadius: 16, padding: 18 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: '#D97706', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>{t.deadlines}</div>
+                {result.deadlines.map((d, i) => (
+                  <div key={i} style={{ fontSize: 14, color: '#92400E', fontWeight: 600, marginBottom: 4 }}>⏰ {d}</div>
+                ))}
+              </div>
+            )}
+            {result.whatToDo && result.whatToDo.length > 0 && (
+              <div style={{ background: '#F0FDF4', borderRadius: 16, padding: 18 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: '#059669', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>{t.whatToDo}</div>
+                {result.whatToDo.map((d, i) => (
+                  <div key={i} style={{ fontSize: 14, color: '#065F46', fontWeight: 600, marginBottom: 4 }}>✅ {d}</div>
+                ))}
+              </div>
+            )}
+            {result.warning && (
+              <div style={{ background: '#FEF2F2', borderRadius: 16, padding: 18 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: '#DC2626', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>{t.warning}</div>
+                <div style={{ fontSize: 14, color: '#7F1D1D', lineHeight: 1.6 }}>{result.warning}</div>
               </div>
             )}
           </div>
-
-          {result && (
-            <div style={{ borderTop: "1px solid #f0f0f0", padding: "20px 16px", marginTop: 16 }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#f0fdf9", border: "1px solid rgba(29,184,122,0.25)", borderRadius: 10, padding: "8px 12px" }}>
-                  <div style={{ width: 8, height: 8, background: GREEN, borderRadius: "50%" }} />
-                  <span style={{ fontSize: 11, fontWeight: 800, color: "#17a066", textTransform: "uppercase", letterSpacing: 0.5 }}>{ui.ready}</span>
-                </div>
-                <button onClick={copyResult} style={{ padding: "7px 12px", background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 12, fontWeight: 600, color: "#555", cursor: "pointer", fontFamily: "inherit" }}>
-                  {copied ? ui.copied : ui.copy}
-                </button>
-              </div>
-
-              <ResultBlock color={GREEN} bg="#f0fdf9" label={ui.labels.letterType} text={result.letterType} isRtl={isRtl} />
-              <ResultBlock color="#0369a1" bg="#f0f9ff" label={ui.labels.summary} text={result.summary} isRtl={isRtl} />
-              {result.deadlines && <ResultBlock color="#dc2626" bg="#fff1f2" label={ui.labels.deadlines} text={result.deadlines} isRtl={isRtl} />}
-              <ResultBlock color="#b45309" bg="#fffbeb" label={ui.labels.whatToDo} text={result.whatToDo} isRtl={isRtl} />
-              {result.important && <ResultBlock color="#dc2626" bg="#fff1f2" label={ui.labels.important} text={result.important} isRtl={isRtl} />}
-
-              <div style={{ marginTop: 4, padding: "12px 14px", background: "#fafafa", border: "1px solid #eee", borderRadius: 12, display: "flex", gap: 10 }}>
-                <span>⚠️</span>
-                <span style={{ fontSize: 12, color: "#999", lineHeight: 1.6 }}>{ui.disclaimer}</span>
-              </div>
-
-              <button onClick={reset} style={{ marginTop: 14, width: "100%", padding: 12, background: "transparent", border: "1.5px solid #e2e8f0", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#666", cursor: "pointer", fontFamily: "inherit" }}>
-                {ui.reset}
-              </button>
-            </div>
-          )}
-        </div>
-
-        <div style={{ background: NAVY, borderRadius: 16, padding: "16px 20px", marginTop: 16, display: "flex", justifyContent: "center", gap: 24, flexWrap: "wrap" }}>
-          {[["🔒", "Never stored"], ["⚡", "Results in seconds"], ["🌍", "4 languages"]].map(([icon, text]) => (
-            <div key={text} style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 12, color: "rgba(255,255,255,0.6)", fontWeight: 500 }}>
-              <span>{icon}</span><span>{text}</span>
-            </div>
-          ))}
-        </div>
+        )}
       </div>
     </div>
-  );
+  )
 }
