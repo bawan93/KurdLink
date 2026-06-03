@@ -15,7 +15,7 @@ const RESET_KEY = 'komek_explainer_reset'
 const translations = {
   en: {
     heroTitle: 'Understand Your Letter',
-    heroSub: 'Paste or upload any official letter and we\'ll explain it in plain language',
+    heroSub: "Paste or upload any official letter and we'll explain it in plain language",
     usesLeft: 'uses left today',
     resetsIn: 'Resets in',
     tab_paste: 'Paste Text',
@@ -33,6 +33,8 @@ const translations = {
     warning: '⚠️ Warning',
     limitReached: 'Daily limit reached. Come back tomorrow.',
     errorMsg: 'Something went wrong. Please try again.',
+    imageReady: 'Image ready — tap Explain',
+    removeImage: '✕ Remove image',
   },
   ku: {
     heroTitle: 'نامەکەت تێبگە',
@@ -54,6 +56,8 @@ const translations = {
     warning: '⚠️ ئاگادارکردنەوە',
     limitReached: 'سنووری ڕۆژانە تەواو بوو. سبەی دەگەڕێیتەوە.',
     errorMsg: 'هەڵەیەک ڕوویدا. دووبارە هەوڵ بدەوە.',
+    imageReady: 'وێنەکە ئامادەیە — دەست بکە',
+    removeImage: '✕ وێنەکە بسڕەوە',
   },
   fa: {
     heroTitle: 'نامه‌ات را بفهم',
@@ -75,6 +79,8 @@ const translations = {
     warning: '⚠️ هشدار',
     limitReached: 'محدودیت روزانه تمام شد. فردا برگردید.',
     errorMsg: 'مشکلی پیش آمد. دوباره تلاش کنید.',
+    imageReady: 'تصویر آماده است — توضیح بده',
+    removeImage: '✕ حذف تصویر',
   },
   ar: {
     heroTitle: 'افهم رسالتك',
@@ -96,6 +102,8 @@ const translations = {
     warning: '⚠️ تحذير',
     limitReached: 'تم الوصول إلى الحد اليومي. ارجع غداً.',
     errorMsg: 'حدث خطأ. حاول مرة أخرى.',
+    imageReady: 'الصورة جاهزة — اشرح',
+    removeImage: '✕ إزالة الصورة',
   },
 }
 
@@ -128,6 +136,9 @@ export default function DocumentExplainerPage() {
   const [lang, setLang] = useState('en')
   const [tab, setTab] = useState('paste')
   const [text, setText] = useState('')
+  const [imageData, setImageData] = useState(null)
+  const [imageType, setImageType] = useState(null)
+  const [imageName, setImageName] = useState(null)
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
@@ -155,13 +166,7 @@ export default function DocumentExplainerPage() {
     if (!resetTime) return
     const interval = setInterval(() => {
       const diff = resetTime - Date.now()
-      if (diff <= 0) {
-        setUses(0)
-        setResetTime(null)
-        setCountdown('')
-        clearInterval(interval)
-        return
-      }
+      if (diff <= 0) { setUses(0); setResetTime(null); setCountdown(''); clearInterval(interval); return }
       const h = Math.floor(diff / 3600000)
       const m = Math.floor((diff % 3600000) / 60000)
       setCountdown(`${h}h ${m}m`)
@@ -175,17 +180,44 @@ export default function DocumentExplainerPage() {
 
   const usesLeft = MAX_USES - uses
   const limitReached = uses >= MAX_USES
+  const canSubmit = tab === 'paste' ? text.trim().length > 0 : imageData !== null
+
+  function handleFile(file) {
+    if (!file) return
+    const isImage = file.type.startsWith('image/')
+    if (isImage) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const base64 = e.target.result.split(',')[1]
+        setImageData(base64)
+        setImageType(file.type)
+        setImageName(file.name)
+      }
+      reader.readAsDataURL(file)
+    } else {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setText(e.target.result)
+        setTab('paste')
+      }
+      reader.readAsText(file)
+    }
+  }
 
   async function handleExplain() {
-    if (!text.trim() || limitReached) return
+    if (limitReached || !canSubmit) return
     setLoading(true)
     setError('')
     setResult(null)
     try {
+      const body = tab === 'upload' && imageData
+        ? { lang, imageData, imageType }
+        : { lang, text }
+
       const res = await fetch('/api/explain', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, lang }),
+        body: JSON.stringify(body),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed')
@@ -201,13 +233,6 @@ export default function DocumentExplainerPage() {
     }
   }
 
-  function handleFile(file) {
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = (e) => setText(e.target.result)
-    reader.readAsText(file)
-  }
-
   return (
     <div style={{ fontFamily: 'Nunito, sans-serif', background: BG, minHeight: '100vh', paddingBottom: 80, direction: isRTL ? 'rtl' : 'ltr' }}>
       {/* Hero */}
@@ -215,8 +240,6 @@ export default function DocumentExplainerPage() {
         <div style={{ fontSize: 44, marginBottom: 12 }}>📄</div>
         <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 900, margin: '0 0 10px', lineHeight: 1.2 }}>{t.heroTitle}</h1>
         <p style={{ color: INDIGO_LIGHT, fontSize: 14, fontWeight: 500, margin: '0 0 24px', maxWidth: 320, marginLeft: 'auto', marginRight: 'auto' }}>{t.heroSub}</p>
-
-        {/* Usage dots */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, flexWrap: 'wrap' }}>
           {Array.from({ length: MAX_USES }).map((_, i) => (
             <div key={i} style={{ width: 10, height: 10, borderRadius: '50%', background: i < uses ? '#6366F1' : MINT, opacity: i < uses ? 0.4 : 1, transition: 'all 0.3s' }} />
@@ -250,22 +273,43 @@ export default function DocumentExplainerPage() {
                 style={{ width: '100%', minHeight: 160, border: `1.5px solid ${SOFT}`, borderRadius: 12, padding: 14, fontFamily: 'Nunito, sans-serif', fontSize: 14, color: '#1C1A4F', resize: 'vertical', outline: 'none', background: BG, boxSizing: 'border-box', direction: 'ltr' }}
               />
             ) : (
-              <div
-                onDragOver={e => { e.preventDefault(); setDragOver(true) }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={e => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]) }}
-                style={{ border: `2px dashed ${dragOver ? INDIGO : SOFT}`, borderRadius: 14, padding: '32px 20px', textAlign: 'center', background: dragOver ? SOFT : BG, transition: 'all 0.2s', cursor: 'pointer' }}
-                onClick={() => fileRef.current?.click()}
-              >
-                <div style={{ fontSize: 32, marginBottom: 8 }}>📎</div>
-                <p style={{ color: '#6B7280', fontSize: 13, margin: '0 0 12px' }}>
-                  {t.dragDrop} <span style={{ color: INDIGO, fontWeight: 700 }}>{t.browse}</span>
-                </p>
-                <button onClick={e => { e.stopPropagation(); cameraRef.current?.click() }} style={{ background: SOFT, color: INDIGO, border: 'none', borderRadius: 10, padding: '10px 20px', fontFamily: 'Nunito, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
-                  {t.camera}
-                </button>
-                <input ref={fileRef} type="file" accept="image/*,.pdf,.txt" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
-                <input ref={cameraRef} type="file" accept="image/*" capture="environment" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
+              <div>
+                <div
+                  onDragOver={e => { e.preventDefault(); setDragOver(true) }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={e => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]) }}
+                  style={{ border: `2px dashed ${dragOver ? INDIGO : imageData ? MINT : SOFT}`, borderRadius: 14, padding: '32px 20px', textAlign: 'center', background: dragOver ? SOFT : imageData ? '#F0FDF4' : BG, transition: 'all 0.2s', cursor: 'pointer' }}
+                  onClick={() => fileRef.current?.click()}
+                >
+                  {imageData ? (
+                    <div>
+                      <div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>
+                      <p style={{ color: '#059669', fontSize: 13, fontWeight: 700, margin: '0 0 4px' }}>{imageName}</p>
+                      <p style={{ color: '#6B7280', fontSize: 12, margin: 0 }}>{t.imageReady}</p>
+                    </div>
+                  ) : (
+                    <div>
+                      <div style={{ fontSize: 32, marginBottom: 8 }}>📎</div>
+                      <p style={{ color: '#6B7280', fontSize: 13, margin: '0 0 12px' }}>
+                        {t.dragDrop} <span style={{ color: INDIGO, fontWeight: 700 }}>{t.browse}</span>
+                      </p>
+                      <button
+                        onClick={e => { e.stopPropagation(); cameraRef.current?.click() }}
+                        style={{ background: SOFT, color: INDIGO, border: 'none', borderRadius: 10, padding: '10px 20px', fontFamily: 'Nunito, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}
+                      >
+                        {t.camera}
+                      </button>
+                    </div>
+                  )}
+                  <input ref={fileRef} type="file" accept="image/*,.txt" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
+                  <input ref={cameraRef} type="file" accept="image/*" capture="environment" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
+                </div>
+                {imageData && (
+                  <button onClick={() => { setImageData(null); setImageType(null); setImageName(null) }}
+                    style={{ marginTop: 8, background: 'none', border: 'none', color: '#9CA3AF', fontSize: 12, cursor: 'pointer', fontFamily: 'Nunito, sans-serif' }}>
+                    {t.removeImage}
+                  </button>
+                )}
               </div>
             )}
 
@@ -273,8 +317,8 @@ export default function DocumentExplainerPage() {
 
             <button
               onClick={handleExplain}
-              disabled={loading || limitReached || !text.trim()}
-              style={{ width: '100%', marginTop: 16, padding: '15px', background: limitReached || !text.trim() ? '#E5E7EB' : INDIGO, color: limitReached || !text.trim() ? '#9CA3AF' : '#fff', border: 'none', borderRadius: 14, fontFamily: 'Nunito, sans-serif', fontSize: 16, fontWeight: 800, cursor: limitReached || !text.trim() ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}
+              disabled={loading || limitReached || !canSubmit}
+              style={{ width: '100%', marginTop: 16, padding: '15px', background: limitReached || !canSubmit ? '#E5E7EB' : INDIGO, color: limitReached || !canSubmit ? '#9CA3AF' : '#fff', border: 'none', borderRadius: 14, fontFamily: 'Nunito, sans-serif', fontSize: 16, fontWeight: 800, cursor: limitReached || !canSubmit ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}
             >
               {loading ? t.explaining : limitReached ? t.limitReached : t.btn}
             </button>
