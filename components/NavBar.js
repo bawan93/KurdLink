@@ -14,7 +14,7 @@ const TABS = [
     icon: '🧭',
     label: { en: 'Guide', ku: 'ڕێبەر', fa: 'راهنما', ar: 'الدليل' },
     route: '/reber/coming-to-uk',
-    match: (p) => p?.startsWith('/reber'),
+    match: (p) => p?.startsWith('/reber') && p !== '/reber/ask',
   },
   {
     id: 'letters',
