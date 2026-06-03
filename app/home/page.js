@@ -1,349 +1,281 @@
-'use client'
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { createBrowserClient } from '@supabase/ssr'
+import { useState, useEffect, useRef } from "react"
 
-function getSupabase() {
-  return createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
-}
+const INDIGO = "#4F46E5"
+const INDIGO_DARK = "#1C1A4F"
+const INDIGO_LIGHT = "#818CF8"
+const MINT = "#34D399"
+const KURD_RED = "#E30A17"
+const KURD_GREEN = "#009C3B"
+const KURD_YELLOW = "#F7C200"
 
-const FONT = "'Nunito', 'Plus Jakarta Sans', sans-serif"
-const INDIGO = '#4F46E5'
-const INDIGO_LIGHT = '#818CF8'
-const INDIGO_DARK = '#1C1A4F'
-const MINT = '#34D399'
-const SOFT = '#EDE9FE'
-const BG = '#F5F4FF'
+const taglines = [
+  { text: "Help for Kurdish people in the UK", dir: "ltr" },
+  { text: "یارمەتی بۆ کوردەکانی بریتانیا", dir: "rtl" },
+  { text: "کمک برای کردهای مقیم بریتانیا", dir: "rtl" },
+  { text: "مساعدة للكرد في المملكة المتحدة", dir: "rtl" },
+]
 
-const TX = {
-  en: {
-    heroLabel: 'FREE · AI POWERED',
-    heroTitle: 'Got a letter from the Home Office?',
-    heroSub: 'Upload any UK official letter and understand it instantly — in your language.',
-    heroCta: 'Explain My Letter',
-    usesLeft: 'free uses left today',
-    guideTitle: 'Your Journey Guide',
-    guideSub: 'Step by step from arrival to citizenship',
-    stages: [
-      { label: 'New to UK', color: INDIGO, route: '/reber/new-to-uk', icon: '✈️' },
-      { label: 'Leave to Remain', color: '#059669', route: '/reber/leave-to-remain', icon: '✅' },
-      { label: 'Citizenship', color: '#7C3AED', route: '/reber/citizenship', icon: '🇬🇧' },
-    ],
-    askTitle: 'Ask the Community',
-    askSub: 'Real questions from people like you',
-    askCta: 'Ask a Question',
-    servicesTitle: 'Services & Jobs',
-    servicesSub: 'Find Kurdish businesses and job opportunities',
-    noListings: 'No listings yet',
-    loading: 'Loading…',
-    call: 'Call',
-  },
-  ku: {
-    heroLabel: 'بەخۆڕایی · AI',
-    heroTitle: 'نامەیەکت لە ئۆفیسی ناوخۆ هەیە؟',
-    heroSub: 'هەر نامەیەکی فەرمیی UK بار بکە و فەوری تێبگە — بە زمانی خۆت.',
-    heroCta: 'نامەکەم شیبکە',
-    usesLeft: 'بەکارهێنانی بەخۆڕایی ئەمڕۆ ماون',
-    guideTitle: 'ڕێنمای گەشتەکەت',
-    guideSub: 'هەنگاو بە هەنگاو لە گەیشتن تا هاووڵاتیی',
-    stages: [
-      { label: 'تازە گەیشتوویت', color: INDIGO, route: '/reber/new-to-uk', icon: '✈️' },
-      { label: 'مۆڵەتی مانەوە', color: '#059669', route: '/reber/leave-to-remain', icon: '✅' },
-      { label: 'هاووڵاتیی', color: '#7C3AED', route: '/reber/citizenship', icon: '🇬🇧' },
-    ],
-    askTitle: 'پرسیار لە کۆمیونیتی',
-    askSub: 'پرسیارە راستەقینەکان لە کەسانی وەک تۆ',
-    askCta: 'پرسیار بکە',
-    servicesTitle: 'خزمەتگوزاری و کار',
-    servicesSub: 'کارو بارێکی کوردی و دەرفەتی کار بدۆزەرەوە',
-    noListings: 'هێشتا هیچ لیستێک نییە',
-    loading: 'چاوەڕوانبە…',
-    call: 'پەیوەندی',
-  },
-  fa: {
-    heroLabel: 'رایگان · هوش مصنوعی',
-    heroTitle: 'نامه‌ای از Home Office داری؟',
-    heroSub: 'هر نامه رسمی UK را آپلود کن و فوری بفهم — به زبان خودت.',
-    heroCta: 'نامه‌ام را توضیح بده',
-    usesLeft: 'استفاده رایگان امروز باقی مانده',
-    guideTitle: 'راهنمای سفر تو',
-    guideSub: 'گام به گام از ورود تا شهروندی',
-    stages: [
-      { label: 'تازه رسیدی', color: INDIGO, route: '/reber/new-to-uk', icon: '✈️' },
-      { label: 'اجازه اقامت', color: '#059669', route: '/reber/leave-to-remain', icon: '✅' },
-      { label: 'شهروندی', color: '#7C3AED', route: '/reber/citizenship', icon: '🇬🇧' },
-    ],
-    askTitle: 'از جامعه بپرس',
-    askSub: 'سوالات واقعی از افرادی مثل تو',
-    askCta: 'سوال بپرس',
-    servicesTitle: 'خدمات و مشاغل',
-    servicesSub: 'کسب‌وکارهای کردی و فرصت‌های شغلی',
-    noListings: 'هنوز آگهی‌ای نیست',
-    loading: 'در حال بارگذاری…',
-    call: 'تماس',
-  },
-  ar: {
-    heroLabel: 'مجاني · ذكاء اصطناعي',
-    heroTitle: 'لديك رسالة من وزارة الداخلية؟',
-    heroSub: 'ارفع أي رسالة رسمية بريطانية وافهمها فوراً — بلغتك.',
-    heroCta: 'اشرح رسالتي',
-    usesLeft: 'استخدامات مجانية متبقية اليوم',
-    guideTitle: 'دليل رحلتك',
-    guideSub: 'خطوة بخطوة من الوصول إلى الجنسية',
-    stages: [
-      { label: 'وصلت للتو', color: INDIGO, route: '/reber/new-to-uk', icon: '✈️' },
-      { label: 'الإذن بالبقاء', color: '#059669', route: '/reber/leave-to-remain', icon: '✅' },
-      { label: 'الجنسية', color: '#7C3AED', route: '/reber/citizenship', icon: '🇬🇧' },
-    ],
-    askTitle: 'اسأل المجتمع',
-    askSub: 'أسئلة حقيقية من أشخاص مثلك',
-    askCta: 'اطرح سؤالاً',
-    servicesTitle: 'الخدمات والوظائف',
-    servicesSub: 'اعثر على أعمال كردية وفرص عمل',
-    noListings: 'لا توجد إعلانات بعد',
-    loading: 'جاري التحميل…',
-    call: 'اتصال',
-  },
-}
+const LANGS = [
+  { id: "en", flag: "🇬🇧", name: "EN" },
+  { id: "ku", flag: null, name: "کوردی" },
+  { id: "fa", flag: "🇮🇷", name: "فارسی" },
+  { id: "ar", flag: "🇮🇶", name: "عربي" },
+]
 
-function SectionHeader({ label, sub, cta, onCta, ctaColor }) {
+const startLabel = { en: "Get Started", ku: "دەست پێ بکە", fa: "شروع کن", ar: "ابدأ الآن" }
+const freeLabel = { en: "Free · English · کوردی · فارسی · عربي", ku: "بەخۆڕایی · English · کوردی · فارسی · عربي", fa: "رایگان · English · کوردی · فارسی · عربي", ar: "مجاني · English · کوردی · فارسی · عربي" }
+
+function KurdFlag({ size = 18 }) {
+  const w = size * 1.5
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 }}>
-      <div>
-        <div style={{ fontSize: 17, fontWeight: 900, color: INDIGO_DARK, letterSpacing: -0.3 }}>{label}</div>
-        {sub && <div style={{ fontSize: 12, color: '#9CA3AF', fontWeight: 500, marginTop: 2 }}>{sub}</div>}
-      </div>
-      {cta && (
-        <button onClick={onCta} style={{ fontSize: 12, fontWeight: 800, color: ctaColor || INDIGO, background: SOFT, border: 'none', borderRadius: 20, padding: '6px 14px', cursor: 'pointer', fontFamily: FONT, whiteSpace: 'nowrap' }}>
-          {cta} →
-        </button>
+    <svg width={w} height={size} viewBox="0 0 90 60" style={{ borderRadius: 2, display: "block" }}>
+      <rect width="90" height="20" fill="#E30A17" />
+      <rect y="20" width="90" height="20" fill="#FFFFFF" />
+      <rect y="40" width="90" height="20" fill="#009C3B" />
+      <circle cx="45" cy="30" r="9" fill="#F7C200" />
+      {Array.from({ length: 21 }).map((_, i) => {
+        const a = (i * 360 / 21) * Math.PI / 180
+        return <line key={i} x1={45+Math.cos(a)*9} y1={30+Math.sin(a)*9} x2={45+Math.cos(a)*14} y2={30+Math.sin(a)*14} stroke="#F7C200" strokeWidth="1.5" />
+      })}
+      <circle cx="45" cy="30" r="5" fill="#E30A17" />
+    </svg>
+  )
+}
+
+function SproutLogo({ size = 44 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100">
+      <defs>
+        <linearGradient id="sbg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={INDIGO} /><stop offset="100%" stopColor={INDIGO_LIGHT} />
+        </linearGradient>
+        <linearGradient id="sl" x1="0%" y1="100%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#059669" /><stop offset="100%" stopColor="#6EE7B7" />
+        </linearGradient>
+      </defs>
+      <circle cx="50" cy="50" r="46" fill="url(#sbg)" />
+      <path d="M 50 76 L 50 45" stroke="white" strokeWidth="5" strokeLinecap="round" fill="none" />
+      <path d="M 50 60 Q 26 55 22 34 Q 44 28 52 56 Z" fill="url(#sl)" />
+      <path d="M 50 50 Q 72 44 76 23 Q 56 17 48 46 Z" fill="url(#sl)" opacity="0.85" />
+      <ellipse cx="50" cy="40" rx="6" ry="9" fill={MINT} />
+      <ellipse cx="50" cy="37" rx="3" ry="4" fill="white" opacity="0.8" />
+    </svg>
+  )
+}
+
+function LangSelector({ lang, onChange }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+  const current = LANGS.find(l => l.id === lang) || LANGS[0]
+  useEffect(() => {
+    const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    document.addEventListener("mousedown", h)
+    return () => document.removeEventListener("mousedown", h)
+  }, [])
+  return (
+    <div ref={ref} style={{ position: "relative" }}>
+      <button onClick={() => setOpen(o => !o)} style={{
+        display: "flex", alignItems: "center", gap: 5, padding: "7px 13px",
+        background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)",
+        borderRadius: 20, color: "white", fontWeight: 800, fontSize: 12,
+        cursor: "pointer", fontFamily: "Nunito, sans-serif",
+      }}>
+        {current.id === "ku" ? <KurdFlag size={12} /> : <span style={{ fontSize: 14 }}>{current.flag}</span>}
+        <span>{current.name}</span>
+        <span style={{ fontSize: 8, opacity: 0.4 }}>{open ? "▲" : "▼"}</span>
+      </button>
+      {open && (
+        <div style={{
+          position: "absolute", top: "calc(100% + 8px)", right: 0,
+          background: "#0d0b24", borderRadius: 16, overflow: "hidden",
+          boxShadow: "0 16px 48px rgba(0,0,0,0.6)", zIndex: 100,
+          minWidth: 150, border: "1px solid rgba(255,255,255,0.08)",
+        }}>
+          {LANGS.map(l => (
+            <button key={l.id} onClick={() => { onChange(l.id); setOpen(false) }} style={{
+              width: "100%", display: "flex", alignItems: "center", gap: 10,
+              padding: "11px 16px", background: lang === l.id ? "rgba(79,70,229,0.3)" : "transparent",
+              border: "none", borderBottom: "1px solid rgba(255,255,255,0.05)",
+              cursor: "pointer", fontFamily: "Nunito, sans-serif", color: "white",
+            }}>
+              {l.id === "ku" ? <KurdFlag size={15} /> : <span style={{ fontSize: 18 }}>{l.flag}</span>}
+              <span style={{ fontSize: 13, fontWeight: 700 }}>{l.name}</span>
+              {lang === l.id && <span style={{ color: MINT, marginLeft: "auto" }}>✓</span>}
+            </button>
+          ))}
+        </div>
       )}
     </div>
   )
 }
 
-export default function Home() {
-  const router = useRouter()
-  const [lang, setLang] = useState('en')
-  const [listings, setListings] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [usesLeft, setUsesLeft] = useState(10)
-  const t = TX[lang] || TX.en
-  const isRtl = lang === 'ku' || lang === 'fa' || lang === 'ar'
+export default function HomePreview() {
+  const [tagIdx, setTagIdx] = useState(0)
+  const [tagVisible, setTagVisible] = useState(true)
+  const [lang, setLang] = useState("en")
+  const isRTL = ["ku","fa","ar"].includes(lang)
 
   useEffect(() => {
-    const saved = localStorage.getItem('komek_lang')
-    if (saved && TX[saved]) setLang(saved)
-    const handler = (e) => { if (TX[e.detail]) setLang(e.detail) }
-    window.addEventListener('langchange', handler)
-
-    // Check document explainer uses left
-    const key = 'doc_explainer_uses'
-    const dateKey = 'doc_explainer_date'
-    const today = new Date().toDateString()
-    const savedDate = localStorage.getItem(dateKey)
-    if (savedDate !== today) {
-      localStorage.setItem(dateKey, today)
-      localStorage.setItem(key, '10')
-      setUsesLeft(10)
-    } else {
-      const uses = parseInt(localStorage.getItem(key) || '10')
-      setUsesLeft(uses)
-    }
-
-    return () => window.removeEventListener('langchange', handler)
+    const interval = setInterval(() => {
+      setTagVisible(false)
+      setTimeout(() => { setTagIdx(i => (i+1) % taglines.length); setTagVisible(true) }, 400)
+    }, 3000)
+    return () => clearInterval(interval)
   }, [])
 
-  useEffect(() => {
-    fetchListings()
-  }, [])
-
-  const fetchListings = async () => {
-    setLoading(true)
-    try {
-      const supabase = getSupabase()
-      const { data } = await supabase
-        .from('listings')
-        .select('*')
-        .in('type', ['list_service', 'hire_staff'])
-        .in('status', ['approved', 'sold', 'filled'])
-        .order('created_at', { ascending: false })
-        .limit(4)
-      setListings(data || [])
-    } catch (e) {
-      setListings([])
+  function handleLangChange(l) {
+    setLang(l)
+    if (typeof window !== "undefined") {
+      localStorage.setItem("komek_lang", l)
+      window.dispatchEvent(new CustomEvent("langchange", { detail: l }))
     }
-    setLoading(false)
   }
 
+  const currentTag = taglines[tagIdx]
+
   return (
-    <div style={{ minHeight: '100vh', minHeight: '100dvh', background: BG, fontFamily: FONT, direction: isRtl ? 'rtl' : 'ltr', paddingBottom: 90 }}>
+    <div style={{
+      height: "100vh", maxWidth: 390, margin: "0 auto",
+      background: "#050412",
+      fontFamily: "'Nunito', sans-serif",
+      display: "flex", flexDirection: "column",
+      overflow: "hidden", position: "relative",
+    }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        @keyframes rotateSun { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%,100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.03); } }
+      `}</style>
 
-      {/* ── DOCUMENT EXPLAINER HERO ── */}
-      <div style={{ background: `linear-gradient(135deg, ${INDIGO_DARK} 0%, #2D2B6B 100%)`, padding: '28px 20px 32px' }}>
-        <div style={{ maxWidth: 480, margin: '0 auto' }}>
+      {/* Full screen background — radial glow from centre */}
+      <div style={{
+        position: "absolute", inset: 0,
+        background: "radial-gradient(ellipse 70% 55% at 50% 52%, rgba(79,70,229,0.22) 0%, rgba(28,26,79,0.35) 45%, transparent 75%)",
+        pointerEvents: "none",
+      }} />
 
-          {/* Label */}
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(52,211,153,0.15)', border: '1px solid rgba(52,211,153,0.3)', borderRadius: 20, padding: '4px 12px', marginBottom: 16 }}>
-            <span style={{ fontSize: 10, fontWeight: 800, color: MINT, letterSpacing: 1.5 }}>{t.heroLabel}</span>
-          </div>
+      {/* Subtle red glow top left */}
+      <div style={{
+        position: "absolute", top: -80, left: -60,
+        width: 260, height: 260, borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(227,10,23,0.12) 0%, transparent 70%)",
+        pointerEvents: "none",
+      }} />
 
-          <h1 style={{ fontSize: 24, fontWeight: 900, color: '#fff', margin: '0 0 10px', lineHeight: 1.25, letterSpacing: -0.5 }}>{t.heroTitle}</h1>
-          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.65)', margin: '0 0 22px', lineHeight: 1.65, fontWeight: 500 }}>{t.heroSub}</p>
+      {/* Subtle green glow bottom right */}
+      <div style={{
+        position: "absolute", bottom: -60, right: -40,
+        width: 220, height: 220, borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(0,156,59,0.1) 0%, transparent 70%)",
+        pointerEvents: "none",
+      }} />
 
-          {/* CTA button */}
-          <button
-            onClick={() => router.push('/journey/document-explainer')}
-            style={{
-              width: '100%', padding: '16px', borderRadius: 16,
-              background: `linear-gradient(135deg, ${MINT}, #059669)`,
-              border: 'none', fontSize: 16, fontWeight: 900, color: '#fff',
-              cursor: 'pointer', fontFamily: FONT,
-              boxShadow: '0 8px 28px rgba(52,211,153,0.4)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-            }}
-          >
-            <span style={{ fontSize: 20 }}>📄</span>
-            {t.heroCta}
-          </button>
+      {/* Kurdish flag — vertical bands very subtle on edges */}
+      <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3, background: `linear-gradient(to bottom, ${KURD_RED}, transparent, ${KURD_GREEN})`, opacity: 0.5, pointerEvents: "none" }} />
+      <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 3, background: `linear-gradient(to bottom, ${KURD_GREEN}, transparent, ${KURD_RED})`, opacity: 0.5, pointerEvents: "none" }} />
 
-          {/* Uses left indicator */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 12 }}>
-            <div style={{ display: 'flex', gap: 3 }}>
-              {Array.from({ length: 10 }).map((_, i) => (
-                <div key={i} style={{ width: 18, height: 4, borderRadius: 2, background: i < usesLeft ? MINT : 'rgba(255,255,255,0.15)', transition: 'background 0.3s' }} />
-              ))}
-            </div>
-            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>{usesLeft} {t.usesLeft}</span>
-          </div>
+      {/* Stars */}
+      <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }} viewBox="0 0 390 844">
+        {[[30,60],[80,30],[140,80],[200,20],[260,55],[320,35],[360,75],[15,140],[100,160],[170,110],[240,150],[300,120],[350,160],[50,220],[150,240],[280,200],[340,230]].map(([x,y],i)=>(
+          <circle key={i} cx={x} cy={y} r={i%4===0?1.4:0.8} fill="white" opacity={0.08+((i*11)%9)*0.04} />
+        ))}
+      </svg>
+
+      {/* Nav */}
+      <div style={{ padding: "52px 24px 0", display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative", zIndex: 10, flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <SproutLogo size={38} />
+          <span style={{ fontSize: 22, fontWeight: 900, color: "white", letterSpacing: -0.5 }}>Komek</span>
         </div>
+        <LangSelector lang={lang} onChange={handleLangChange} />
       </div>
 
-      <div style={{ maxWidth: 480, margin: '0 auto', padding: '20px 20px 0' }}>
+      {/* Centre — sun + text */}
+      <div style={{
+        flex: 1, display: "flex", flexDirection: "column",
+        alignItems: "center", justifyContent: "center",
+        position: "relative", zIndex: 10, padding: "0 24px",
+        gap: 0,
+      }}>
+        {/* Kurdish sun — large, slow pulse */}
+        <div style={{ animation: "pulse 1s ease-in-out infinite", marginBottom: 36 }}>
+          <svg width="180" height="180" viewBox="0 0 180 180">
+            <defs>
+              <radialGradient id="sg2" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor={KURD_YELLOW} />
+                <stop offset="100%" stopColor="#F59E0B" />
+              </radialGradient>
+              <filter id="sunblur"><feGaussianBlur stdDeviation="6" /></filter>
+            </defs>
+            {/* Glow behind */}
+            <circle cx="90" cy="90" r="70" fill={KURD_YELLOW} opacity="0.12" filter="url(#sunblur)" />
+            {/* Rays */}
+            {Array.from({ length: 21 }).map((_, i) => {
+              const a = (i * 360 / 21) * Math.PI / 180
+              return <line key={i}
+                x1={90 + Math.cos(a) * 38} y1={90 + Math.sin(a) * 38}
+                x2={90 + Math.cos(a) * 62} y2={90 + Math.sin(a) * 62}
+                stroke={KURD_YELLOW} strokeWidth="3.5" strokeLinecap="round" opacity="0.95" />
+            })}
+            {/* Body */}
+            <circle cx="90" cy="90" r="38" fill="url(#sg2)" />
+            {/* Red centre */}
+            <circle cx="90" cy="90" r="17" fill={KURD_RED} />
+            {/* Sheen */}
+            <ellipse cx="78" cy="78" rx="12" ry="8" fill="white" opacity="0.14" />
+          </svg>
+        </div>
 
-        {/* ── JOURNEY GUIDE SECTION ── */}
-        <SectionHeader
-          label={t.guideTitle}
-          sub={t.guideSub}
-          cta="View all"
-          onCta={() => router.push('/reber/coming-to-uk')}
-        />
+        {/* Tagline — big, centred, fades between languages */}
+        <div style={{
+          textAlign: "center",
+          opacity: tagVisible ? 1 : 0,
+          transition: "opacity 0.4s ease",
+          minHeight: 80,
+          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+        }}>
+          <p style={{
+            fontSize: 26, fontWeight: 900, color: "white",
+            lineHeight: 1.25, textAlign: "center",
+            direction: currentTag.dir,
+            letterSpacing: currentTag.dir === "ltr" ? -0.5 : 0,
+            textShadow: "0 2px 24px rgba(79,70,229,0.4)",
+          }}>
+            {currentTag.text}
+          </p>
+        </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 28 }}>
-          {t.stages.map((stage, i) => (
-            <button
-              key={i}
-              onClick={() => router.push(stage.route)}
-              style={{
-                background: '#fff', borderRadius: 16, padding: '16px 10px',
-                border: `1.5px solid ${stage.color}20`, cursor: 'pointer',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
-                fontFamily: FONT, boxShadow: `0 4px 16px ${stage.color}10`,
-                transition: 'all 0.15s',
-              }}
-            >
-              <div style={{ width: 44, height: 44, borderRadius: 14, background: `${stage.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>
-                {stage.icon}
-              </div>
-              <div style={{ fontSize: 11, fontWeight: 800, color: stage.color, textAlign: 'center', lineHeight: 1.3 }}>{stage.label}</div>
-            </button>
+        {/* Language dots */}
+        <div style={{ display: "flex", gap: 6, marginTop: 20 }}>
+          {taglines.map((_, i) => (
+            <div key={i} style={{
+              width: i === tagIdx ? 20 : 6, height: 6, borderRadius: 3,
+              background: i === tagIdx ? KURD_YELLOW : "rgba(255,255,255,0.15)",
+              transition: "all 0.4s ease",
+            }} />
           ))}
         </div>
 
-        {/* ── ASK A QUESTION ── */}
-        <SectionHeader
-          label={t.askTitle}
-          sub={t.askSub}
-        />
+        {/* CTA */}
+        <button style={{
+          marginTop: 36,
+          background: `linear-gradient(135deg, ${MINT} 0%, #059669 100%)`,
+          borderRadius: 28, padding: "16px 48px",
+          fontSize: 16, fontWeight: 900, color: "white",
+          border: "none", cursor: "pointer",
+          boxShadow: "0 8px 32px rgba(52,211,153,0.35)",
+          letterSpacing: 0.3,
+        }}>{startLabel[lang]} →</button>
 
-        <button
-          onClick={() => router.push('/reber/ask')}
-          style={{
-            width: '100%', background: '#fff', borderRadius: 16, padding: '16px 18px',
-            border: `1.5px solid ${SOFT}`, cursor: 'pointer', fontFamily: FONT,
-            display: 'flex', alignItems: 'center', gap: 14, marginBottom: 28,
-            boxShadow: '0 2px 12px rgba(79,70,229,0.06)',
-            textAlign: isRtl ? 'right' : 'left',
-          }}
-        >
-          <div style={{ width: 46, height: 46, borderRadius: 14, background: SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>❓</div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 14, fontWeight: 800, color: INDIGO }}>{t.askCta}</div>
-            <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2, fontWeight: 500 }}>{t.askSub}</div>
-          </div>
-          <span style={{ fontSize: 20, color: '#C4B5FD', flexShrink: 0 }}>{isRtl ? '←' : '→'}</span>
-        </button>
-
-        {/* ── SERVICES & JOBS ── */}
-        <SectionHeader
-          label={t.servicesTitle}
-          sub={t.servicesSub}
-          cta="View all"
-          onCta={() => router.push('/services')}
-        />
-
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: '32px 0', color: '#9CA3AF', fontSize: 13, fontWeight: 600 }}>
-            🌱 {t.loading}
-          </div>
-        ) : listings.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '32px 0' }}>
-            <div style={{ fontSize: 40, marginBottom: 10 }}>🤝</div>
-            <div style={{ fontSize: 14, color: '#9CA3AF', fontWeight: 600 }}>{t.noListings}</div>
-          </div>
-        ) : (
-          listings.map(listing => {
-            const d = listing.data || {}
-            const isService = listing.type === 'list_service'
-            const title = isService ? d.fullName : d.jobTitle
-            const sub = isService ? d.category : d.salary ? `💰 ${d.salary}` : ''
-            const color = isService ? INDIGO : '#059669'
-            const icon = isService ? '🎯' : '💼'
-
-            return (
-              <div
-                key={listing.id}
-                onClick={() => router.push(`/listing/${listing.id}`)}
-                style={{
-                  background: '#fff', borderRadius: 16, marginBottom: 10,
-                  cursor: 'pointer', border: '1.5px solid #EDE9FE',
-                  boxShadow: '0 2px 12px rgba(79,70,229,0.05)', overflow: 'hidden',
-                }}
-              >
-                <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12, flexDirection: isRtl ? 'row-reverse' : 'row' }}>
-                  <div style={{ width: 42, height: 42, borderRadius: 12, background: `${color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>
-                    {icon}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: INDIGO_DARK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</div>
-                    {sub && <div style={{ fontSize: 12, color, fontWeight: 700, marginTop: 2 }}>{sub}</div>}
-                    {d.city && <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>📍 {d.city}</div>}
-                  </div>
-                  <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-                    {(d.phone || d.applyPhone) && (
-                      <a href={`tel:${d.phone || d.applyPhone}`} onClick={e => e.stopPropagation()} style={{
-                        background: `linear-gradient(135deg, ${INDIGO}, ${INDIGO_LIGHT})`,
-                        borderRadius: 10, padding: '7px 12px', color: '#fff',
-                        fontWeight: 700, fontSize: 12, textDecoration: 'none',
-                      }}>
-                        📞
-                      </a>
-                    )}
-                    {d.whatsapp && (
-                      <a href={`https://wa.me/${d.whatsapp.replace(/\D/g, '')}`} onClick={e => e.stopPropagation()} target="_blank" style={{
-                        background: '#25D366', borderRadius: 10, padding: '7px 12px',
-                        color: '#fff', fontWeight: 700, fontSize: 12, textDecoration: 'none',
-                      }}>
-                        💬
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )
-          })
-        )}
+        {/* Free label */}
+        <p style={{ marginTop: 14, fontSize: 10, color: "rgba(255,255,255,0.3)", fontWeight: 600, textAlign: "center" }}>
+          {freeLabel[lang]}
+        </p>
       </div>
+
+      {/* Bottom safe area */}
+      <div style={{ height: 24, flexShrink: 0 }} />
     </div>
   )
 }
