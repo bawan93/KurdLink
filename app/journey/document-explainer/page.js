@@ -186,12 +186,23 @@ export default function DocumentExplainerPage() {
     if (!file) return
     const isImage = file.type.startsWith('image/')
     if (isImage) {
+      // Convert any image format (incl. AVIF, HEIC) to JPEG via canvas
       const reader = new FileReader()
       reader.onload = (e) => {
-        const base64 = e.target.result.split(',')[1]
-        setImageData(base64)
-        setImageType(file.type)
-        setImageName(file.name)
+        const img = new Image()
+        img.onload = () => {
+          const canvas = document.createElement('canvas')
+          canvas.width = img.width
+          canvas.height = img.height
+          const ctx = canvas.getContext('2d')
+          ctx.drawImage(img, 0, 0)
+          const jpegDataUrl = canvas.toDataURL('image/jpeg', 0.92)
+          const base64 = jpegDataUrl.split(',')[1]
+          setImageData(base64)
+          setImageType('image/jpeg')
+          setImageName(file.name)
+        }
+        img.src = e.target.result
       }
       reader.readAsDataURL(file)
     } else {
