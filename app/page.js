@@ -95,8 +95,8 @@ export default function SplashPage() {
 
   return (
     <div style={{
-      height: "100dvh",
-      minHeight: "100vh",
+      height: "100vh",
+      maxHeight: "100vh",
       background: "#050412",
       fontFamily: "Nunito, sans-serif",
       display: "flex",
@@ -109,6 +109,7 @@ export default function SplashPage() {
           0%, 100% { opacity: 0.6; transform: scale(1); }
           50% { opacity: 1; transform: scale(1.03); }
         }
+        html, body { margin: 0; padding: 0; overflow: hidden; background: #050412; }
       `}</style>
 
       {/* ALL decorative layers — pointerEvents none */}
@@ -260,7 +261,6 @@ export default function SplashPage() {
         </p>
       </div>
 
-      <div style={{ height: 24, flexShrink: 0 }} />
     </div>
   )
 }
