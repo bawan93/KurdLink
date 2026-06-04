@@ -95,7 +95,8 @@ export default function SplashPage() {
 
   return (
     <div style={{
-      height: "100vh",
+      height: "100dvh",
+      minHeight: "100vh",
       background: "#050412",
       fontFamily: "Nunito, sans-serif",
       display: "flex",
