@@ -136,8 +136,10 @@ export default function HomePage() {
 
   function handleLangChange(l) {
     setLang(l)
-    localStorage.setItem("komek_lang", l)
-    window.dispatchEvent(new CustomEvent("langchange", { detail: l }))
+    try {
+      localStorage.setItem("komek_lang", l)
+      window.dispatchEvent(new CustomEvent("langchange", { detail: l }))
+    } catch(e) {}
   }
 
   const currentTag = taglines[tagIdx]
