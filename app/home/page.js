@@ -1,4 +1,6 @@
+'use client'
 import { useState, useEffect, useRef } from "react"
+import { useRouter } from "next/navigation"
 
 const INDIGO = "#4F46E5"
 const INDIGO_DARK = "#1C1A4F"
@@ -9,10 +11,10 @@ const KURD_GREEN = "#009C3B"
 const KURD_YELLOW = "#F7C200"
 
 const taglines = [
-  { text: "Help for Kurdish people in the UK", dir: "ltr" },
-  { text: "یارمەتی بۆ کوردەکانی بریتانیا", dir: "rtl" },
-  { text: "کمک برای کردهای مقیم بریتانیا", dir: "rtl" },
-  { text: "مساعدة للكرد في المملكة المتحدة", dir: "rtl" },
+  { text: "Your rights · Your language · Your community", dir: "ltr" },
+  { text: "مافەکانت · زمانەکەت · کۆمەڵگاکەت", dir: "rtl" },
+  { text: "حقوقت · زبانت · جامعه‌ات", dir: "rtl" },
+  { text: "حقوقك · لغتك · مجتمعك", dir: "rtl" },
 ]
 
 const LANGS = [
@@ -23,7 +25,6 @@ const LANGS = [
 ]
 
 const startLabel = { en: "Get Started", ku: "دەست پێ بکە", fa: "شروع کن", ar: "ابدأ الآن" }
-const freeLabel = { en: "Free · English · کوردی · فارسی · عربي", ku: "بەخۆڕایی · English · کوردی · فارسی · عربي", fa: "رایگان · English · کوردی · فارسی · عربي", ar: "مجاني · English · کوردی · فارسی · عربي" }
 
 function KurdFlag({ size = 18 }) {
   const w = size * 1.5
@@ -109,26 +110,34 @@ function LangSelector({ lang, onChange }) {
   )
 }
 
-export default function HomePreview() {
+export default function HomePage() {
+  const router = useRouter()
   const [tagIdx, setTagIdx] = useState(0)
   const [tagVisible, setTagVisible] = useState(true)
   const [lang, setLang] = useState("en")
-  const isRTL = ["ku","fa","ar"].includes(lang)
+  const isRTL = ["ku", "fa", "ar"].includes(lang)
 
   useEffect(() => {
+    const saved = localStorage.getItem("komek_lang")
+    if (saved) setLang(saved)
+    const handler = (e) => setLang(e.detail)
+    window.addEventListener("langchange", handler)
+
     const interval = setInterval(() => {
       setTagVisible(false)
-      setTimeout(() => { setTagIdx(i => (i+1) % taglines.length); setTagVisible(true) }, 400)
+      setTimeout(() => { setTagIdx(i => (i + 1) % taglines.length); setTagVisible(true) }, 400)
     }, 3000)
-    return () => clearInterval(interval)
+
+    return () => {
+      window.removeEventListener("langchange", handler)
+      clearInterval(interval)
+    }
   }, [])
 
   function handleLangChange(l) {
     setLang(l)
-    if (typeof window !== "undefined") {
-      localStorage.setItem("komek_lang", l)
-      window.dispatchEvent(new CustomEvent("langchange", { detail: l }))
-    }
+    localStorage.setItem("komek_lang", l)
+    window.dispatchEvent(new CustomEvent("langchange", { detail: l }))
   }
 
   const currentTag = taglines[tagIdx]
@@ -137,25 +146,26 @@ export default function HomePreview() {
     <div style={{
       height: "100vh", maxWidth: 390, margin: "0 auto",
       background: "#050412",
-      fontFamily: "'Nunito', sans-serif",
+      fontFamily: "Nunito, sans-serif",
       display: "flex", flexDirection: "column",
       overflow: "hidden", position: "relative",
+      direction: isRTL ? "rtl" : "ltr",
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        @keyframes rotateSun { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%,100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.03); } }
+        @keyframes pulse {
+          0%, 100% { opacity: 0.6; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.03); }
+        }
       `}</style>
 
-      {/* Full screen background — radial glow from centre */}
+      {/* Background glow */}
       <div style={{
         position: "absolute", inset: 0,
         background: "radial-gradient(ellipse 70% 55% at 50% 52%, rgba(79,70,229,0.22) 0%, rgba(28,26,79,0.35) 45%, transparent 75%)",
         pointerEvents: "none",
       }} />
 
-      {/* Subtle red glow top left */}
+      {/* Red glow top left */}
       <div style={{
         position: "absolute", top: -80, left: -60,
         width: 260, height: 260, borderRadius: "50%",
@@ -163,7 +173,7 @@ export default function HomePreview() {
         pointerEvents: "none",
       }} />
 
-      {/* Subtle green glow bottom right */}
+      {/* Green glow bottom right */}
       <div style={{
         position: "absolute", bottom: -60, right: -40,
         width: 220, height: 220, borderRadius: "50%",
@@ -171,7 +181,7 @@ export default function HomePreview() {
         pointerEvents: "none",
       }} />
 
-      {/* Kurdish flag — vertical bands very subtle on edges */}
+      {/* Kurdish flag vertical edges */}
       <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3, background: `linear-gradient(to bottom, ${KURD_RED}, transparent, ${KURD_GREEN})`, opacity: 0.5, pointerEvents: "none" }} />
       <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 3, background: `linear-gradient(to bottom, ${KURD_GREEN}, transparent, ${KURD_RED})`, opacity: 0.5, pointerEvents: "none" }} />
 
@@ -191,14 +201,13 @@ export default function HomePreview() {
         <LangSelector lang={lang} onChange={handleLangChange} />
       </div>
 
-      {/* Centre — sun + text */}
+      {/* Centre content */}
       <div style={{
         flex: 1, display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center",
         position: "relative", zIndex: 10, padding: "0 24px",
-        gap: 0,
       }}>
-        {/* Kurdish sun — large, slow pulse */}
+        {/* Pulsing Kurdish sun */}
         <div style={{ animation: "pulse 1s ease-in-out infinite", marginBottom: 36 }}>
           <svg width="180" height="180" viewBox="0 0 180 180">
             <defs>
@@ -208,9 +217,7 @@ export default function HomePreview() {
               </radialGradient>
               <filter id="sunblur"><feGaussianBlur stdDeviation="6" /></filter>
             </defs>
-            {/* Glow behind */}
             <circle cx="90" cy="90" r="70" fill={KURD_YELLOW} opacity="0.12" filter="url(#sunblur)" />
-            {/* Rays */}
             {Array.from({ length: 21 }).map((_, i) => {
               const a = (i * 360 / 21) * Math.PI / 180
               return <line key={i}
@@ -218,16 +225,13 @@ export default function HomePreview() {
                 x2={90 + Math.cos(a) * 62} y2={90 + Math.sin(a) * 62}
                 stroke={KURD_YELLOW} strokeWidth="3.5" strokeLinecap="round" opacity="0.95" />
             })}
-            {/* Body */}
             <circle cx="90" cy="90" r="38" fill="url(#sg2)" />
-            {/* Red centre */}
             <circle cx="90" cy="90" r="17" fill={KURD_RED} />
-            {/* Sheen */}
             <ellipse cx="78" cy="78" rx="12" ry="8" fill="white" opacity="0.14" />
           </svg>
         </div>
 
-        {/* Tagline — big, centred, fades between languages */}
+        {/* Tagline */}
         <div style={{
           textAlign: "center",
           opacity: tagVisible ? 1 : 0,
@@ -246,7 +250,7 @@ export default function HomePreview() {
           </p>
         </div>
 
-        {/* Language dots */}
+        {/* Dots */}
         <div style={{ display: "flex", gap: 6, marginTop: 20 }}>
           {taglines.map((_, i) => (
             <div key={i} style={{
@@ -258,23 +262,24 @@ export default function HomePreview() {
         </div>
 
         {/* CTA */}
-        <button style={{
-          marginTop: 36,
-          background: `linear-gradient(135deg, ${MINT} 0%, #059669 100%)`,
-          borderRadius: 28, padding: "16px 48px",
-          fontSize: 16, fontWeight: 900, color: "white",
-          border: "none", cursor: "pointer",
-          boxShadow: "0 8px 32px rgba(52,211,153,0.35)",
-          letterSpacing: 0.3,
-        }}>{startLabel[lang]} →</button>
+        <button
+          onClick={() => router.push("/home")}
+          style={{
+            marginTop: 36,
+            background: `linear-gradient(135deg, ${MINT} 0%, #059669 100%)`,
+            borderRadius: 28, padding: "16px 48px",
+            fontSize: 16, fontWeight: 900, color: "white",
+            border: "none", cursor: "pointer",
+            boxShadow: "0 8px 32px rgba(52,211,153,0.35)",
+            letterSpacing: 0.3, fontFamily: "Nunito, sans-serif",
+          }}>{startLabel[lang]} →</button>
 
-        {/* Free label */}
+        {/* Languages */}
         <p style={{ marginTop: 14, fontSize: 10, color: "rgba(255,255,255,0.3)", fontWeight: 600, textAlign: "center" }}>
-          {freeLabel[lang]}
+          English · کوردی · فارسی · عربي
         </p>
       </div>
 
-      {/* Bottom safe area */}
       <div style={{ height: 24, flexShrink: 0 }} />
     </div>
   )
