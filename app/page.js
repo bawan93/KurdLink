@@ -29,7 +29,7 @@ const startLabel = { en: "Get Started", ku: "دەست پێ بکە", fa: "شرو�
 function KurdFlag({ size = 18 }) {
   const w = size * 1.5
   return (
-    <svg width={w} height={size} viewBox="0 0 90 60" style={{ borderRadius: 2, display: "block" }}>
+    <svg width={w} height={size} viewBox="0 0 90 60" style={{ borderRadius: 2, display: "block", pointerEvents: "none" }}>
       <rect width="90" height="20" fill="#E30A17" />
       <rect y="20" width="90" height="20" fill="#FFFFFF" />
       <rect y="40" width="90" height="20" fill="#009C3B" />
@@ -43,9 +43,9 @@ function KurdFlag({ size = 18 }) {
   )
 }
 
-function SproutLogo({ size = 44 }) {
+function SproutLogo({ size = 38 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 100 100">
+    <svg width={size} height={size} viewBox="0 0 100 100" style={{ pointerEvents: "none" }}>
       <defs>
         <linearGradient id="sbg" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor={INDIGO} /><stop offset="100%" stopColor={INDIGO_LIGHT} />
@@ -64,93 +64,44 @@ function SproutLogo({ size = 44 }) {
   )
 }
 
-function LangSelector({ lang, onChange }) {
-  const [open, setOpen] = useState(false)
-  const current = LANGS.find(l => l.id === lang) || LANGS[0]
-
-  return (
-    <div style={{ position: "relative", zIndex: 1000 }}>
-      <button onClick={() => setOpen(o => !o)} style={{
-        display: "flex", alignItems: "center", gap: 5, padding: "7px 13px",
-        background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)",
-        borderRadius: 20, color: "white", fontWeight: 800, fontSize: 12,
-        cursor: "pointer", fontFamily: "Nunito, sans-serif",
-      }}>
-        {current.id === "ku" ? <KurdFlag size={12} /> : <span style={{ fontSize: 14 }}>{current.flag}</span>}
-        <span>{current.name}</span>
-        <span style={{ fontSize: 8, opacity: 0.4 }}>{open ? "▲" : "▼"}</span>
-      </button>
-      {open && (
-        <>
-          {/* Invisible overlay to catch outside clicks */}
-          <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 998 }} />
-          <div style={{
-            position: "absolute", top: "calc(100% + 8px)", right: 0,
-            background: "#0d0b24", borderRadius: 16, overflow: "hidden",
-            boxShadow: "0 16px 48px rgba(0,0,0,0.6)", zIndex: 999,
-            minWidth: 150, border: "1px solid rgba(255,255,255,0.08)",
-          }}>
-            {LANGS.map(l => (
-              <button key={l.id} onClick={() => { onChange(l.id); setOpen(false) }} style={{
-                width: "100%", display: "flex", alignItems: "center", gap: 10,
-                padding: "11px 16px", background: lang === l.id ? "rgba(79,70,229,0.3)" : "transparent",
-                border: "none", borderBottom: "1px solid rgba(255,255,255,0.05)",
-                cursor: "pointer", fontFamily: "Nunito, sans-serif", color: "white",
-              }}>
-                {l.id === "ku" ? <KurdFlag size={15} /> : <span style={{ fontSize: 18 }}>{l.flag}</span>}
-                <span style={{ fontSize: 13, fontWeight: 700 }}>{l.name}</span>
-                {lang === l.id && <span style={{ color: MINT, marginLeft: "auto" }}>✓</span>}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  )
-}
-
-export default function HomePage() {
+export default function SplashPage() {
   const router = useRouter()
   const [tagIdx, setTagIdx] = useState(0)
   const [tagVisible, setTagVisible] = useState(true)
   const [lang, setLang] = useState("en")
-  const isRTL = ["ku", "fa", "ar"].includes(lang)
+  const [langOpen, setLangOpen] = useState(false)
 
   useEffect(() => {
     const saved = localStorage.getItem("komek_lang")
     if (saved) setLang(saved)
-    const handler = (e) => setLang(e.detail)
-    window.addEventListener("langchange", handler)
 
     const interval = setInterval(() => {
       setTagVisible(false)
       setTimeout(() => { setTagIdx(i => (i + 1) % taglines.length); setTagVisible(true) }, 400)
     }, 3000)
 
-    return () => {
-      window.removeEventListener("langchange", handler)
-      clearInterval(interval)
-    }
+    return () => clearInterval(interval)
   }, [])
 
-  function handleLangChange(l) {
+  function selectLang(l) {
     setLang(l)
-    try {
-      localStorage.setItem("komek_lang", l)
-      window.dispatchEvent(new CustomEvent("langchange", { detail: l }))
-    } catch(e) {}
+    setLangOpen(false)
+    localStorage.setItem("komek_lang", l)
+    window.dispatchEvent(new CustomEvent("langchange", { detail: l }))
   }
 
   const currentTag = taglines[tagIdx]
+  const currentLang = LANGS.find(l => l.id === lang) || LANGS[0]
 
   return (
     <div style={{
-      height: "100vh", maxWidth: 390, margin: "0 auto",
+      height: "100vh",
       background: "#050412",
       fontFamily: "Nunito, sans-serif",
-      display: "flex", flexDirection: "column",
-      overflow: "hidden", position: "relative",
-      direction: isRTL ? "rtl" : "ltr",
+      display: "flex",
+      flexDirection: "column",
+      overflow: "hidden",
+      position: "relative",
     }}>
       <style>{`
         @keyframes pulse {
@@ -159,47 +110,72 @@ export default function HomePage() {
         }
       `}</style>
 
-      {/* Background glow */}
-      <div style={{
-        position: "absolute", inset: 0,
-        background: "radial-gradient(ellipse 70% 55% at 50% 52%, rgba(79,70,229,0.22) 0%, rgba(28,26,79,0.35) 45%, transparent 75%)",
-        pointerEvents: "none",
-      }} />
-
-      {/* Red glow top left */}
-      <div style={{
-        position: "absolute", top: -80, left: -60,
-        width: 260, height: 260, borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(227,10,23,0.12) 0%, transparent 70%)",
-        pointerEvents: "none",
-      }} />
-
-      {/* Green glow bottom right */}
-      <div style={{
-        position: "absolute", bottom: -60, right: -40,
-        width: 220, height: 220, borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(0,156,59,0.1) 0%, transparent 70%)",
-        pointerEvents: "none",
-      }} />
-
-      {/* Kurdish flag vertical edges */}
+      {/* ALL decorative layers — pointerEvents none */}
+      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 70% 55% at 50% 52%, rgba(79,70,229,0.22) 0%, rgba(28,26,79,0.35) 45%, transparent 75%)", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", top: -80, left: -60, width: 260, height: 260, borderRadius: "50%", background: "radial-gradient(circle, rgba(227,10,23,0.12) 0%, transparent 70%)", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", bottom: -60, right: -40, width: 220, height: 220, borderRadius: "50%", background: "radial-gradient(circle, rgba(0,156,59,0.1) 0%, transparent 70%)", pointerEvents: "none" }} />
       <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3, background: `linear-gradient(to bottom, ${KURD_RED}, transparent, ${KURD_GREEN})`, opacity: 0.5, pointerEvents: "none" }} />
       <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 3, background: `linear-gradient(to bottom, ${KURD_GREEN}, transparent, ${KURD_RED})`, opacity: 0.5, pointerEvents: "none" }} />
 
-      {/* Stars */}
-      <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }} viewBox="0 0 390 844">
+      {/* Stars — pointerEvents none */}
+      <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 0 }} viewBox="0 0 390 844">
         {[[30,60],[80,30],[140,80],[200,20],[260,55],[320,35],[360,75],[15,140],[100,160],[170,110],[240,150],[300,120],[350,160],[50,220],[150,240],[280,200],[340,230]].map(([x,y],i)=>(
           <circle key={i} cx={x} cy={y} r={i%4===0?1.4:0.8} fill="white" opacity={0.08+((i*11)%9)*0.04} />
         ))}
       </svg>
 
-      {/* Nav */}
-      <div style={{ padding: "52px 24px 0", display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative", zIndex: 10, flexShrink: 0 }}>
+      {/* Nav — high z-index, interactive */}
+      <div style={{ padding: "52px 24px 0", display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative", zIndex: 50, flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <SproutLogo size={38} />
           <span style={{ fontSize: 22, fontWeight: 900, color: "white", letterSpacing: -0.5 }}>Komek</span>
         </div>
-        <LangSelector lang={lang} onChange={handleLangChange} />
+
+        {/* Language toggle — inline, no external click handler */}
+        <div style={{ position: "relative", zIndex: 200 }}>
+          <button
+            onClick={() => setLangOpen(o => !o)}
+            style={{
+              display: "flex", alignItems: "center", gap: 5, padding: "7px 13px",
+              background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)",
+              borderRadius: 20, color: "white", fontWeight: 800, fontSize: 12,
+              cursor: "pointer", fontFamily: "Nunito, sans-serif",
+            }}>
+            {currentLang.id === "ku" ? <KurdFlag size={12} /> : <span style={{ fontSize: 14 }}>{currentLang.flag}</span>}
+            <span>{currentLang.name}</span>
+            <span style={{ fontSize: 8, opacity: 0.4 }}>{langOpen ? "▲" : "▼"}</span>
+          </button>
+
+          {langOpen && (
+            <div style={{
+              position: "absolute", top: "calc(100% + 8px)", right: 0,
+              background: "#0d0b24", borderRadius: 16,
+              boxShadow: "0 16px 48px rgba(0,0,0,0.8)",
+              zIndex: 300, minWidth: 150,
+              border: "1px solid rgba(255,255,255,0.15)",
+              overflow: "hidden",
+            }}>
+              {LANGS.map(l => (
+                <button
+                  key={l.id}
+                  onClick={() => selectLang(l.id)}
+                  style={{
+                    width: "100%", display: "flex", alignItems: "center", gap: 10,
+                    padding: "12px 16px",
+                    background: lang === l.id ? "rgba(79,70,229,0.4)" : "transparent",
+                    border: "none", borderBottom: "1px solid rgba(255,255,255,0.07)",
+                    cursor: "pointer", fontFamily: "Nunito, sans-serif", color: "white",
+                    fontSize: 13, fontWeight: 700,
+                    textAlign: "left",
+                  }}>
+                  {l.id === "ku" ? <KurdFlag size={15} /> : <span style={{ fontSize: 18 }}>{l.flag}</span>}
+                  <span>{l.name}</span>
+                  {lang === l.id && <span style={{ color: MINT, marginLeft: "auto" }}>✓</span>}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Centre content */}
@@ -208,9 +184,9 @@ export default function HomePage() {
         alignItems: "center", justifyContent: "center",
         position: "relative", zIndex: 10, padding: "0 24px",
       }}>
-        {/* Pulsing Kurdish sun */}
-        <div style={{ animation: "pulse 1s ease-in-out infinite", marginBottom: 36 }}>
-          <svg width="180" height="180" viewBox="0 0 180 180">
+        {/* Sun */}
+        <div style={{ animation: "pulse 1s ease-in-out infinite", marginBottom: 36, pointerEvents: "none" }}>
+          <svg width="180" height="180" viewBox="0 0 180 180" style={{ pointerEvents: "none" }}>
             <defs>
               <radialGradient id="sg2" cx="50%" cy="50%" r="50%">
                 <stop offset="0%" stopColor={KURD_YELLOW} />
@@ -239,6 +215,7 @@ export default function HomePage() {
           transition: "opacity 0.4s ease",
           minHeight: 80,
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+          pointerEvents: "none",
         }}>
           <p style={{
             fontSize: 26, fontWeight: 900, color: "white",
@@ -246,13 +223,14 @@ export default function HomePage() {
             direction: currentTag.dir,
             letterSpacing: currentTag.dir === "ltr" ? -0.5 : 0,
             textShadow: "0 2px 24px rgba(79,70,229,0.4)",
+            margin: 0,
           }}>
             {currentTag.text}
           </p>
         </div>
 
         {/* Dots */}
-        <div style={{ display: "flex", gap: 6, marginTop: 20 }}>
+        <div style={{ display: "flex", gap: 6, marginTop: 20, pointerEvents: "none" }}>
           {taglines.map((_, i) => (
             <div key={i} style={{
               width: i === tagIdx ? 20 : 6, height: 6, borderRadius: 3,
@@ -273,10 +251,10 @@ export default function HomePage() {
             border: "none", cursor: "pointer",
             boxShadow: "0 8px 32px rgba(52,211,153,0.35)",
             letterSpacing: 0.3, fontFamily: "Nunito, sans-serif",
+            position: "relative", zIndex: 20,
           }}>{startLabel[lang]} →</button>
 
-        {/* Languages */}
-        <p style={{ marginTop: 14, fontSize: 10, color: "rgba(255,255,255,0.3)", fontWeight: 600, textAlign: "center" }}>
+        <p style={{ marginTop: 14, fontSize: 10, color: "rgba(255,255,255,0.3)", fontWeight: 600, textAlign: "center", pointerEvents: "none" }}>
           English · کوردی · فارسی · عربي
         </p>
       </div>
