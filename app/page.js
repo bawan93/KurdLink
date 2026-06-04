@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 
 const INDIGO = "#4F46E5"
@@ -66,15 +66,10 @@ function SproutLogo({ size = 44 }) {
 
 function LangSelector({ lang, onChange }) {
   const [open, setOpen] = useState(false)
-  const ref = useRef(null)
   const current = LANGS.find(l => l.id === lang) || LANGS[0]
-  useEffect(() => {
-    const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
-    document.addEventListener("mousedown", h)
-    return () => document.removeEventListener("mousedown", h)
-  }, [])
+
   return (
-    <div ref={ref} style={{ position: "relative" }}>
+    <div style={{ position: "relative", zIndex: 1000 }}>
       <button onClick={() => setOpen(o => !o)} style={{
         display: "flex", alignItems: "center", gap: 5, padding: "7px 13px",
         background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)",
@@ -86,25 +81,29 @@ function LangSelector({ lang, onChange }) {
         <span style={{ fontSize: 8, opacity: 0.4 }}>{open ? "▲" : "▼"}</span>
       </button>
       {open && (
-        <div style={{
-          position: "absolute", top: "calc(100% + 8px)", right: 0,
-          background: "#0d0b24", borderRadius: 16, overflow: "hidden",
-          boxShadow: "0 16px 48px rgba(0,0,0,0.6)", zIndex: 100,
-          minWidth: 150, border: "1px solid rgba(255,255,255,0.08)",
-        }}>
-          {LANGS.map(l => (
-            <button key={l.id} onMouseDown={(e) => { e.preventDefault(); onChange(l.id); setOpen(false) }} style={{
-              width: "100%", display: "flex", alignItems: "center", gap: 10,
-              padding: "11px 16px", background: lang === l.id ? "rgba(79,70,229,0.3)" : "transparent",
-              border: "none", borderBottom: "1px solid rgba(255,255,255,0.05)",
-              cursor: "pointer", fontFamily: "Nunito, sans-serif", color: "white",
-            }}>
-              {l.id === "ku" ? <KurdFlag size={15} /> : <span style={{ fontSize: 18 }}>{l.flag}</span>}
-              <span style={{ fontSize: 13, fontWeight: 700 }}>{l.name}</span>
-              {lang === l.id && <span style={{ color: MINT, marginLeft: "auto" }}>✓</span>}
-            </button>
-          ))}
-        </div>
+        <>
+          {/* Invisible overlay to catch outside clicks */}
+          <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 998 }} />
+          <div style={{
+            position: "absolute", top: "calc(100% + 8px)", right: 0,
+            background: "#0d0b24", borderRadius: 16, overflow: "hidden",
+            boxShadow: "0 16px 48px rgba(0,0,0,0.6)", zIndex: 999,
+            minWidth: 150, border: "1px solid rgba(255,255,255,0.08)",
+          }}>
+            {LANGS.map(l => (
+              <button key={l.id} onClick={() => { onChange(l.id); setOpen(false) }} style={{
+                width: "100%", display: "flex", alignItems: "center", gap: 10,
+                padding: "11px 16px", background: lang === l.id ? "rgba(79,70,229,0.3)" : "transparent",
+                border: "none", borderBottom: "1px solid rgba(255,255,255,0.05)",
+                cursor: "pointer", fontFamily: "Nunito, sans-serif", color: "white",
+              }}>
+                {l.id === "ku" ? <KurdFlag size={15} /> : <span style={{ fontSize: 18 }}>{l.flag}</span>}
+                <span style={{ fontSize: 13, fontWeight: 700 }}>{l.name}</span>
+                {lang === l.id && <span style={{ color: MINT, marginLeft: "auto" }}>✓</span>}
+              </button>
+            ))}
+          </div>
+        </>
       )}
     </div>
   )
