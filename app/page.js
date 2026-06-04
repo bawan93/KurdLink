@@ -93,7 +93,7 @@ function LangSelector({ lang, onChange }) {
           minWidth: 150, border: "1px solid rgba(255,255,255,0.08)",
         }}>
           {LANGS.map(l => (
-            <button key={l.id} onClick={() => { onChange(l.id); setOpen(false) }} style={{
+            <button key={l.id} onMouseDown={(e) => { e.preventDefault(); onChange(l.id); setOpen(false) }} style={{
               width: "100%", display: "flex", alignItems: "center", gap: 10,
               padding: "11px 16px", background: lang === l.id ? "rgba(79,70,229,0.3)" : "transparent",
               border: "none", borderBottom: "1px solid rgba(255,255,255,0.05)",
