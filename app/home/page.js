@@ -41,7 +41,8 @@ function SproutLogo({ size = 32 }) {
 function Counter({ target, duration = 1500, suffix = "" }) {
   const [count, setCount] = useState(0)
   useEffect(() => {
-    if (target === 0) return
+    if (target === 0) { setCount(0); return }
+    setCount(0)
     let start = 0
     const step = target / (duration / 16)
     const timer = setInterval(() => {
@@ -86,6 +87,9 @@ export default function HomePage() {
     const supabase = getSupabase()
     setLoading(true)
 
+    // Cache bust with timestamp
+    const ts = Date.now()
+
     // 1. Count explainer usage (people helped)
     const { count: explainCount } = await supabase
       .from('explainer_usage')
@@ -113,6 +117,8 @@ export default function HomePage() {
       .in('status', ['approved', 'filled'])
       .order('created_at', { ascending: false })
       .limit(3)
+
+    console.log('Fetched at', ts, '— explainCount:', explainCount)
 
     setStats({ explained: explainCount || 0, listings: listingCount || 0 })
     setQuestions(topQuestions || [])
