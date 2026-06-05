@@ -1,4 +1,5 @@
 'use client'
+export const dynamic = 'force-dynamic'
 import { useState, useEffect } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 
@@ -67,7 +68,18 @@ export default function HomePage() {
     const handler = (e) => setLang(e.detail)
     window.addEventListener('langchange', handler)
     fetchAll()
-    return () => window.removeEventListener('langchange', handler)
+
+    // Refetch when page becomes visible again
+    const onFocus = () => fetchAll()
+    window.addEventListener('focus', onFocus)
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') fetchAll()
+    })
+
+    return () => {
+      window.removeEventListener('langchange', handler)
+      window.removeEventListener('focus', onFocus)
+    }
   }, [])
 
   async function fetchAll() {
