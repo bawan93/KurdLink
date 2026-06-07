@@ -121,7 +121,7 @@ export async function POST(req) {
 
     // Record usage after successful response
     if (userId) {
-      if (inputType === 'image') await recordUsage(userId, 'user', 'image')
+      await recordUsage(userId, 'user', inputType)
     } else {
       await recordUsage(ip, 'ip', inputType)
     }
