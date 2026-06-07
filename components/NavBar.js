@@ -19,14 +19,14 @@ const TABS = [
   {
     id: 'letters',
     icon: '📄',
-    label: { en: 'Letters', ku: 'نامەکان', fa: 'نامه‌ها', ar: 'الرسائل' },
+label: { en: 'Letters', ku: 'شیکاری نامە', fa: 'نامه‌ها', ar: 'الرسائل' },
     route: '/journey/document-explainer',
     match: (p) => p?.startsWith('/journey'),
   },
   {
     id: 'ask',
     icon: '❓',
-    label: { en: 'Ask', ku: 'پرسیار', fa: 'سوال', ar: 'اسأل' },
+    label: { en: 'Ask', ku: 'پرسیار بکە', fa: 'سوال', ar: 'اسأل' },
     route: '/reber/ask',
     match: (p) => p === '/reber/ask',
   },
