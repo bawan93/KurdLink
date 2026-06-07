@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
-import TX from '@/lib/translations'
+import TX from '../../lib/translations'
 
 const INDIGO = '#4F46E5'
 const INDIGO_DARK = '#1C1A4F'
