@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Komek</string>
+    <string name="title_activity_main">Komek</string>
+    <string name="package_name">com.komek.app</string>
+    <string name="custom_url_scheme">com.komek.app</string>
+</resources>
