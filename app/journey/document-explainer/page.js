@@ -155,12 +155,10 @@ export default function DocumentExplainerPage() {
   const fileRef = useRef(null)
   const cameraRef = useRef(null)
   const t = translations[lang] || translations.en
-  const isRTL = ['ku', 'fa', 'ar'].includes(lang)
   const canSubmit = tab === 'paste' ? text.trim().length > 0 : imageData !== null
 
-  // Limits
   const imageLimit = userId ? 10 : 3
-  const textLimit = 10 // anon only, logged in is unlimited
+  const textLimit = 10
   const imageLeft = Math.max(0, imageLimit - imageUsed)
   const textLeft = Math.max(0, textLimit - textUsed)
 
@@ -174,7 +172,6 @@ export default function DocumentExplainerPage() {
       const uid = data?.user?.id || null
       setUserId(uid)
 
-      // Get IP for anon users
       if (!uid) {
         try {
           const res = await fetch('https://api.ipify.org?format=json')
@@ -268,7 +265,6 @@ export default function DocumentExplainerPage() {
       }
       if (!res.ok) throw new Error(data.error || 'Failed')
       setResult(data)
-      // Refresh usage count after successful explanation
       await refreshUsage()
     } catch (e) {
       setError(t.errorMsg)
@@ -294,8 +290,7 @@ export default function DocumentExplainerPage() {
     )
   }
 
-  // Usage counter bar
-  const UsageBar = ({ used, limit, label, color }) => {
+  const UsageBar = ({ used, limit, label }) => {
     const left = Math.max(0, limit - used)
     const pct = Math.min(100, (used / limit) * 100)
     const barColor = pct >= 100 ? '#EF4444' : pct >= 66 ? '#F59E0B' : MINT
@@ -313,27 +308,24 @@ export default function DocumentExplainerPage() {
   }
 
   return (
-    <div style={{ fontFamily: 'Nunito, sans-serif', background: BG, minHeight: '100vh', paddingBottom: 80, direction: 'ltr' }}><div style={{ fontFamily: 'Nunito, sans-serif', background: BG, minHeight: '100vh', paddingBottom: 80, direction: 'ltr' }}>
+    <div style={{ fontFamily: 'Nunito, sans-serif', background: BG, minHeight: '100vh', paddingBottom: 80, direction: 'ltr' }}>
       {/* Hero */}
       <div style={{ background: `linear-gradient(135deg, ${INDIGO_DARK} 0%, #2D2A7A 100%)`, padding: '40px 20px 32px', textAlign: 'center' }}>
         <div style={{ fontSize: 44, marginBottom: 12 }}>📄</div>
         <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 900, margin: '0 0 10px', lineHeight: 1.2 }}>{t.heroTitle}</h1>
         <p style={{ color: INDIGO_LIGHT, fontSize: 14, fontWeight: 500, margin: '0 0 20px', maxWidth: 320, marginLeft: 'auto', marginRight: 'auto' }}>{t.heroSub}</p>
 
-        {/* Live usage counters */}
         <div style={{ display: 'flex', justifyContent: 'center', gap: 10, flexWrap: 'wrap' }}>
           <UsageBar
             used={imageUsed}
             limit={imageLimit}
             label={userId ? '🖼 Images (account)' : '🖼 Images (free)'}
-            color={MINT}
           />
           {!userId && (
             <UsageBar
               used={textUsed}
               limit={textLimit}
               label="✉️ Text (free)"
-              color={INDIGO_LIGHT}
             />
           )}
           {userId && (
