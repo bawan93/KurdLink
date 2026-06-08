@@ -1,154 +1,186 @@
-'use client'
+// KOMEK — Kurdish Translation Script
+// Run once: node translate.js
+// Requires: ANTHROPIC_API_KEY in your .env.local file
+// Output: paste the result into lib/translations.js
 
-import { useState, useEffect } from 'react'
-import { createBrowserClient } from '@supabase/ssr'
-import TX from '../../../lib/translations'
+const fs = require('fs')
+const path = require('path')
 
-const INDIGO = '#4F46E5'
-const INDIGO_DARK = '#1C1A4F'
-const INDIGO_LIGHT = '#818CF8'
-const MINT = '#34D399'
-const SOFT = '#EDE9FE'
-const BG = '#F5F4FF'
-const ADMIN_EMAIL = 'bawanhozhin@outlook.com'
-
-const supabase = createBrowserClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-)
-
-export default function AskPage() {
-  const [lang, setLang] = useState('en')
-  const [question, setQuestion] = useState('')
-  const [posting, setPosting] = useState(false)
-  const [questions, setQuestions] = useState([])
-  const [voted, setVoted] = useState({})
-  const [adminAnswer, setAdminAnswer] = useState({})
-  const [answerPosting, setAnswerPosting] = useState({})
-  const [user, setUser] = useState(null)
-  const t = (TX[lang] || TX.en).ask
-  const isRTL = ['ku', 'fa', 'ar'].includes(lang)
-
-  useEffect(() => {
-    const stored = localStorage.getItem('komek_lang')
-    if (stored) setLang(stored)
-    const handler = (e) => setLang(e.detail)
-    window.addEventListener('langchange', handler)
-    fetchQuestions()
-    supabase.auth.getUser().then(({ data }) => setUser(data?.user || null))
-    return () => window.removeEventListener('langchange', handler)
-  }, [])
-
-  async function fetchQuestions() {
-    const { data } = await supabase
-      .from('questions')
-      .select('*')
-      .order('upvotes', { ascending: false })
-    if (data) setQuestions(data)
-  }
-
-  async function handlePost() {
-    if (!question.trim()) return
-    setPosting(true)
-    await supabase.from('questions').insert({ question: question.trim() })
-    setQuestion('')
-    setPosting(false)
-    fetchQuestions()
-  }
-
-  async function handleUpvote(q) {
-    if (voted[q.id]) return
-    setVoted(v => ({ ...v, [q.id]: true }))
-    await supabase.from('questions').update({ upvotes: (q.upvotes || 0) + 1 }).eq('id', q.id)
-    fetchQuestions()
-  }
-
-  async function handleAnswer(q) {
-    const ans = adminAnswer[q.id]
-    if (!ans?.trim()) return
-    setAnswerPosting(v => ({ ...v, [q.id]: true }))
-    await supabase.from('questions').update({ answer: ans.trim(), status: 'answered', answered_at: new Date().toISOString() }).eq('id', q.id)
-    setAdminAnswer(v => ({ ...v, [q.id]: '' }))
-    setAnswerPosting(v => ({ ...v, [q.id]: false }))
-    fetchQuestions()
-  }
-
-  return (
-    <div style={{ fontFamily: 'Nunito, sans-serif', background: BG, minHeight: '100vh', paddingBottom: 80, direction: isRTL ? 'rtl' : 'ltr' }}>
-      <div style={{ background: `linear-gradient(135deg, ${INDIGO_DARK} 0%, #2D2A7A 100%)`, padding: '40px 20px 48px', textAlign: 'center' }}>
-        <div style={{ fontSize: 44, marginBottom: 12 }}>❓</div>
-        <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 900, margin: '0 0 10px' }}>{t.heroTitle}</h1>
-        <p style={{ color: INDIGO_LIGHT, fontSize: 14, fontWeight: 500, margin: 0 }}>{t.heroSub}</p>
-      </div>
-
-      <div style={{ padding: '0 16px', marginTop: -20 }}>
-        <div style={{ background: '#fff', borderRadius: 20, boxShadow: '0 4px 24px rgba(79,70,229,0.10)', padding: 20, marginBottom: 20 }}>
-          <textarea
-            value={question}
-            onChange={e => setQuestion(e.target.value)}
-            placeholder={t.placeholder}
-            rows={3}
-            style={{ width: '100%', border: `1.5px solid ${SOFT}`, borderRadius: 12, padding: 14, fontFamily: 'Nunito, sans-serif', fontSize: 14, color: INDIGO_DARK, resize: 'none', outline: 'none', background: BG, boxSizing: 'border-box' }}
-          />
-          <button
-            onClick={handlePost}
-            disabled={posting || !question.trim()}
-            style={{ width: '100%', marginTop: 12, padding: '14px', background: !question.trim() ? '#E5E7EB' : INDIGO, color: !question.trim() ? '#9CA3AF' : '#fff', border: 'none', borderRadius: 14, fontFamily: 'Nunito, sans-serif', fontSize: 15, fontWeight: 800, cursor: !question.trim() ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}
-          >
-            {posting ? t.posting : t.askBtn}
-          </button>
-        </div>
-
-        {questions.length === 0 ? (
-          <div style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 14, fontWeight: 600, marginTop: 40 }}>{t.empty}</div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {questions.map(q => (
-              <div key={q.id} style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px rgba(79,70,229,0.07)', overflow: 'hidden' }}>
-                <div style={{ background: q.status === 'answered' ? '#F0FDF4' : SOFT, padding: '6px 16px', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <div style={{ width: 7, height: 7, borderRadius: '50%', background: q.status === 'answered' ? MINT : INDIGO_LIGHT }} />
-                  <span style={{ fontSize: 11, fontWeight: 800, color: q.status === 'answered' ? '#059669' : INDIGO, textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                    {q.status === 'answered' ? t.answered : t.awaiting}
-                  </span>
-                </div>
-                <div style={{ padding: '14px 16px' }}>
-                  <p style={{ fontSize: 15, fontWeight: 700, color: INDIGO_DARK, margin: '0 0 10px', lineHeight: 1.4 }}>{q.question}</p>
-                  {q.answer && (
-                    <div style={{ background: '#F0FDF4', borderRadius: 10, padding: '10px 14px', marginBottom: 10 }}>
-                      <div style={{ fontSize: 11, fontWeight: 800, color: '#059669', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>Komek</div>
-                      <p style={{ fontSize: 13, color: '#065F46', margin: 0, lineHeight: 1.5 }}>{q.answer}</p>
-                    </div>
-                  )}
-                  <button
-                    onClick={() => handleUpvote(q)}
-                    style={{ display: 'flex', alignItems: 'center', gap: 6, background: voted[q.id] ? SOFT : 'transparent', border: `1.5px solid ${voted[q.id] ? INDIGO : '#E5E7EB'}`, borderRadius: 20, padding: '6px 14px', fontFamily: 'Nunito, sans-serif', fontSize: 12, fontWeight: 700, color: voted[q.id] ? INDIGO : '#6B7280', cursor: 'pointer', transition: 'all 0.2s' }}
-                  >
-                    👍 {t.upvote} · {q.upvotes || 0}
-                  </button>
-                  {user?.email === ADMIN_EMAIL && q.status !== 'answered' && (
-                    <div style={{ marginTop: 12 }}>
-                      <textarea
-                        value={adminAnswer[q.id] || ''}
-                        onChange={e => setAdminAnswer(v => ({ ...v, [q.id]: e.target.value }))}
-                        placeholder={t.answerPlaceholder}
-                        rows={2}
-                        style={{ width: '100%', border: `1.5px solid ${SOFT}`, borderRadius: 10, padding: 10, fontFamily: 'Nunito, sans-serif', fontSize: 13, color: INDIGO_DARK, resize: 'none', outline: 'none', background: BG, boxSizing: 'border-box' }}
-                      />
-                      <button
-                        onClick={() => handleAnswer(q)}
-                        disabled={answerPosting[q.id]}
-                        style={{ marginTop: 8, padding: '8px 18px', background: MINT, color: '#fff', border: 'none', borderRadius: 10, fontFamily: 'Nunito, sans-serif', fontSize: 13, fontWeight: 800, cursor: 'pointer' }}
-                      >
-                        {answerPosting[q.id] ? t.posting : t.answerBtn}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  )
+// Load .env.local
+const envPath = path.join(__dirname, '.env.local')
+if (fs.existsSync(envPath)) {
+  const env = fs.readFileSync(envPath, 'utf8')
+  env.split('\n').forEach(line => {
+    const [key, ...val] = line.split('=')
+    if (key && val.length) process.env[key.trim()] = val.join('=').trim()
+  })
 }
+
+const API_KEY = process.env.ANTHROPIC_API_KEY
+if (!API_KEY) {
+  console.error('❌ ANTHROPIC_API_KEY not found in .env.local')
+  process.exit(1)
+}
+
+const strings = {
+  nav: { guide: "Guide", letters: "Letters", ask: "Ask", find: "Find" },
+  bottomNav: { home: "Home", post: "Post", account: "Account" },
+  splash: { tagline: "Your rights · Your language · Your community", getStarted: "Get Started" },
+  home: {
+    peopleHelped: "People helped", jobsServices: "Jobs & services", languages: "Languages",
+    letterExplainer: "Letter Explainer", letterExplainerSub: "Upload any official letter — AI explains it in your language",
+    journeyTitle: "Your Journey in the UK", arrive: "Arrive", newToUK: "New to UK",
+    stay: "Stay", leaveToRemain: "Leave to Remain", citizen: "Citizen", citizenship: "Citizenship",
+    community: "Community", jobsServicesCard: "Jobs & Services", availableIn: "Available in",
+    noQuestions: "No questions yet", noListings: "No listings yet"
+  },
+  explainer: {
+    heroTitle: "Understand Your Letter", heroSub: "Paste or upload any official letter and we'll explain it in plain language",
+    usesLeft: "uses left today", resetsIn: "Resets in", pasteText: "Paste Text", uploadPhoto: "Upload / Photo",
+    placeholder: "Paste your letter here...", dragDrop: "Drag & drop your letter image or", browse: "browse",
+    takePhoto: "Take Photo", explainBtn: "Explain This Letter", explaining: "Explaining...",
+    letterType: "Letter Type", summary: "Summary", deadlines: "Deadlines", whatToDo: "What To Do",
+    warning: "Warning", limitReached: "Daily limit reached. Come back tomorrow.",
+    errorMsg: "Something went wrong. Please try again.", imageReady: "Image ready — tap Explain",
+    removeImage: "Remove image", createAccount: "Create Free Account",
+    anonImageNote: "3 free image explanations per day without account",
+    anonTextNote: "10 free text explanations per day without account",
+    accountImageNote: "10 image explanations per day", accountTextUnlimited: "Unlimited text explanations",
+    limitImageAnon: "You've used your 3 free image explanations today. Create a free account for 10 per day.",
+    limitTextAnon: "You've used your 10 free text explanations today. Come back tomorrow.",
+    limitImageAccount: "You've used your 10 image explanations today. Come back tomorrow."
+  },
+  ask: {
+    heroTitle: "Ask a Question", heroSub: "Get answers from the Komek community and team",
+    placeholder: "What do you want to know?", askBtn: "Ask", posting: "Posting...",
+    awaiting: "Awaiting answer", answered: "Answered", upvote: "Helpful",
+    answerPlaceholder: "Write your answer...", answerBtn: "Post Answer",
+    empty: "No questions yet. Be the first to ask!"
+  },
+  post: {
+    heroTitle: "What would you like to post?", heroSub: "Choose a category to get started.",
+    hireStaff: "Hire Staff", hireStaffDesc: "Post a job vacancy",
+    listService: "List a Service", listServiceDesc: "Offer your professional service"
+  },
+  hireStaff: {
+    heroTitle: "Post a Job", heroSub: "Find the right person for your role",
+    jobTitle: "Job Title", jobTitlePh: "e.g. Delivery Driver, Chef, Receptionist",
+    description: "Job Description", descPh: "Describe the role and responsibilities...",
+    location: "Location", locationPh: "e.g. London, Birmingham, Manchester",
+    salary: "Salary / Pay", salaryPh: "e.g. £12/hour, £25,000/year, Negotiable",
+    contact: "Contact (Phone or Email)", contactPh: "How should people apply?",
+    submit: "Post Job", submitting: "Posting...",
+    success: "Job posted! It will appear once approved.", required: "Please fill in all fields."
+  },
+  listService: {
+    heroTitle: "List a Service", heroSub: "Offer your skills to the Komek community",
+    serviceName: "Service Name", serviceNamePh: "e.g. Plumber, Driving Instructor, Accountant",
+    description: "Description", descPh: "Describe your service and experience...",
+    location: "Location", locationPh: "e.g. London, Birmingham, or Nationwide",
+    price: "Price / Rate", pricePh: "e.g. £50/hour, From £200, Free consultation",
+    contact: "Contact (Phone or Email)", contactPh: "How should people get in touch?",
+    submit: "List My Service", submitting: "Listing...",
+    success: "Service listed! It will appear once approved.", required: "Please fill in all fields."
+  },
+  find: {
+    heroTitle: "Find Jobs & Services", heroSub: "Browse opportunities from the Kurdish community",
+    jobs: "Jobs", services: "Services", location: "Location", salary: "Pay",
+    price: "Rate", contact: "Contact", empty: "Nothing here yet.", filled: "Filled", paused: "Paused"
+  },
+  account: {
+    heroTitle: "Your Komek Account", heroSub: "Log in or create a free account to post listings.",
+    login: "Log In", signup: "Sign Up", fullName: "Full Name", email: "Email", password: "Password",
+    namePh: "Your full name", passPh: "At least 6 characters", loginBtn: "Log In",
+    signupBtn: "Create Free Account", logout: "Log out", welcome: "Welcome back",
+    postNew: "+ Post a Job or Service", myListings: "My Listings",
+    noListings: "You haven't posted anything yet.", wrongPass: "Incorrect email or password.",
+    noName: "Please enter your name.", cantCreate: "Could not create account.",
+    created: "Account created! You can now log in.",
+    deleteCfm: "Are you sure you want to delete this listing?",
+    pendingNote: "Waiting for admin approval.", edit: "Edit", markFilled: "Mark as Filled",
+    pause: "Pause", unpause: "Unpause", delete: "Delete", saveEdit: "Save & Resubmit",
+    cancel: "Cancel", editNote: "Edit below — listing will need re-approval after saving.",
+    untitled: "Untitled", jobPosting: "Job Posting", service: "Service",
+    approved: "Approved", pending: "Pending", rejected: "Rejected", paused: "Paused", filled: "Filled"
+  },
+  guide: {
+    faqTitle: "Common Questions", helpTitle: "Get Help",
+    showAnswer: "Show answer", hideAnswer: "Hide answer", official: "Official", free: "Free"
+  },
+  comingToUK: {
+    label: "YOUR JOURNEY", title: "Coming to the UK",
+    sub: "Everything you need to know — from the moment you arrive to becoming a British citizen.",
+    stage1step: "Stage 1", stage1title: "New to the UK",
+    stage1desc: "Just arrived? This guide covers everything from your first steps on UK soil to getting your ARC card, housing support and free legal help.",
+    stage1stat1: "Weekly support", stage1stat2: "Free NHS",
+    stage2step: "Stage 2", stage2title: "Leave to Remain",
+    stage2desc: "Been granted refugee status? You have 28 days to act. Housing, benefits, work, bank accounts — this guide covers it all.",
+    stage2stat1: "Days to act", stage2stat2: "Leave to remain",
+    stage3step: "Stage 3", stage3title: "British Citizenship",
+    stage3desc: "The path to a British passport — settled status, indefinite leave to remain, the Life in the UK test and naturalisation.",
+    stage3stat1: "To settled status", stage3stat2: "Approx. fee",
+    readGuide: "Read the guide"
+  }
+}
+
+async function translateToKurdish(strings) {
+  console.log('🔄 Translating to natural Sorani Kurdish...')
+  
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': API_KEY,
+      'anthropic-version': '2023-06-01'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 8000,
+      messages: [{
+        role: 'user',
+        content: `You are a native Sorani Kurdish speaker from Iraqi Kurdistan. Translate all the VALUES in this JSON into natural, everyday Sorani Kurdish as spoken by Kurdish people in the UK who are originally from Iraq or Iran.
+
+CRITICAL RULES:
+- Use natural conversational Sorani Kurdish — exactly how a Kurdish person would say it in real life, NOT a literal word-for-word translation from English
+- Use Sorani dialect ONLY (not Kurmanji)
+- Keep technical terms in English where Kurdish people would naturally say them in English (e.g. NHS, ARC card, BRP)
+- Keep currency symbols and numbers as-is
+- Keep "e.g." as-is in placeholder text
+- Return ONLY valid JSON with the same structure — no markdown, no backticks, no explanation
+
+${JSON.stringify(strings, null, 2)}`
+      }]
+    })
+  })
+
+  const data = await response.json()
+  if (!response.ok) {
+    console.error('API Error:', data)
+    process.exit(1)
+  }
+
+  const text = data.content[0].text.replace(/```json|```/g, '').trim()
+  return JSON.parse(text)
+}
+
+async function main() {
+  try {
+    const ku = await translateToKurdish(strings)
+    
+    const output = `// KOMEK — Kurdish (Sorani) Translations
+// Generated by Claude API — natural Sorani Kurdish
+// Paste the 'ku' section into lib/translations.js
+
+const ku = ${JSON.stringify(ku, null, 2)}
+
+module.exports = ku`
+
+    fs.writeFileSync('kurdish_translations.js', output)
+    console.log('✅ Done! Kurdish translations saved to kurdish_translations.js')
+    console.log('📋 Open that file, copy the translations, and paste into lib/translations.js')
+  } catch (err) {
+    console.error('❌ Error:', err.message)
+  }
+}
+
+main()
