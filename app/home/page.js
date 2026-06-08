@@ -1,11 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { createBrowserClient } from '@supabase/ssr'
+import { createClient } from '../lib/supabase'
 import TX from '../../lib/translations'
-
-function getSupabase() {
-  return createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
-}
 
 const INDIGO = '#4F46E5'
 const INDIGO_DARK = '#1C1A4F'
@@ -82,7 +78,7 @@ export default function HomePage() {
   }, [])
 
   async function fetchAll() {
-    const supabase = getSupabase()
+    const supabase = createClient()
     setLoading(true)
     const { count: explainCount } = await supabase.from('explainer_usage').select('*', { count: 'exact', head: true })
     const { count: listingCount } = await supabase.from('listings').select('*', { count: 'exact', head: true }).in('type', ['hire_staff', 'list_service']).in('status', ['approved', 'filled'])
