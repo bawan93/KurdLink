@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
-import { createBrowserClient } from '@supabase/ssr'
+import { createClient } from '../../lib/supabase'
 
 const INDIGO = '#4F46E5'
 const INDIGO_DARK = '#1C1A4F'
@@ -11,9 +11,6 @@ const SOFT = '#EDE9FE'
 const BG = '#F5F4FF'
 const FONT = "Nunito, sans-serif"
 
-function getSupabase() {
-  return createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
-}
 
 const TYPE_META = {
   list_service: { icon: '🎯', color: INDIGO, label: { en: 'Service', ku: 'خزمەتگوزاری', fa: 'خدمت', ar: 'خدمة' } },
@@ -37,9 +34,6 @@ function Field({ label, value }) {
   )
 }
 
-export async function generateStaticParams() {
-  return []
-}
 
 export default function ListingDetail({ params }) {
   const { id } = use(params)
@@ -60,7 +54,7 @@ export default function ListingDetail({ params }) {
 
   const fetchListing = async (listingId) => {
     try {
-      const { data, error } = await getSupabase().from('listings').select('*').eq('id', listingId).maybeSingle()
+      const { data, error } = await createClient().from('listings').select('*').eq('id', listingId).maybeSingle()
       if (error) console.error(error)
       setListing(data)
     } catch (err) { console.error(err) }
