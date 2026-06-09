@@ -343,7 +343,7 @@ export default function ReberPage() {
   const t = TX[lang] || TX.en
 
   useEffect(() => {
-    const saved = localStorage.getItem('kurdlink_lang')
+    const saved = localStorage.getItem('komek_lang')
     if (saved) setLang(saved)
     fetchQuestions()
     checkAdmin()
