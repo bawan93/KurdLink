@@ -7,14 +7,14 @@ const INDIGO_DARK = '#1C1A4F'
 const MINT = '#34D399'
 const SOFT = '#EDE9FE'
 const BG = '#F5F4FF'
-const FONT = "'Nunito', 'Plus Jakarta Sans', sans-serif"
+const FONT = "'Nunito', sans-serif"
 
 const TX = {
   en: {
     heroLabel: 'YOUR JOURNEY',
     heroTitle: 'New to the UK.',
     heroTitleItalic: "Here's what to do.",
-    heroSub: 'A clear, honest guide for anyone who has just arrived and needs to claim asylum in the UK.',
+    heroSub: 'A clear honest guide for anyone who has just arrived and needs to claim asylum in the UK.',
     stat1: '£49.18', stat1Label: 'Weekly support payment',
     stat2: '12mo', stat2Label: 'Wait before right to work',
     stat3: '100%', stat3Label: 'Free NHS from day one',
@@ -24,8 +24,8 @@ const TX = {
     steps: [
       { n: '1', icon: '✈️', title: 'Claim Asylum', desc: 'At the airport, port or train station, tell an immigration officer: "I want to claim asylum." You can do this with no documents.' },
       { n: '2', icon: '📋', title: 'Screening Interview', desc: 'A short interview with the Home Office. Basic questions about who you are and why you left. A free interpreter is your right.' },
-      { n: '3', icon: '🪪', title: 'Get Your ARC Card', desc: 'Your Asylum Registration Card is your ID. It gives you access to housing support, NHS, and other services. Keep it safe.' },
-      { n: '4', icon: '🏠', title: 'Apply for Support', desc: 'If you have no money or home, apply for asylum support: £49.18/week per person on an ASPEN card, plus accommodation.' },
+      { n: '3', icon: '🪪', title: 'Get Your ARC Card', desc: 'Your Asylum Registration Card is your ID. It gives you access to housing support, NHS and other services. Keep it safe.' },
+      { n: '4', icon: '🏠', title: 'Apply for Support', desc: 'If you have no money or home, apply for asylum support: £49.18 per week per person on an ASPEN card, plus accommodation.' },
       { n: '5', icon: '⚖️', title: 'Get a Free Lawyer', desc: 'This is the most important step. You are entitled to free legal aid. Call Migrant Help free: 0808 8010 503, 24/7.' },
       { n: '6', icon: '🗣️', title: 'Full Asylum Interview', desc: 'Your main interview where you explain your case. Bring all evidence. Your lawyer should be with you. Be honest and detailed.' },
     ],
@@ -34,20 +34,18 @@ const TX = {
     rights: [
       { icon: '🏥', title: 'Free NHS Healthcare', desc: 'From day one. No documents needed. Always request a free interpreter.' },
       { icon: '🎒', title: 'Free School for Children', desc: 'All children 5–16 must be in school. The council must find a place.' },
-      { icon: '💳', title: 'Financial Support', desc: '£49.18/week on an ASPEN card if destitute. £9.95 if meals provided.' },
+      { icon: '💳', title: 'Financial Support', desc: '£49.18 per week on an ASPEN card if destitute.' },
       { icon: '⚖️', title: 'Free Legal Advice', desc: 'You are entitled to legal aid. Get a lawyer as soon as possible.' },
       { icon: '🌍', title: 'Free Interpreter', desc: 'For every interview, appointment or meeting. Always demand it.' },
-      { icon: '🛡️', title: 'Cannot Be Deported', desc: 'While your claim or appeal is active, you cannot be removed from the UK.' },
+      { icon: '🛡️', title: 'Cannot Be Deported', desc: 'While your claim or appeal is active you cannot be removed from the UK.' },
     ],
     faqLabel: 'COMMON QUESTIONS',
     faqTitle: 'Things People Ask',
     faqs: [
-      { emoji: '💼', q: 'Can I work while waiting?', a: 'Generally no. But if you have been waiting more than 12 months and the delay is not your fault, you can apply for permission to work using the PTW1 form. If approved, your ARC card will show "Work Permitted".' },
-      { emoji: '👨‍👩‍👧', q: 'Can my family join me?', a: 'Not while your claim is being decided. Once you are granted refugee status you can apply for family reunion to bring your spouse and children under 18.' },
-      { emoji: '❗', q: 'What if I am refused?', a: 'Do not panic. Most refusals can be appealed. You usually have 14 days to appeal. Contact your lawyer or Migrant Help immediately. You can stay in the UK while your appeal is active.' },
-      { emoji: '📬', q: 'How long does it take?', a: 'It varies greatly. Some cases are decided in months, others take years. Keep your address updated with the Home Office at all times so they can contact you.' },
-      { emoji: '🏥', q: 'Do I need ID to see a doctor?', a: 'No. You have the right to free NHS care from day one, even without your ARC card. Some GPs may ask for ID but they cannot legally refuse you. Always request a free interpreter.' },
-      { emoji: '💳', q: 'What is the ASPEN card?', a: 'A pre-paid debit card loaded with your weekly asylum support (£49.18/week). Use it like a bank card to buy food and essentials, or withdraw cash.' },
+      { emoji: '💼', q: 'Can I work while waiting?', a: 'Generally no. But if you have been waiting more than 12 months and the delay is not your fault you can apply for permission to work.' },
+      { emoji: '❗', q: 'What if I am refused?', a: 'Do not panic. Most refusals can be appealed. You usually have 14 days to appeal. Contact your lawyer or Migrant Help immediately.' },
+      { emoji: '📬', q: 'How long does it take?', a: 'It varies. Some cases are decided in months others take years. Keep your address updated with the Home Office at all times.' },
+      { emoji: '💳', q: 'What is the ASPEN card?', a: 'A pre-paid debit card loaded with your weekly asylum support £49.18 per week. Use it like a bank card to buy food and essentials.' },
     ],
     helpLabel: 'GET HELP',
     helpTitle: 'Who to Call',
@@ -59,53 +57,55 @@ const TX = {
     ],
     disclaimer: '⚠️ This guide is for information only. Laws and policies change. Always get personal legal advice.',
   },
+
   ku: {
     heroLabel: 'گەشتەکەت',
-    heroTitle: 'تازە گەیشتوویت بە UK.',
-    heroTitleItalic: 'ئەمەت دەکات.',
-    heroSub: 'ڕێنمایەکی ڕوون و راستەقینە بۆ هەر کەسێک کە تازە گەیشتووە و پێویستی بە داواکردنی ئامادەیی هەیە.',
-    stat1: '٤٩.١٨£', stat1Label: 'پارەی پشتگیری هەفتانە',
-    stat2: '١٢ مانگ', stat2Label: 'چاوەڕوانی پێش مافی کار',
-    stat3: '١٠٠٪', stat3Label: 'NHS بەخۆڕایی لە ڕۆژی یەکەم',
-    stat4: '٠', stat4Label: 'بەلگە پێویست نییە بۆ GP',
+    heroTitle: 'من تازەم لە بەریتانیا.',
+    heroTitleItalic: 'پێویستە چی بکەیت.',
+    heroSub: 'ڕێنماییەکی ڕوون و ڕاستگۆیانە بۆ هەر کەسێک کە تازە گەیشتووە و پێویستی بە داوای مافی پەنابەری هەیە لە بەریتانیا.',
+    stat1: '£49.18', stat1Label: 'پارەی پشتگیری هەفتانە',
+    stat2: '١٢ مانگ', stat2Label: 'چاوەڕێ بکە پێش مافی کارکردنت',
+    stat3: '١٠٠٪', stat3Label: 'لە ڕۆژی یەکەمەوە NHS بەخۆڕایی',
+    stat4: '٠', stat4Label: 'ئەو بەڵگەنامانەی کە پێویستن بۆ بینینی GP',
     stepsLabel: 'هەنگاو بە هەنگاو',
-    stepsTitle: 'چۆنییەتی کارکردنی پرۆسەی ئامادەیی',
+    stepsTitle: 'چۆنیەتی کارکردنی پرۆسەی پەنابەری',
     steps: [
-      { n: '١', icon: '✈️', title: 'داوای ئامادەیی بکە', desc: 'لە فڕۆکەخانە، بەندەر یان وێستگە، بڵێ: "I want to claim asylum." بەبێ بەلگەش دەکرێت.' },
-      { n: '٢', icon: '📋', title: 'چاوپێکەوتنی پشکنین', desc: 'چاوپێکەوتنێکی کورت لەگەڵ ئۆفیسی ناوخۆ. وەرگێڕی بەخۆڕایی مافی توە.' },
-      { n: '٣', icon: '🪪', title: 'کارتی ARC وەربگرە', desc: 'کارتی تۆمارکردنی ئامادەییت ناسنامەکەتە. دەستگەیشتن بە NHS و خزمەتگوزاریەکان دەدات. بیپارێزە.' },
-      { n: '٤', icon: '🏠', title: 'داوای پشتگیری بکە', desc: 'ئەگەر پارەت نییە، داوای پشتگیری ئامادەیی بکە: ٤٩.١٨ پاوەند هەفتانە لەسەر کارتی ASPEN.' },
-      { n: '٥', icon: '⚖️', title: 'پارێزەری بەخۆڕایی بگرە', desc: 'مافت هەیە بۆ یارمەتیی یاساییی بەخۆڕایی. Migrant Help: 0808 8010 503 (بەخۆڕایی، ٢٤/٧)' },
-      { n: '٦', icon: '🗣️', title: 'چاوپێکەوتنی تەواوی ئامادەیی', desc: 'چاوپێکەوتنی سەرەکیتە. هەموو بەلگەکانت بهێنە. راست بە وردی باس بکە.' },
+      { n: '١', icon: '✈️', title: 'داوای پەنابەری', desc: 'هەر کە گەیشتیت بە ئەفسەرێکی کۆچبەری بڵێ دەمەوێت داوای مافی پەنابەری بکەم. دەتوانیت ئەم کارە بکەیت بەبێ هیچ بەڵگەنامەیەک.' },
+      { n: '٢', icon: '📋', title: 'چاوپێکەوتنی سکرینکردن', desc: 'چاوپێکەوتنێکی کورت لەگەڵ هۆم ئۆفیس. پرسیارە بنەڕەتییەکان سەبارەت بەوەی کە تۆ کێیت و بۆچی هاتوویت. دەتوانیت داوای وەرگێڕ بکەیت.' },
+      { n: '٣', icon: '🪪', title: 'کارتی ARC بەدەست بهێنە', desc: 'کارتی تۆمارکردنی پەنابەریت ناسنامەی تۆیە. دەستڕاگەیشتن بە پشتگیری نیشتەجێبوون NHS و خزمەتگوزارییەکانی ترت پێدەبەخشێت. بە سەلامەتی بیهێڵەرەوە.' },
+      { n: '٤', icon: '🏠', title: 'داواکاری پێشکەش بکە بۆ پشتگیری', desc: 'ئەگەر پارەت نییە یان ماڵت نییە داوای پاڵپشتی پەنابەری بکە: ٤٩.١٨ پاوەند لە هەفتەیەکدا بۆ هەر کەسێک لەسەر کارتی ASPEN لەگەڵ شوێنی نیشتەجێبوون.' },
+      { n: '٥', icon: '⚖️', title: 'پارێزەرێکی بێ بەرامبەر بەدەست بهێنە', desc: 'ئەمە گرنگترین هەنگاوە. تۆ مافی یارمەتی یاسایی بێبەرامبەرت هەیە. پەیوەندی بکەن بە یارمەتی کۆچبەران بەخۆڕایی: 0808 8010 503' },
+      { n: '٦', icon: '🗣️', title: 'چاوپێکەوتنی تەواوی پەنابەری', desc: 'چاوپێکەوتنی سەرەکیت کە تێیدا کەیسەکەت ڕوون دەکەیتەوە. هەموو بەڵگەکان لەگەڵ خۆتان بهێنن. پارێزەرەکەت لەگەڵت بێت. ڕاستگۆ و وردبین بە.' },
     ],
     rightsLabel: 'مافەکانت',
-    rightsTitle: 'چی مافت هەیە',
+    rightsTitle: 'ئەوەی مافی خۆتە',
     rights: [
-      { icon: '🏥', title: 'چارەسەری بەخۆڕاییی NHS', desc: 'لە ڕۆژی یەکەمەوە. پێویستت بە بەلگە نییە.' },
-      { icon: '🎒', title: 'قوتابخانەی بەخۆڕایی', desc: 'هەموو منداڵانی ٥-١٦ ساڵ دەبێت لە قوتابخانە بن.' },
-      { icon: '💳', title: 'پشتگیری دارایی', desc: '٤٩.١٨ پاوەند هەفتانە لەسەر کارتی ASPEN.' },
-      { icon: '⚖️', title: 'ڕاوێژی یاساییی بەخۆڕایی', desc: 'مافت هەیە بۆ یارمەتیی یاسایی.' },
-      { icon: '🌍', title: 'وەرگێڕی بەخۆڕایی', desc: 'بۆ هەموو چاوپێکەوتن و مۆڵەتەکان.' },
-      { icon: '🛡️', title: 'ناتوانرێیت دیپۆرت بکرێیت', desc: 'لەکاتی چالاکبوونی کێسەکەت.' },
+      { icon: '🏥', title: 'چاودێری تەندروستی NHS بەخۆڕایی', desc: 'لە ڕۆژی یەکەمەوە. هیچ بەڵگەنامەیەک پێویست نییە. هەمیشە داوای وەرگێڕێکی بێبەرامبەر بکە.' },
+      { icon: '🎒', title: 'قوتابخانەی بێ بەرامبەر بۆ منداڵان', desc: 'هەموو منداڵانی ٥ تا ١٦ ساڵ دەبێت لە قوتابخانە بن. ئەنجوومەنی ناوخۆیی دەبێت شوێنێکیان بۆ بدۆزێتەوە.' },
+      { icon: '💳', title: 'پاڵپشتی دارایی', desc: '٤٩.١٨ پاوەند بۆ هەفتەیەک لەسەر کارتی ASPEN.' },
+      { icon: '⚖️', title: 'ئامۆژگاری یاسایی بەخۆڕایی', desc: 'تۆ مافی یارمەتی یاسایی هەیە. بە زووترین کات پارێزەرێک وەربگرە.' },
+      { icon: '🌍', title: 'داوای وەرگێڕ بکە', desc: 'بۆ هەموو چاوپێکەوتنێک یان کۆبوونەوەیەک. هەمیشە داوای بکە.' },
+      { icon: '🛡️', title: 'ناتوانرێت دیپۆرت بکرێتەوە', desc: 'لەکاتێکدا تۆ داواکاری یان دووبارە داواکاری پێشکەش دەکەیت، ناتوانرێت لە بەریتانیا دووربخرێتەوە.' },
     ],
     faqLabel: 'پرسیارە باوەکان',
-    faqTitle: 'شتەی کەسان دەیپرسن',
+    faqTitle: 'ئەو شتانەی خەڵک لێی دەپرسن',
     faqs: [
-      { emoji: '💼', q: 'دەتوانم کار بکەم؟', a: 'بە گشتی نەخێر. بەلام ئەگەر زیاتر لە ١٢ مانگ چاوەڕوانت کردووە، دەتوانیت داوای مۆڵەتی کار بکەیت.' },
-      { emoji: '❗', q: 'ئەگەر داوام ڕەتکرایەوە؟', a: 'نەترسە. زۆرینەی ڕەتکردنەوەکان دەتوانرێن تژیاوە بکرێن. معمولاً ١٤ ڕۆژ هەیت. فەوری پەیوەندی بکە بە پارێزەرەکەت.' },
-      { emoji: '📬', q: 'چەند دەخایەنێت؟', a: 'جیاواز دەبێت. هەندێ مانگەکان، هەندێکی تر ساڵەکان. ئادرەسەکەت هەموو کاتێک نوێ بکەرەوە.' },
-      { emoji: '💳', q: 'کارتی ASPEN چییە؟', a: 'کارتێکی دەبیتیە کە بە ٤٩.١٨ پاوەند هەفتانە داندرێت. وەک کارتی بانکی بەکاریبهێنە.' },
+      { emoji: '💼', q: 'ئایا دەتوانم لە کاتی چاوەڕوانیدا کار بکەم؟', a: 'بەگشتی نەخێر. بەڵام ئەگەر زیاتر لە ١٢ مانگ چاوەڕێی دەکەیت و دواکەوتنەکە خەتای تۆ نییە دەتوانیت داوای مۆڵەتی کارکردن بکەیت.' },
+      { emoji: '❗', q: 'چی ئەگەر ڕەتکرامەوە؟', a: 'مەترسە. دەتوانیت دووبارە داواکاری پێشکەش بکەیت. بەزۆری ١٤ ڕۆژت هەیە. دەستبەجێ پەیوەندی بە پارێزەرەکەتەوە یان یارمەتی کۆچبەرانەوە بکە.' },
+      { emoji: '📬', q: 'چەند کات دەخایەنێت؟', a: 'دەگۆڕێت. هەندێک حاڵەت بە چەند مانگێک یەکلایی دەکرێنەوە هەندێکی تر ساڵانێک دەخایەنێت. لە هەموو کاتێکدا ناونیشانەکەت لەگەڵ Home Office نوێ بکەرەوە.' },
+      { emoji: '💳', q: 'کارتی ASPEN چییە؟', a: 'کارتێکی بانکی پێشوەختە کە پڕکراوە لە پشتگیری هەفتانەی پەنابەریت ٤٩.١٨ پاوەند لە هەفتەیەکدا. وەک کارتی بانک بەکاری بهێنە بۆ کڕینی خواردن و پێداویستییە سەرەکییەکان.' },
     ],
-    helpLabel: 'یارمەتی بگرە',
-    helpTitle: 'کێ بپەیوەندێ',
+    helpLabel: 'یارمەتی وەربگرە',
+    helpTitle: 'پەیوەندی بە کێوە بکات',
     helpers: [
-      { emoji: '📞', name: 'Migrant Help', desc: 'ڕاوێژ و پشتگیری بەخۆڕایی', number: '0808 8010 503', tag: 'بەخۆڕایی · ٢٤/٧' },
-      { emoji: '⚖️', name: 'Legal Aid Agency', desc: 'نوێنەرایەتیی یاساییی بەخۆڕایی', number: '0300 200 2020', tag: 'بەخۆڕایی' },
-      { emoji: '💙', name: 'Samaritans', desc: 'پشتگیری کریزی دەروونی', number: '116 123', tag: 'بەخۆڕایی · ٢٤/٧' },
-      { emoji: '🏠', name: 'Shelter', desc: 'یارمەتیی کریزی نیشتەجێبوون', number: '0808 800 4444', tag: 'بەخۆڕایی' },
+      { emoji: '📞', name: 'Migrant Help', desc: 'ئامۆژگاری و پشتیوانی بێبەرامبەر بۆ پەناخوازان', number: '0808 8010 503', tag: 'بەخۆڕایی · ٢٤/٧' },
+      { emoji: '⚖️', name: 'Legal Aid Agency', desc: 'نوێنەرایەتی یاسایی ئازاد بۆ کەیسەکانی پەنابەری', number: '0300 200 2020', tag: 'بەخۆڕایی' },
+      { emoji: '💙', name: 'Samaritans', desc: 'پشتگیری لە قەیرانی تەندروستی دەروونی', number: '116 123', tag: 'بەخۆڕایی · ٢٤/٧' },
+      { emoji: '🏠', name: 'Shelter', desc: 'قەیرانی نیشتەجێبوون و یارمەتی بێ ماڵ و حاڵ', number: '0808 800 4444', tag: 'بەخۆڕایی' },
     ],
-    disclaimer: '⚠️ ئەم ڕێنمایە تەنها بۆ زانیارییە. هەموو کاتێک ڕاوێژی یاساییی کەسیگرەو بگرە.',
+    disclaimer: '⚠️ ئەم ڕێنماییە تەنها بۆ زانیارییە. یاسا و سیاسەتەکان دەگۆڕدرێن. هەمیشە ئامۆژگاری یاسایی وەربگرە.',
   },
+
   fa: {
     heroLabel: 'سفر شما',
     heroTitle: 'تازه رسیدی به UK.',
@@ -153,6 +153,7 @@ const TX = {
     ],
     disclaimer: '⚠️ این راهنما فقط برای اطلاعات است. قوانین تغییر می‌کنند. همیشه مشاوره حقوقی شخصی بگیر.',
   },
+
   ar: {
     heroLabel: 'رحلتك',
     heroTitle: 'وصلت للتو إلى UK.',
@@ -215,10 +216,9 @@ export default function NewToUKPage() {
   }, [])
 
   const t = TX[lang] || TX.en
-  const isRtl = lang === 'ku' || lang === 'fa' || lang === 'ar'
 
   return (
-    <div style={{ fontFamily: FONT, direction: isRtl ? 'rtl' : 'ltr', background: BG, minHeight: '100vh', paddingBottom: 80 }}>
+    <div style={{ fontFamily: FONT, direction: 'ltr', background: BG, minHeight: '100vh', paddingBottom: 80 }}>
 
       {/* HERO */}
       <div style={{ background: INDIGO_DARK, padding: '40px 24px 48px' }}>
@@ -227,18 +227,18 @@ export default function NewToUKPage() {
             <span style={{ fontSize: 12 }}>✈️</span>
             <span style={{ fontSize: 11, fontWeight: 800, color: INDIGO_LIGHT, letterSpacing: 1.5 }}>{t.heroLabel}</span>
           </div>
-          <h1 style={{ fontSize: 32, fontWeight: 900, color: '#fff', margin: '0 0 4px', lineHeight: 1.2, letterSpacing: -0.5 }}>{t.heroTitle}</h1>
-          <h1 style={{ fontSize: 32, fontWeight: 900, color: MINT, margin: '0 0 16px', lineHeight: 1.2, letterSpacing: -0.5, fontStyle: 'italic' }}>{t.heroTitleItalic}</h1>
-          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', margin: '0 0 36px', lineHeight: 1.7, fontWeight: 500 }}>{t.heroSub}</p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <h1 style={{ fontSize: 30, fontWeight: 900, color: '#fff', margin: '0 0 4px', lineHeight: 1.2 }}>{t.heroTitle}</h1>
+          <h1 style={{ fontSize: 30, fontWeight: 900, color: MINT, margin: '0 0 16px', lineHeight: 1.2, fontStyle: 'italic' }}>{t.heroTitleItalic}</h1>
+          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', margin: '0 0 32px', lineHeight: 1.7, fontWeight: 500 }}>{t.heroSub}</p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             {[
               { val: t.stat1, label: t.stat1Label, color: MINT },
               { val: t.stat2, label: t.stat2Label, color: INDIGO_LIGHT },
               { val: t.stat3, label: t.stat3Label, color: MINT },
               { val: t.stat4, label: t.stat4Label, color: '#F87171' },
             ].map((s, i) => (
-              <div key={i} style={{ background: 'rgba(255,255,255,0.06)', borderRadius: 16, padding: '16px', border: '1px solid rgba(255,255,255,0.08)' }}>
-                <div style={{ fontSize: 24, fontWeight: 900, color: s.color, letterSpacing: -0.5 }}>{s.val}</div>
+              <div key={i} style={{ background: 'rgba(255,255,255,0.06)', borderRadius: 14, padding: '14px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div style={{ fontSize: 22, fontWeight: 900, color: s.color }}>{s.val}</div>
                 <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 600, marginTop: 4, lineHeight: 1.4 }}>{s.label}</div>
               </div>
             ))}
@@ -247,41 +247,19 @@ export default function NewToUKPage() {
       </div>
 
       {/* STEPS */}
-      <div style={{ background: BG, padding: '40px 24px' }}>
+      <div style={{ background: BG, padding: '36px 20px' }}>
         <div style={{ maxWidth: 480, margin: '0 auto' }}>
-          <div style={{ fontSize: 11, fontWeight: 800, color: INDIGO, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8, opacity: 0.6 }}>{t.stepsLabel}</div>
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 28px', letterSpacing: -0.3 }}>{t.stepsTitle}</h2>
-          <div style={{ overflowX: 'auto', paddingBottom: 8, marginBottom: 24 }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 0, minWidth: 'max-content', padding: '0 4px' }}>
-              {t.steps.map((step, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 80 }}>
-                    <div style={{ width: 56, height: 56, borderRadius: '50%', background: SOFT, border: `2px solid ${INDIGO}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, position: 'relative', marginBottom: 8 }}>
-                      {step.icon}
-                      <div style={{ position: 'absolute', top: -6, right: isRtl ? 'auto' : -6, left: isRtl ? -6 : 'auto', width: 20, height: 20, borderRadius: '50%', background: INDIGO, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 900, color: '#fff' }}>
-                        {step.n}
-                      </div>
-                    </div>
-                    <div style={{ fontSize: 10, fontWeight: 800, color: INDIGO, textAlign: 'center', lineHeight: 1.3, width: 72 }}>{step.title}</div>
-                  </div>
-                  {i < t.steps.length - 1 && (
-                    <div style={{ width: 24, height: 2, background: `${INDIGO}30`, flexShrink: 0, marginBottom: 28 }} />
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
+          <div style={{ fontSize: 11, fontWeight: 800, color: INDIGO, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 6, opacity: 0.6 }}>{t.stepsLabel}</div>
+          <h2 style={{ fontSize: 20, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 24px' }}>{t.stepsTitle}</h2>
           {t.steps.map((step, i) => (
-            <div key={i} style={{ display: 'flex', gap: 14, marginBottom: 12, flexDirection: isRtl ? 'row-reverse' : 'row' }}>
-              <div style={{ width: 44, height: 44, borderRadius: 14, background: SOFT, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, border: `1.5px solid ${INDIGO}20` }}>
+            <div key={i} style={{ display: 'flex', gap: 12, marginBottom: 10, alignItems: 'flex-start' }}>
+              <div style={{ width: 42, height: 42, borderRadius: 14, background: SOFT, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, border: `1.5px solid ${INDIGO}20`, position: 'relative' }}>
                 {step.icon}
+                <div style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: '50%', background: INDIGO, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 900, color: '#fff' }}>{step.n}</div>
               </div>
-              <div style={{ flex: 1, background: '#fff', borderRadius: 14, padding: '12px 14px', border: '1px solid #EDE9FE', boxShadow: '0 2px 8px rgba(79,70,229,0.05)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                  <div style={{ width: 20, height: 20, borderRadius: '50%', background: INDIGO, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 900, color: '#fff', flexShrink: 0 }}>{step.n}</div>
-                  <div style={{ fontSize: 14, fontWeight: 900, color: INDIGO }}>{step.title}</div>
-                </div>
-                <div style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.7, fontWeight: 500 }}>{step.desc}</div>
+              <div style={{ flex: 1, background: '#fff', borderRadius: 14, padding: '12px 14px', border: `1px solid ${SOFT}`, boxShadow: '0 2px 8px rgba(79,70,229,0.05)' }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: INDIGO, marginBottom: 4 }}>{step.title}</div>
+                <div style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.7 }}>{step.desc}</div>
               </div>
             </div>
           ))}
@@ -289,16 +267,16 @@ export default function NewToUKPage() {
       </div>
 
       {/* RIGHTS */}
-      <div style={{ background: INDIGO_DARK, padding: '40px 24px' }}>
+      <div style={{ background: INDIGO_DARK, padding: '36px 20px' }}>
         <div style={{ maxWidth: 480, margin: '0 auto' }}>
-          <div style={{ fontSize: 11, fontWeight: 800, color: MINT, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8, opacity: 0.8 }}>{t.rightsLabel}</div>
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#fff', margin: '0 0 24px', letterSpacing: -0.3 }}>{t.rightsTitle}</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div style={{ fontSize: 11, fontWeight: 800, color: MINT, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 6, opacity: 0.8 }}>{t.rightsLabel}</div>
+          <h2 style={{ fontSize: 20, fontWeight: 900, color: '#fff', margin: '0 0 20px' }}>{t.rightsTitle}</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             {t.rights.map((r, i) => (
-              <div key={i} style={{ background: 'rgba(255,255,255,0.05)', borderRadius: 16, padding: '16px', border: '1px solid rgba(129,140,248,0.2)' }}>
-                <div style={{ fontSize: 28, marginBottom: 10 }}>{r.icon}</div>
-                <div style={{ fontSize: 13, fontWeight: 800, color: '#fff', marginBottom: 6, lineHeight: 1.3 }}>{r.title}</div>
-                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6, fontWeight: 500 }}>{r.desc}</div>
+              <div key={i} style={{ background: 'rgba(255,255,255,0.05)', borderRadius: 14, padding: '14px', border: '1px solid rgba(129,140,248,0.2)' }}>
+                <div style={{ fontSize: 26, marginBottom: 8 }}>{r.icon}</div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: '#fff', marginBottom: 5, lineHeight: 1.3 }}>{r.title}</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>{r.desc}</div>
               </div>
             ))}
           </div>
@@ -306,20 +284,21 @@ export default function NewToUKPage() {
       </div>
 
       {/* FAQ */}
-      <div style={{ background: BG, padding: '40px 24px' }}>
+      <div style={{ background: BG, padding: '36px 20px' }}>
         <div style={{ maxWidth: 480, margin: '0 auto' }}>
-          <div style={{ fontSize: 11, fontWeight: 800, color: INDIGO, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8, opacity: 0.6 }}>{t.faqLabel}</div>
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 20px', letterSpacing: -0.3 }}>{t.faqTitle}</h2>
+          <div style={{ fontSize: 11, fontWeight: 800, color: INDIGO, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 6, opacity: 0.6 }}>{t.faqLabel}</div>
+          <h2 style={{ fontSize: 20, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 18px' }}>{t.faqTitle}</h2>
           {t.faqs.map((faq, i) => (
-            <div key={i} style={{ background: '#fff', borderRadius: 16, marginBottom: 10, overflow: 'hidden', border: openFaq === i ? `1.5px solid ${INDIGO}` : '1.5px solid #EDE9FE', boxShadow: openFaq === i ? '0 4px 20px rgba(79,70,229,0.1)' : '0 2px 8px rgba(79,70,229,0.04)', transition: 'all 0.2s' }}>
-              <button onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{ width: '100%', padding: '14px 16px', background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', fontFamily: FONT, flexDirection: isRtl ? 'row-reverse' : 'row', textAlign: isRtl ? 'right' : 'left' }}>
-                <div style={{ width: 38, height: 38, borderRadius: 12, background: SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>{faq.emoji}</div>
+            <div key={i} style={{ background: '#fff', borderRadius: 14, marginBottom: 10, overflow: 'hidden', border: openFaq === i ? `1.5px solid ${INDIGO}` : `1.5px solid ${SOFT}`, boxShadow: openFaq === i ? '0 4px 20px rgba(79,70,229,0.1)' : '0 2px 8px rgba(79,70,229,0.04)', transition: 'all 0.2s' }}>
+              <button onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                style={{ width: '100%', padding: '14px 16px', background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', fontFamily: FONT, textAlign: 'left' }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>{faq.emoji}</div>
                 <div style={{ flex: 1, fontSize: 14, fontWeight: 700, color: INDIGO_DARK }}>{faq.q}</div>
                 <span style={{ fontSize: 18, color: openFaq === i ? INDIGO : '#C4B5FD', transition: 'transform 0.2s', transform: openFaq === i ? 'rotate(90deg)' : 'none', flexShrink: 0 }}>›</span>
               </button>
               {openFaq === i && (
-                <div style={{ padding: '0 16px 16px', paddingInlineStart: isRtl ? 16 : 66 }}>
-                  <div style={{ fontSize: 13, color: '#4B5563', lineHeight: 1.8, fontWeight: 500, background: SOFT, borderRadius: 12, padding: '12px 14px' }}>{faq.a}</div>
+                <div style={{ padding: '0 16px 16px 64px' }}>
+                  <div style={{ fontSize: 13, color: '#4B5563', lineHeight: 1.8, background: SOFT, borderRadius: 12, padding: '12px 14px' }}>{faq.a}</div>
                 </div>
               )}
             </div>
@@ -328,21 +307,22 @@ export default function NewToUKPage() {
       </div>
 
       {/* HELP */}
-      <div style={{ background: INDIGO_DARK, padding: '40px 24px' }}>
+      <div style={{ background: INDIGO_DARK, padding: '36px 20px' }}>
         <div style={{ maxWidth: 480, margin: '0 auto' }}>
-          <div style={{ fontSize: 11, fontWeight: 800, color: MINT, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8, opacity: 0.8 }}>{t.helpLabel}</div>
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#fff', margin: '0 0 20px', letterSpacing: -0.3 }}>{t.helpTitle}</h2>
+          <div style={{ fontSize: 11, fontWeight: 800, color: MINT, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 6, opacity: 0.8 }}>{t.helpLabel}</div>
+          <h2 style={{ fontSize: 20, fontWeight: 900, color: '#fff', margin: '0 0 18px' }}>{t.helpTitle}</h2>
           {t.helpers.map((h, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, background: 'rgba(255,255,255,0.05)', borderRadius: 16, padding: '14px 16px', marginBottom: 10, border: '1px solid rgba(129,140,248,0.2)', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
-              <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(129,140,248,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>{h.emoji}</div>
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(255,255,255,0.05)', borderRadius: 14, padding: '14px 16px', marginBottom: 10, border: '1px solid rgba(129,140,248,0.2)' }}>
+              <div style={{ width: 42, height: 42, borderRadius: 12, background: 'rgba(129,140,248,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{h.emoji}</div>
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2, flexWrap: 'wrap' }}>
                   <div style={{ fontSize: 14, fontWeight: 800, color: '#fff' }}>{h.name}</div>
                   <div style={{ background: 'rgba(52,211,153,0.15)', color: MINT, fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20 }}>{h.tag}</div>
                 </div>
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', fontWeight: 500 }}>{h.desc}</div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>{h.desc}</div>
               </div>
-              <a href={`tel:${h.number.replace(/\s/g, '')}`} style={{ background: MINT, color: '#fff', fontWeight: 800, fontSize: 12, padding: '8px 14px', borderRadius: 12, textDecoration: 'none', flexShrink: 0, whiteSpace: 'nowrap' }}>
+              <a href={`tel:${h.number.replace(/\s/g, '')}`}
+                style={{ background: MINT, color: '#fff', fontWeight: 800, fontSize: 11, padding: '8px 12px', borderRadius: 10, textDecoration: 'none', flexShrink: 0, whiteSpace: 'nowrap' }}>
                 📞 {h.number}
               </a>
             </div>
@@ -350,10 +330,10 @@ export default function NewToUKPage() {
         </div>
       </div>
 
-      {/* Disclaimer */}
-      <div style={{ background: BG, padding: '20px 24px 40px' }}>
-        <div style={{ maxWidth: 480, margin: '0 auto', background: '#FFFBEB', borderRadius: 16, padding: '14px 16px', border: '1px solid rgba(251,191,36,0.3)' }}>
-          <div style={{ fontSize: 12, color: '#92400E', lineHeight: 1.7, fontWeight: 500 }}>{t.disclaimer}</div>
+      {/* DISCLAIMER */}
+      <div style={{ background: BG, padding: '20px 20px 40px' }}>
+        <div style={{ maxWidth: 480, margin: '0 auto', background: '#FFFBEB', borderRadius: 14, padding: '14px 16px', border: '1px solid rgba(251,191,36,0.3)' }}>
+          <div style={{ fontSize: 12, color: '#92400E', lineHeight: 1.7 }}>{t.disclaimer}</div>
         </div>
       </div>
     </div>
