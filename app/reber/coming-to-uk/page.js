@@ -28,9 +28,14 @@ const TX = {
       { step: "Stage 3", title: "Path to Citizenship", badge: "Final stage", badgeColor: "#F59E0B", desc: "You have status. Now build your future and work toward citizenship.", preview: ["Indefinite Leave to Remain", "Life in the UK test", "British citizenship"], cta: "View Stage 3", route: "/reber/citizenship" },
     ],
     quiz: [
-      { q: "When did you arrive in the UK?", options: ["In the last few weeks", "A few months ago", "More than a year ago"] },
-      { q: "Have you had your asylum interview yet?", options: ["No, not yet", "Yes, I have had it", "I do not have an asylum claim"] },
-      { q: "Have you received a decision on your case?", options: ["No, still waiting", "Yes — I was granted status", "Yes — I was refused"] },
+      {
+        q: "Have you received a decision on your asylum case?",
+        options: ["No, still waiting", "Yes — I was granted Leave to Remain", "Yes — I was refused"]
+      },
+      {
+        q: "Have you had Leave to Remain for 5 or more years?",
+        options: ["No, less than 5 years", "Yes, 5 years or more"]
+      },
     ],
     quizResult: ["You are at Stage 1 — Just Arrived", "You are at Stage 2 — Leave to Remain", "You are at Stage 3 — Path to Citizenship"],
   },
@@ -51,9 +56,14 @@ const TX = {
       { step: "قۆناغی سێیەم", title: "ڕێگای هاوڵاتیبوون", badge: "قۆناغی کۆتایی", badgeColor: "#F59E0B", desc: "پێگەی پەنابەریت پێدراوە. ئێستا داهاتووت بنیاد بنێ.", preview: ["مانەوەی نادیار", "تاقیکردنەوەی ژیان لە بەریتانیا", "هاووڵاتیبوونی بریتانی"], cta: "بینینی قۆناغی سێیەم", route: "/reber/citizenship" },
     ],
     quiz: [
-      { q: "کەی گەیشتیتە بەریتانیا؟", options: ["لە چەند هەفتەی ڕابردوودا", "چەند مانگێک لەمەوبەر", "زیاتر لە ساڵێک لەمەوبەر"] },
-      { q: "تا ئێستا چاوپێکەوتنی پەنابەریت ئەنجامداوە؟", options: ["نەخێر، هێشتا چاوەڕێم", "بەڵێ، چاوپێکەوتنەکەم ئەنجامداوە", "من داوای پەنابەریم نەکردووە"] },
-      { q: "ئایا بڕیارت لەسەر کەیسەکەت وەرگرتووە؟", options: ["نەخێر، هێشتا چاوەڕێم", "بەڵێ — کەیسەکەم وەرگیرا", "بەڵێ — دۆسیەکەم ڕەتکرایەوە"] },
+      {
+        q: "ئایا بڕیارێک لەسەر کەیسی پەنابەریت وەرگرتووە؟",
+        options: ["نەخێر، هێشتا چاوەڕێم", "بەڵێ — مۆڵەتی مانەوەم پێدراوە", "بەڵێ — دۆسیەکەم ڕەتکرایەوە"]
+      },
+      {
+        q: "ئایا ٥ ساڵ یان زیاتر مۆڵەتی مانەوەت هەیە؟",
+        options: ["نەخێر، کەمتر لە ٥ ساڵ", "بەڵێ، ٥ ساڵ یان زیاتر"]
+      },
     ],
     quizResult: ["تۆ لە قۆناغی یەکەمدایت — تازە گەیشتووی", "تۆ لە قۆناغی دووەمدایت — پاسپۆرتەکەت وەرگرتووە", "تۆ لە قۆناغی سێیەمدایت — ڕێگای هاوڵاتیبوون"],
   },
@@ -74,9 +84,14 @@ const TX = {
       { step: "مرحله ۳", title: "مسیر شهروندی", badge: "مرحله آخر", badgeColor: "#F59E0B", desc: "وضعیتت تأیید شده. حالا آینده‌ات را بساز.", preview: ["اقامت دائم", "آزمون زندگی در UK", "شهروندی بریتانیا"], cta: "مرحله ۳ را ببین", route: "/reber/citizenship" },
     ],
     quiz: [
-      { q: "کی به بریتانیا رسیدی؟", options: ["چند هفته پیش", "چند ماه پیش", "بیش از یک سال پیش"] },
-      { q: "مصاحبه پناهندگی داشتی؟", options: ["نه، هنوز نه", "بله، داشتم", "درخواست پناهندگی ندارم"] },
-      { q: "تصمیمی درباره پرونده‌ات گرفته شده؟", options: ["نه، هنوز منتظرم", "بله — وضعیتم تأیید شد", "بله — رد شدم"] },
+      {
+        q: "آیا تصمیمی درباره پرونده پناهندگی‌ات گرفته شده؟",
+        options: ["نه، هنوز منتظرم", "بله — اجازه اقامت گرفتم", "بله — رد شدم"]
+      },
+      {
+        q: "آیا ۵ سال یا بیشتر اجازه اقامت داری؟",
+        options: ["نه، کمتر از ۵ سال", "بله، ۵ سال یا بیشتر"]
+      },
     ],
     quizResult: ["در مرحله ۱ هستی — تازه رسیدی", "در مرحله ۲ هستی — اجازه اقامت", "در مرحله ۳ هستی — مسیر شهروندی"],
   },
@@ -97,9 +112,14 @@ const TX = {
       { step: "المرحلة ٣", title: "مسار الجنسية", badge: "المرحلة الأخيرة", badgeColor: "#F59E0B", desc: "تم منحك الوضع. الآن ابنِ مستقبلك.", preview: ["إقامة دائمة غير محددة", "اختبار الحياة في المملكة المتحدة", "الجنسية البريطانية"], cta: "عرض المرحلة ٣", route: "/reber/citizenship" },
     ],
     quiz: [
-      { q: "متى وصلت إلى المملكة المتحدة؟", options: ["خلال الأسابيع الماضية", "قبل أشهر", "منذ أكثر من سنة"] },
-      { q: "هل أجريت مقابلة اللجوء؟", options: ["لا، لم أجرها بعد", "نعم، أجريتها", "ليس لدي طلب لجوء"] },
-      { q: "هل تلقيت قراراً بشأن قضيتك؟", options: ["لا، ما زلت أنتظر", "نعم — تم منحي الوضع", "نعم — رُفض طلبي"] },
+      {
+        q: "هل تلقيت قراراً بشأن قضية لجوئك؟",
+        options: ["لا، ما زلت أنتظر", "نعم — مُنحت إذن البقاء", "نعم — رُفض طلبي"]
+      },
+      {
+        q: "هل لديك إذن بقاء منذ ٥ سنوات أو أكثر؟",
+        options: ["لا، أقل من ٥ سنوات", "نعم، ٥ سنوات أو أكثر"]
+      },
     ],
     quizResult: ["أنت في المرحلة ١ — وصلت للتو", "أنت في المرحلة ٢ — إذن البقاء", "أنت في المرحلة ٣ — مسار الجنسية"],
   },
@@ -125,13 +145,30 @@ export default function ComingToUKPage() {
 
   const handleQuizAnswer = (answer) => {
     const next = [...quizAnswers, answer]
-    if (quizStep < 2) { setQuizAnswers(next); setQuizStep(quizStep + 1) }
-    else { setQuizAnswers(next); setQuizDone(true) }
+    // Q1: if still waiting or refused -> Stage 1 immediately, no Q2 needed
+    if (quizStep === 0) {
+      if (answer === t.quiz[0].options[0] || answer === t.quiz[0].options[2]) {
+        // Still waiting or refused -> Stage 1
+        setQuizAnswers(next)
+        setQuizDone(true)
+      } else {
+        // Granted -> ask Q2
+        setQuizAnswers(next)
+        setQuizStep(1)
+      }
+    } else {
+      // Q2: 5 years or more -> Stage 3, less than 5 -> Stage 2
+      setQuizAnswers(next)
+      setQuizDone(true)
+    }
   }
 
   const getQuizResult = () => {
-    if (quizAnswers[0] === t.quiz[0].options[0]) return 0
-    if (quizAnswers[2] === t.quiz[2].options[1]) return 2
+    // Q1: still waiting or refused -> Stage 1
+    if (quizAnswers[0] === t.quiz[0].options[0] || quizAnswers[0] === t.quiz[0].options[2]) return 0
+    // Q1: granted, Q2: 5+ years -> Stage 3
+    if (quizAnswers[1] === t.quiz[1].options[1]) return 2
+    // Q1: granted, Q2: less than 5 years -> Stage 2
     return 1
   }
 
@@ -171,7 +208,7 @@ export default function ComingToUKPage() {
         ) : !quizDone ? (
           <div style={{ background: '#fff', borderRadius: 16, padding: 20, boxShadow: '0 2px 12px rgba(79,70,229,0.08)', border: `1px solid ${SOFT}` }}>
             <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
-              {[0,1,2].map(i => <div key={i} style={{ flex: 1, height: 4, borderRadius: 4, background: i<=quizStep?INDIGO:SOFT, transition: 'background 0.3s' }} />)}
+              {[0,1].map(i => <div key={i} style={{ flex: 1, height: 4, borderRadius: 4, background: i<=quizStep?INDIGO:SOFT, transition: 'background 0.3s' }} />)}
             </div>
             <p style={{ color: INDIGO_DARK, fontWeight: 800, fontSize: 16, margin: '0 0 16px', lineHeight: 1.4 }}>{t.quiz[quizStep].q}</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
