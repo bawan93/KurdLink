@@ -104,7 +104,7 @@ export async function POST(req) {
         'x-api-key': process.env.ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01'
       },
-      bbody: JSON.stringify({
+      body: JSON.stringify({
   model: imageData ? "claude-sonnet-4-6" : "claude-haiku-4-5-20251001",
   max_tokens: 600,
   system: systemPrompt,
