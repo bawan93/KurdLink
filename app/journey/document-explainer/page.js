@@ -42,6 +42,9 @@ const translations = {
     createAccount: 'Create Free Account',
     usesLeft: 'uses left today',
     of: 'of',
+    imagesAccount: '🖼 Images (account)',
+    imagesFree: '🖼 Images (free)',
+    unlimitedText: '✉️ Unlimited text',
   },
   ku: {
     heroTitle: 'لە نامەکەت تێبگە',
@@ -68,6 +71,9 @@ const translations = {
     createAccount: 'ئەکاونتی خۆڕای دروست بکە',
     usesLeft: 'جار ئەمڕۆ ماوە',
     of: 'لە',
+    imagesAccount: '🖼 وێنەکان (ئەکاونت)',
+    imagesFree: '🖼 وێنەکان (خۆڕایی)',
+    unlimitedText: '✉️ نووسینی نامحدود',
   },
   fa: {
     heroTitle: 'نامه‌ات را بفهم',
@@ -94,6 +100,9 @@ const translations = {
     createAccount: 'ایجاد حساب رایگان',
     usesLeft: 'باقی مانده امروز',
     of: 'از',
+    imagesAccount: '🖼 تصاویر (حساب)',
+    imagesFree: '🖼 تصاویر (رایگان)',
+    unlimitedText: '✉️ متن نامحدود',
   },
   ar: {
     heroTitle: 'افهم رسالتك',
@@ -120,6 +129,9 @@ const translations = {
     createAccount: 'إنشاء حساب مجاني',
     usesLeft: 'متبقية اليوم',
     of: 'من',
+    imagesAccount: '🖼 الصور (حساب)',
+    imagesFree: '🖼 الصور (مجاني)',
+    unlimitedText: '✉️ نص غير محدود',
   },
 }
 
@@ -313,25 +325,22 @@ export default function DocumentExplainerPage() {
         <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 900, margin: '0 0 10px', lineHeight: 1.2 }}>{t.heroTitle}</h1>
         <p style={{ color: INDIGO_LIGHT, fontSize: 14, fontWeight: 500, margin: '0 0 20px', maxWidth: 320, marginLeft: 'auto', marginRight: 'auto' }}>{t.heroSub}</p>
 
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 10, flexWrap: 'wrap' }}>
-          <UsageBar
-            used={imageUsed}
-            limit={imageLimit}
-            label={userId ? '🖼 Images (account)' : '🖼 Images (free)'}
-          />
-          {!userId && (
+        {tab === 'upload' && (
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 10, flexWrap: 'wrap' }}>
             <UsageBar
-              used={textUsed}
-              limit={textLimit}
-              label="✉️ Text (free)"
+              used={imageUsed}
+              limit={imageLimit}
+              label={userId ? t.imagesAccount : t.imagesFree}
             />
-          )}
-          {userId && (
+          </div>
+        )}
+        {tab === 'upload' && userId && (
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 6 }}>
             <div style={{ background: 'rgba(52,211,153,0.2)', borderRadius: 12, padding: '8px 14px', display: 'flex', alignItems: 'center' }}>
-              <span style={{ fontSize: 11, color: MINT, fontWeight: 700 }}>✉️ {translations[lang]?.accountTextUnlimited || 'Unlimited text'}</span>
+              <span style={{ fontSize: 11, color: MINT, fontWeight: 700 }}>{t.unlimitedText}</span>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Main card */}
