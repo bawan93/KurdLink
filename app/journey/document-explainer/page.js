@@ -34,7 +34,7 @@ const translations = {
     whatToDo: 'What To Do',
     warning: '⚠️ Warning',
     errorMsg: 'Something went wrong. Please try again.',
-    imageReady: 'Image ready — tap Explain',
+    imageReady: 'Tap Explain to continue',
     removeImage: '✕ Remove image',
     limitImage_anon: "You've used your 3 free image explanations today. Create a free account for 10 per day.",
     limitText_anon: "You've used your 10 free text explanations today. Come back tomorrow.",
@@ -60,7 +60,7 @@ const translations = {
     whatToDo: 'چی بکەیت',
     warning: '⚠️ ئاگادارکردنەوە',
     errorMsg: 'هەڵەیەک ڕوویدا. دووبارە هەوڵ بدەوە.',
-    imageReady: 'وێنەکە ئامادەیە — دەست بکە',
+    imageReady: 'دەستی بکە بۆ ڕوونکردنەوە',
     removeImage: '✕ وێنەکە بسڕەوە',
     limitImage_anon: '٣ جارت بەخۆڕایی وێنە ڕوونکردوەتەوە ئەمڕۆ. ئەکاونت دروست بکە بۆ ١٠ جار.',
     limitText_anon: '١٠ جارت بەخۆڕایی دەق ڕوونکردوەتەوە ئەمڕۆ. سبەی دەگەڕێیتەوە.',
@@ -86,7 +86,7 @@ const translations = {
     whatToDo: 'چه کاری انجام دهید',
     warning: '⚠️ هشدار',
     errorMsg: 'مشکلی پیش آمد. دوباره تلاش کنید.',
-    imageReady: 'تصویر آماده است — توضیح بده',
+    imageReady: 'برای توضیح ادامه بده',
     removeImage: '✕ حذف تصویر',
     limitImage_anon: 'امروز ۳ توضیح تصویر رایگان استفاده کردی. حساب رایگان بساز برای ۱۰ در روز.',
     limitText_anon: 'امروز ۱۰ توضیح متن رایگان استفاده کردی. فردا برگرد.',
@@ -112,7 +112,7 @@ const translations = {
     whatToDo: 'ماذا تفعل',
     warning: '⚠️ تحذير',
     errorMsg: 'حدث خطأ. حاول مرة أخرى.',
-    imageReady: 'الصورة جاهزة — اشرح',
+    imageReady: 'اضغط للشرح',
     removeImage: '✕ إزالة الصورة',
     limitImage_anon: 'استخدمت ٣ شروحات صور مجانية اليوم. أنشئ حساباً مجانياً للحصول على ١٠ يومياً.',
     limitText_anon: 'استخدمت ١٠ شروحات نص مجانية اليوم. ارجع غداً.',
@@ -159,8 +159,6 @@ export default function DocumentExplainerPage() {
 
   const imageLimit = userId ? 10 : 3
   const textLimit = 10
-  const imageLeft = Math.max(0, imageLimit - imageUsed)
-  const textLeft = Math.max(0, textLimit - textUsed)
 
   useEffect(() => {
     const stored = localStorage.getItem('komek_lang')
@@ -354,40 +352,47 @@ export default function DocumentExplainerPage() {
                 style={{ width: '100%', minHeight: 160, border: `1.5px solid ${SOFT}`, borderRadius: 12, padding: 14, fontFamily: 'Nunito, sans-serif', fontSize: 14, color: INDIGO_DARK, resize: 'vertical', outline: 'none', background: BG, boxSizing: 'border-box', direction: 'ltr' }} />
             ) : (
               <div>
-                <div
-                  onDragOver={e => { e.preventDefault(); setDragOver(true) }}
-                  onDragLeave={() => setDragOver(false)}
-                  onDrop={e => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]) }}
-                  style={{ border: `2px dashed ${dragOver ? INDIGO : imageData ? MINT : SOFT}`, borderRadius: 14, padding: '32px 20px', textAlign: 'center', background: dragOver ? SOFT : imageData ? '#F0FDF4' : BG, transition: 'all 0.2s', cursor: 'pointer' }}
-                  onClick={() => fileRef.current?.click()}
-                >
-                  {imageData ? (
-                    <div>
-                      <div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>
-                      <p style={{ color: '#059669', fontSize: 13, fontWeight: 700, margin: '0 0 4px' }}>{imageName}</p>
-                      <p style={{ color: '#6B7280', fontSize: 12, margin: 0 }}>{t.imageReady}</p>
-                    </div>
-                  ) : (
-                    <div>
-                      <div style={{ fontSize: 32, marginBottom: 8 }}>📎</div>
-                      <p style={{ color: '#6B7280', fontSize: 13, margin: '0 0 12px' }}>
-                        {t.dragDrop} <span style={{ color: INDIGO, fontWeight: 700 }}>{t.browse}</span>
-                      </p>
-                      <button onClick={e => { e.stopPropagation(); cameraRef.current?.click() }}
-                        style={{ background: SOFT, color: INDIGO, border: 'none', borderRadius: 10, padding: '10px 20px', fontFamily: 'Nunito, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
-                        {t.camera}
+                {imageData ? (
+                  /* ── IMAGE PREVIEW ── */
+                  <div style={{ borderRadius: 14, overflow: 'hidden', border: `2px solid ${MINT}`, background: '#F0FDF4' }}>
+                    <img
+                      src={`data:image/jpeg;base64,${imageData}`}
+                      alt={imageName}
+                      style={{ width: '100%', maxHeight: 320, objectFit: 'contain', display: 'block' }}
+                    />
+                    <div style={{ padding: '10px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div>
+                        <p style={{ color: '#059669', fontSize: 13, fontWeight: 700, margin: '0 0 2px' }}>{imageName}</p>
+                        <p style={{ color: '#6B7280', fontSize: 12, margin: 0 }}>{t.imageReady}</p>
+                      </div>
+                      <button
+                        onClick={() => { setImageData(null); setImageType(null); setImageName(null) }}
+                        style={{ background: 'none', border: 'none', color: '#9CA3AF', fontSize: 12, cursor: 'pointer', fontFamily: 'Nunito, sans-serif', flexShrink: 0 }}>
+                        {t.removeImage}
                       </button>
                     </div>
-                  )}
-                  <input ref={fileRef} type="file" accept="image/*,.txt" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
-                  <input ref={cameraRef} type="file" accept="image/*" capture="environment" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
-                </div>
-                {imageData && (
-                  <button onClick={() => { setImageData(null); setImageType(null); setImageName(null) }}
-                    style={{ marginTop: 8, background: 'none', border: 'none', color: '#9CA3AF', fontSize: 12, cursor: 'pointer', fontFamily: 'Nunito, sans-serif' }}>
-                    {t.removeImage}
-                  </button>
+                  </div>
+                ) : (
+                  /* ── DROP ZONE ── */
+                  <div
+                    onDragOver={e => { e.preventDefault(); setDragOver(true) }}
+                    onDragLeave={() => setDragOver(false)}
+                    onDrop={e => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]) }}
+                    style={{ border: `2px dashed ${dragOver ? INDIGO : SOFT}`, borderRadius: 14, padding: '32px 20px', textAlign: 'center', background: dragOver ? SOFT : BG, transition: 'all 0.2s', cursor: 'pointer' }}
+                    onClick={() => fileRef.current?.click()}
+                  >
+                    <div style={{ fontSize: 32, marginBottom: 8 }}>📎</div>
+                    <p style={{ color: '#6B7280', fontSize: 13, margin: '0 0 12px' }}>
+                      {t.dragDrop} <span style={{ color: INDIGO, fontWeight: 700 }}>{t.browse}</span>
+                    </p>
+                    <button onClick={e => { e.stopPropagation(); cameraRef.current?.click() }}
+                      style={{ background: SOFT, color: INDIGO, border: 'none', borderRadius: 10, padding: '10px 20px', fontFamily: 'Nunito, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+                      {t.camera}
+                    </button>
+                  </div>
                 )}
+                <input ref={fileRef} type="file" accept="image/*,.txt" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
+                <input ref={cameraRef} type="file" accept="image/*" capture="environment" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
               </div>
             )}
 
