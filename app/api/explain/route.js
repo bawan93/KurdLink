@@ -106,7 +106,7 @@ export async function POST(req) {
       },
       body: JSON.stringify({
   model: imageData ? "claude-sonnet-4-6" : "claude-haiku-4-5-20251001",
-  max_tokens: 600,
+  max_tokens: 1200,
   system: systemPrompt,
   messages
 })
