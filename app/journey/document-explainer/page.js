@@ -40,11 +40,8 @@ const translations = {
     limitText_anon: "You've used your 10 free text explanations today. Come back tomorrow.",
     limitImage_account: "You've used your 10 image explanations today. Come back tomorrow.",
     createAccount: 'Create Free Account',
-    usesLeft: 'uses left today',
-    of: 'of',
-    imagesAccount: '🖼 Images (account)',
-    imagesFree: '🖼 Images (free)',
-    unlimitedText: '✉️ Unlimited text',
+    imagesLeft: 'images left',
+    resetsIn: 'Resets in',
   },
   ku: {
     heroTitle: 'لە نامەکەت تێبگە',
@@ -69,11 +66,8 @@ const translations = {
     limitText_anon: '١٠ جارت بەخۆڕایی دەق ڕوونکردوەتەوە ئەمڕۆ. سبەی دەگەڕێیتەوە.',
     limitImage_account: '١٠ جارت وێنە ڕوونکردوەتەوە ئەمڕۆ. سبەی دەگەڕێیتەوە.',
     createAccount: 'ئەکاونتی خۆڕای دروست بکە',
-    usesLeft: 'جار ئەمڕۆ ماوە',
-    of: 'لە',
-    imagesAccount: '🖼 وێنەکان (ئەکاونت)',
-    imagesFree: '🖼 وێنەکان (خۆڕایی)',
-    unlimitedText: '✉️ نووسینی نامحدود',
+    imagesLeft: 'وێنە ماوە',
+    resetsIn: 'نوێ دەبێتەوە لە',
   },
   fa: {
     heroTitle: 'نامه‌ات را بفهم',
@@ -98,11 +92,8 @@ const translations = {
     limitText_anon: 'امروز ۱۰ توضیح متن رایگان استفاده کردی. فردا برگرد.',
     limitImage_account: 'امروز ۱۰ توضیح تصویر استفاده کردی. فردا برگرد.',
     createAccount: 'ایجاد حساب رایگان',
-    usesLeft: 'باقی مانده امروز',
-    of: 'از',
-    imagesAccount: '🖼 تصاویر (حساب)',
-    imagesFree: '🖼 تصاویر (رایگان)',
-    unlimitedText: '✉️ متن نامحدود',
+    imagesLeft: 'تصویر باقی مانده',
+    resetsIn: 'بازنشینی در',
   },
   ar: {
     heroTitle: 'افهم رسالتك',
@@ -127,11 +118,8 @@ const translations = {
     limitText_anon: 'استخدمت ١٠ شروحات نص مجانية اليوم. ارجع غداً.',
     limitImage_account: 'استخدمت ١٠ شروحات صور اليوم. ارجع غداً.',
     createAccount: 'إنشاء حساب مجاني',
-    usesLeft: 'متبقية اليوم',
-    of: 'من',
-    imagesAccount: '🖼 الصور (حساب)',
-    imagesFree: '🖼 الصور (مجاني)',
-    unlimitedText: '✉️ نص غير محدود',
+    imagesLeft: 'صور متبقية',
+    resetsIn: 'يتجدد في',
   },
 }
 
@@ -145,6 +133,38 @@ async function fetchUsageCount(identifier, identifierType, inputType) {
     .eq('input_type', inputType)
     .gte('created_at', since)
   return count || 0
+}
+
+async function fetchOldestUsage(identifier, identifierType, inputType) {
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+  const { data } = await supabase
+    .from('explainer_usage')
+    .select('created_at')
+    .eq('identifier', identifier)
+    .eq('identifier_type', identifierType)
+    .eq('input_type', inputType)
+    .gte('created_at', since)
+    .order('created_at', { ascending: true })
+    .limit(1)
+  return data?.[0]?.created_at || null
+}
+
+function useCountdown(resetAt) {
+  const [timeLeft, setTimeLeft] = useState('')
+  useEffect(() => {
+    if (!resetAt) { setTimeLeft(''); return }
+    const update = () => {
+      const diff = new Date(resetAt).getTime() + 24 * 60 * 60 * 1000 - Date.now()
+      if (diff <= 0) { setTimeLeft(''); return }
+      const h = Math.floor(diff / 3600000)
+      const m = Math.floor((diff % 3600000) / 60000)
+      setTimeLeft(`${h}h ${m}m`)
+    }
+    update()
+    const id = setInterval(update, 30000)
+    return () => clearInterval(id)
+  }, [resetAt])
+  return timeLeft
 }
 
 export default function DocumentExplainerPage() {
@@ -163,14 +183,14 @@ export default function DocumentExplainerPage() {
   const [userIp, setUserIp] = useState(null)
   const [dragOver, setDragOver] = useState(false)
   const [imageUsed, setImageUsed] = useState(0)
-  const [textUsed, setTextUsed] = useState(0)
+  const [oldestImageUsage, setOldestImageUsage] = useState(null)
   const fileRef = useRef(null)
   const cameraRef = useRef(null)
   const t = translations[lang] || translations.en
   const canSubmit = tab === 'paste' ? text.trim().length > 0 : imageData !== null
-
   const imageLimit = userId ? 10 : 3
-  const textLimit = 10
+  const imageLeft = Math.max(0, imageLimit - imageUsed)
+  const countdown = useCountdown(imageUsed > 0 ? oldestImageUsage : null)
 
   useEffect(() => {
     const stored = localStorage.getItem('komek_lang')
@@ -188,15 +208,21 @@ export default function DocumentExplainerPage() {
           const d = await res.json()
           setUserIp(d.ip)
           const imgCount = await fetchUsageCount(d.ip, 'ip', 'image')
-          const txtCount = await fetchUsageCount(d.ip, 'ip', 'text')
           setImageUsed(imgCount)
-          setTextUsed(txtCount)
+          if (imgCount > 0) {
+            const oldest = await fetchOldestUsage(d.ip, 'ip', 'image')
+            setOldestImageUsage(oldest)
+          }
         } catch {
           // IP fetch failed, continue without
         }
       } else {
         const imgCount = await fetchUsageCount(uid, 'user', 'image')
         setImageUsed(imgCount)
+        if (imgCount > 0) {
+          const oldest = await fetchOldestUsage(uid, 'user', 'image')
+          setOldestImageUsage(oldest)
+        }
       }
     })
 
@@ -204,14 +230,14 @@ export default function DocumentExplainerPage() {
   }, [])
 
   async function refreshUsage() {
-    if (userId) {
-      const imgCount = await fetchUsageCount(userId, 'user', 'image')
-      setImageUsed(imgCount)
-    } else if (userIp) {
-      const imgCount = await fetchUsageCount(userIp, 'ip', 'image')
-      const txtCount = await fetchUsageCount(userIp, 'ip', 'text')
-      setImageUsed(imgCount)
-      setTextUsed(txtCount)
+    const identifier = userId || userIp
+    const identifierType = userId ? 'user' : 'ip'
+    if (!identifier) return
+    const imgCount = await fetchUsageCount(identifier, identifierType, 'image')
+    setImageUsed(imgCount)
+    if (imgCount > 0) {
+      const oldest = await fetchOldestUsage(identifier, identifierType, 'image')
+      setOldestImageUsage(oldest)
     }
   }
 
@@ -300,22 +326,7 @@ export default function DocumentExplainerPage() {
     )
   }
 
-  const UsageBar = ({ used, limit, label }) => {
-    const left = Math.max(0, limit - used)
-    const pct = Math.min(100, (used / limit) * 100)
-    const barColor = pct >= 100 ? '#EF4444' : pct >= 66 ? '#F59E0B' : MINT
-    return (
-      <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '8px 12px', minWidth: 120 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
-          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>{label}</span>
-          <span style={{ fontSize: 11, color: 'white', fontWeight: 900 }}>{left} {t.usesLeft}</span>
-        </div>
-        <div style={{ height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.15)', overflow: 'hidden' }}>
-          <div style={{ height: '100%', width: `${pct}%`, borderRadius: 2, background: barColor, transition: 'width 0.4s ease' }} />
-        </div>
-      </div>
-    )
-  }
+  const barColor = imageLeft === 0 ? '#EF4444' : imageLeft === 1 ? '#F59E0B' : MINT
 
   return (
     <div style={{ fontFamily: 'Nunito, sans-serif', background: BG, minHeight: '100vh', paddingBottom: 80, direction: 'ltr' }}>
@@ -326,19 +337,14 @@ export default function DocumentExplainerPage() {
         <p style={{ color: INDIGO_LIGHT, fontSize: 14, fontWeight: 500, margin: '0 0 20px', maxWidth: 320, marginLeft: 'auto', marginRight: 'auto' }}>{t.heroSub}</p>
 
         {tab === 'upload' && (
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 10, flexWrap: 'wrap' }}>
-            <UsageBar
-              used={imageUsed}
-              limit={imageLimit}
-              label={userId ? t.imagesAccount : t.imagesFree}
-            />
-          </div>
-        )}
-        {tab === 'upload' && userId && (
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 6 }}>
-            <div style={{ background: 'rgba(52,211,153,0.2)', borderRadius: 12, padding: '8px 14px', display: 'flex', alignItems: 'center' }}>
-              <span style={{ fontSize: 11, color: MINT, fontWeight: 700 }}>{t.unlimitedText}</span>
+          <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.1)', borderRadius: 14, padding: '12px 20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 22, fontWeight: 900, color: barColor }}>{imageLeft}</span>
+              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', fontWeight: 600 }}>{t.imagesLeft}</span>
             </div>
+            {countdown ? (
+              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>{t.resetsIn} {countdown}</span>
+            ) : null}
           </div>
         )}
       </div>
@@ -362,7 +368,6 @@ export default function DocumentExplainerPage() {
             ) : (
               <div>
                 {imageData ? (
-                  /* ── IMAGE PREVIEW ── */
                   <div style={{ borderRadius: 14, overflow: 'hidden', border: `2px solid ${MINT}`, background: '#F0FDF4' }}>
                     <img
                       src={`data:image/jpeg;base64,${imageData}`}
@@ -382,7 +387,6 @@ export default function DocumentExplainerPage() {
                     </div>
                   </div>
                 ) : (
-                  /* ── DROP ZONE ── */
                   <div
                     onDragOver={e => { e.preventDefault(); setDragOver(true) }}
                     onDragLeave={() => setDragOver(false)}
