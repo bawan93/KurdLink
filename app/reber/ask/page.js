@@ -25,9 +25,9 @@ export default function AskPage() {
   const [voted, setVoted] = useState({})
   const [adminAnswer, setAdminAnswer] = useState({})
   const [answerPosting, setAnswerPosting] = useState({})
+  const [deleting, setDeleting] = useState({})
   const [user, setUser] = useState(null)
   const t = (TX[lang] || TX.en).ask
-  const isRTL = ['ku', 'fa', 'ar'].includes(lang)
 
   useEffect(() => {
     const stored = localStorage.getItem('komek_lang')
@@ -73,8 +73,16 @@ export default function AskPage() {
     fetchQuestions()
   }
 
+  async function handleDelete(q) {
+    if (!window.confirm('Delete this question?')) return
+    setDeleting(v => ({ ...v, [q.id]: true }))
+    await supabase.from('questions').delete().eq('id', q.id)
+    fetchQuestions()
+    setDeleting(v => ({ ...v, [q.id]: false }))
+  }
+
   return (
-    <div style={{ fontFamily: 'Nunito, sans-serif', background: BG, minHeight: '100vh', paddingBottom: 80, direction: isRTL ? 'rtl' : 'ltr' }}>
+    <div style={{ fontFamily: 'Nunito, sans-serif', background: BG, minHeight: '100vh', paddingBottom: 80, direction: 'ltr' }}>
       <div style={{ background: `linear-gradient(135deg, ${INDIGO_DARK} 0%, #2D2A7A 100%)`, padding: '40px 20px 48px', textAlign: 'center' }}>
         <div style={{ fontSize: 44, marginBottom: 12 }}>❓</div>
         <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 900, margin: '0 0 10px' }}>{t.heroTitle}</h1>
@@ -105,11 +113,22 @@ export default function AskPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {questions.map(q => (
               <div key={q.id} style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px rgba(79,70,229,0.07)', overflow: 'hidden' }}>
-                <div style={{ background: q.status === 'answered' ? '#F0FDF4' : SOFT, padding: '6px 16px', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <div style={{ width: 7, height: 7, borderRadius: '50%', background: q.status === 'answered' ? MINT : INDIGO_LIGHT }} />
-                  <span style={{ fontSize: 11, fontWeight: 800, color: q.status === 'answered' ? '#059669' : INDIGO, textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                    {q.status === 'answered' ? t.answered : t.awaiting}
-                  </span>
+                <div style={{ background: q.status === 'answered' ? '#F0FDF4' : SOFT, padding: '6px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{ width: 7, height: 7, borderRadius: '50%', background: q.status === 'answered' ? MINT : INDIGO_LIGHT }} />
+                    <span style={{ fontSize: 11, fontWeight: 800, color: q.status === 'answered' ? '#059669' : INDIGO, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                      {q.status === 'answered' ? t.answered : t.awaiting}
+                    </span>
+                  </div>
+                  {user?.email === ADMIN_EMAIL && (
+                    <button
+                      onClick={() => handleDelete(q)}
+                      disabled={deleting[q.id]}
+                      style={{ background: 'none', border: 'none', color: '#EF4444', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Nunito, sans-serif', padding: '2px 6px' }}
+                    >
+                      {deleting[q.id] ? '…' : '🗑 Delete'}
+                    </button>
+                  )}
                 </div>
                 <div style={{ padding: '14px 16px' }}>
                   <p style={{ fontSize: 15, fontWeight: 700, color: INDIGO_DARK, margin: '0 0 10px', lineHeight: 1.4 }}>{q.question}</p>
