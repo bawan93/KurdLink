@@ -7,10 +7,10 @@ const INDIGO_LIGHT = '#818CF8'
 const FONT = "'Nunito', 'Plus Jakarta Sans', sans-serif"
 
 const TX = {
-  en: { home: 'Home', post: 'Post', account: 'Account' },
-  ku: { home: 'سەرەکی', post: 'پۆست', account: 'ئەکاونت' },
-  fa: { home: 'خانه', post: 'پست', account: 'حساب' },
-  ar: { home: 'الرئيسية', post: 'نشر', account: 'حسابي' },
+  en: { home: 'Komek', post: 'Post', account: 'Account' },
+  ku: { home: 'کۆمەک', post: 'بڵاوکردنەوە', account: 'ئەکاونت' },
+  fa: { home: 'کومک', post: 'ارسال', account: 'حساب' },
+  ar: { home: 'كومك', post: 'نشر', account: 'حسابي' },
 }
 
 export default function BottomNav() {
@@ -41,12 +41,24 @@ export default function BottomNav() {
       boxShadow: '0 -4px 24px rgba(79,70,229,0.08)',
       direction: 'ltr',
     }}>
-      {/* Home */}
+      {/* Komek / Home */}
       <button onClick={() => router.push('/home')} style={{ flex: 1, padding: '10px 0 8px', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, fontFamily: FONT }}>
         <div style={{ width: 28, height: 28, borderRadius: 8, background: isHome ? '#EDE9FE' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M3 9.5L12 3L21 9.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z" stroke={isHome ? INDIGO : '#9CA3AF'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M9 21V12h6v9" stroke={isHome ? INDIGO : '#9CA3AF'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <svg width="18" height="18" viewBox="0 0 100 100">
+            <defs>
+              <linearGradient id="bnsbg" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor={isHome ? INDIGO : '#9CA3AF'} />
+                <stop offset="100%" stopColor={isHome ? INDIGO_LIGHT : '#9CA3AF'} />
+              </linearGradient>
+              <linearGradient id="bnsl" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor={isHome ? '#059669' : '#9CA3AF'} />
+                <stop offset="100%" stopColor={isHome ? '#6EE7B7' : '#9CA3AF'} />
+              </linearGradient>
+            </defs>
+            <circle cx="50" cy="50" r="46" fill="url(#bnsbg)" />
+            <path d="M 50 76 L 50 45" stroke="white" strokeWidth="7" strokeLinecap="round" fill="none" />
+            <path d="M 50 60 Q 26 55 22 34 Q 44 28 52 56 Z" fill="url(#bnsl)" />
+            <path d="M 50 50 Q 72 44 76 23 Q 56 17 48 46 Z" fill="url(#bnsl)" opacity="0.85" />
           </svg>
         </div>
         <span style={{ fontSize: 10, fontWeight: 800, color: isHome ? INDIGO : '#9CA3AF' }}>{t.home}</span>
