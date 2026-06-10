@@ -343,7 +343,7 @@ export default function DocumentExplainerPage() {
               <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', fontWeight: 600 }}>{t.imagesLeft}</span>
             </div>
             {countdown ? (
-              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>{t.resetsIn} {countdown}</span>
+              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 600, whiteSpace: 'nowrap' }}>{t.resetsIn} {countdown}</span>
             ) : null}
           </div>
         )}
