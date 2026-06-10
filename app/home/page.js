@@ -219,6 +219,8 @@ export default function HomePage() {
   }, [])
 
   const t = TX[lang] || TX.en
+  const isRtl = ['ku', 'fa', 'ar'].includes(lang)
+  const ta = isRtl ? 'right' : 'left'
 
   return (
     <div style={{ fontFamily: FONT, background: BG, minHeight: '100vh', paddingBottom: 90, direction: 'ltr' }}>
@@ -232,7 +234,7 @@ export default function HomePage() {
             <SproutLogo size={48} />
             <span style={{ fontSize: 36, fontWeight: 900, color: '#fff', letterSpacing: -1 }}>Komek</span>
           </div>
-          <p style={{ color: '#a5b4fc', fontSize: 15, margin: '0 0 20px', lineHeight: 1.6, maxWidth: 340, marginLeft: 'auto', marginRight: 'auto' }}>{t.heroSub}</p>
+          <p style={{ color: '#a5b4fc', fontSize: 15, margin: '0 0 20px', lineHeight: 1.6, maxWidth: 340, marginLeft: 'auto', marginRight: 'auto', textAlign: 'center' }}>{t.heroSub}</p>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: `${MINT}22`, border: `1px solid ${MINT}44`, borderRadius: 20, padding: '6px 16px' }}>
             <div style={{ width: 8, height: 8, borderRadius: '50%', background: MINT }} />
             <span style={{ fontSize: 13, fontWeight: 800, color: MINT }}>{t.tagline}</span>
@@ -242,25 +244,27 @@ export default function HomePage() {
 
       {/* FEATURES */}
       <div style={{ padding: '24px 16px 0', maxWidth: 520, margin: '0 auto' }}>
-        <p style={{ fontSize: 13, fontWeight: 700, color: '#6b7280', textAlign: 'center', margin: '0 0 20px', lineHeight: 1.5 }}>{t.featuresTitle}</p>
+        <p style={{ fontSize: 13, fontWeight: 700, color: '#6b7280', textAlign: ta, margin: '0 0 20px', lineHeight: 1.5 }}>{t.featuresTitle}</p>
 
         {t.features.map((f, i) => (
           <div key={i}
             onClick={() => router.push(f.route)}
-            style={{ background: '#fff', borderRadius: 20, marginBottom: 14, padding: '20px', border: `1px solid ${SOFT}`, boxShadow: '0 2px 12px rgba(79,70,229,0.06)', cursor: 'pointer', display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+            style={{ background: '#fff', borderRadius: 20, marginBottom: 14, padding: '20px', border: `1px solid ${SOFT}`, boxShadow: '0 2px 12px rgba(79,70,229,0.06)', cursor: 'pointer', display: 'flex', flexDirection: isRtl ? 'row-reverse' : 'row', gap: 16, alignItems: 'flex-start' }}>
             <div style={{ width: 52, height: 52, borderRadius: 16, background: SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, flexShrink: 0 }}>{f.icon}</div>
             <div style={{ flex: 1 }}>
-              <h3 style={{ fontSize: 15, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 6px' }}>{f.title}</h3>
-              <p style={{ fontSize: 13, color: '#6b7280', margin: '0 0 12px', lineHeight: 1.6 }}>{f.desc}</p>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: INDIGO, borderRadius: 10, padding: '7px 14px' }}>
-                <span style={{ fontSize: 12, fontWeight: 800, color: '#fff' }}>{f.cta} →</span>
+              <h3 style={{ fontSize: 15, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 6px', textAlign: ta }}>{f.title}</h3>
+              <p style={{ fontSize: 13, color: '#6b7280', margin: '0 0 12px', lineHeight: 1.6, textAlign: ta }}>{f.desc}</p>
+              <div style={{ display: 'flex', justifyContent: isRtl ? 'flex-end' : 'flex-start' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: INDIGO, borderRadius: 10, padding: '7px 14px' }}>
+                  <span style={{ fontSize: 12, fontWeight: 800, color: '#fff' }}>{f.cta} {isRtl ? '←' : '→'}</span>
+                </div>
               </div>
             </div>
           </div>
         ))}
 
         {/* FOOTER LINE */}
-        <div style={{ textAlign: 'center', padding: '8px 0 16px' }}>
+        <div style={{ textAlign: ta, padding: '8px 0 16px' }}>
           <span style={{ fontSize: 13, fontWeight: 800, color: INDIGO_LIGHT }}>{t.footer}</span>
         </div>
       </div>
