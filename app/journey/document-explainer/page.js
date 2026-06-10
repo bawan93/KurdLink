@@ -49,11 +49,11 @@ const translations = {
     tab_paste: 'نووسین پەیست بکە',
     tab_upload: 'وێنە ئەپلۆد / وێنە گرتن',
     placeholder: 'ئیمەیڵ، نامەی تەلەفۆنی یان هەر نووسینێک...',
-    dragDrop: 'وێنەی نامەکە بخە یان',
-    browse: 'گەڕان',
-    camera: '📷 وێنە بکە',
+    dragDrop: 'وێنە ئەپلۆد بکە',
+    browse: '',
+    camera: '📷 وێنە بگرە',
     btn: 'نامەکە ڕوون بکەرەوە',
-    explaining: 'ڕوونکردنەوە...',
+    explaining: 'تکایە چاوەڕێ بکە...',
     letterType: 'جۆری نامە',
     summary: 'کورتە',
     deadlines: 'ماوەکان',
@@ -417,8 +417,14 @@ export default function DocumentExplainerPage() {
 
             {!limitType && (
               <button onClick={handleExplain} disabled={loading || !canSubmit}
-                style={{ width: '100%', marginTop: 16, padding: '15px', background: !canSubmit ? '#E5E7EB' : INDIGO, color: !canSubmit ? '#9CA3AF' : '#fff', border: 'none', borderRadius: 14, fontFamily: 'Nunito, sans-serif', fontSize: 16, fontWeight: 800, cursor: !canSubmit ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}>
-                {loading ? t.explaining : t.btn}
+                style={{ width: '100%', marginTop: 16, padding: '15px', background: !canSubmit ? '#E5E7EB' : INDIGO, color: !canSubmit ? '#9CA3AF' : '#fff', border: 'none', borderRadius: 14, fontFamily: 'Nunito, sans-serif', fontSize: 16, fontWeight: 800, cursor: !canSubmit ? 'not-allowed' : 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+                {loading ? (
+                  <>
+                    <span style={{ display: 'inline-block', width: 18, height: 18, border: '2.5px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+                    {t.explaining}
+                  </>
+                ) : t.btn}
+                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
               </button>
             )}
           </div>
