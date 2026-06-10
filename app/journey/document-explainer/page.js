@@ -337,7 +337,7 @@ export default function DocumentExplainerPage() {
         <p style={{ color: INDIGO_LIGHT, fontSize: 14, fontWeight: 500, margin: '0 0 20px', maxWidth: 320, marginLeft: 'auto', marginRight: 'auto' }}>{t.heroSub}</p>
 
         {tab === 'upload' && (
-          <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.1)', borderRadius: 14, padding: '12px 20px' }}>
+          <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.1)', borderRadius: 14, padding: '12px 20px', whiteSpace: 'nowrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ fontSize: 22, fontWeight: 900, color: barColor }}>{imageLeft}</span>
               <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', fontWeight: 600 }}>{t.imagesLeft}</span>
