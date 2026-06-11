@@ -10,128 +10,62 @@ const SOFT = '#EDE9FE'
 const BG = '#F5F4FF'
 const FONT = "'Nunito', sans-serif"
 
+const ARABIC_NUMS = ['١', '٢', '٣']
+
 const TX = {
   en: {
     heroTitle: "Your Journey in the UK",
     heroSub: "A step-by-step guide from arrival to citizenship — in your language, at your pace.",
-    quizTitle: "Not sure where you are?",
-    quizSub: "Answer 3 quick questions and we'll find your stage.",
-    startQuiz: "Find My Stage",
     allStages: "All Stages",
     letterBanner: "Got a letter from the Home Office?",
     letterCta: "Explain it free",
-    goToStage: "Go to my stage →",
-    retake: "Retake quiz",
     stages: [
       { step: "Stage 1", title: "Just Arrived", badge: "Start here", badgeColor: MINT, desc: "You've just arrived in the UK and don't know what happens next.", preview: ["What happens when you first arrive", "Where they will put you", "What to do in your first week"], cta: "View Stage 1", route: "/reber/new-to-uk" },
       { step: "Stage 2", title: "Leave to Remain", badge: "Most common", badgeColor: INDIGO_LIGHT, desc: "Your asylum claim is being processed and you are waiting for a decision.", preview: ["The 42-day deadline", "Your Biometric Residence Permit", "Your new rights"], cta: "View Stage 2", route: "/reber/leave-to-remain" },
       { step: "Stage 3", title: "Path to Citizenship", badge: "Final stage", badgeColor: "#F59E0B", desc: "You have status. Now build your future and work toward citizenship.", preview: ["Indefinite Leave to Remain", "Life in the UK test", "British citizenship"], cta: "View Stage 3", route: "/reber/citizenship" },
     ],
-    quiz: [
-      {
-        q: "Have you received a decision on your asylum case?",
-        options: ["No, still waiting", "Yes — I was granted Leave to Remain", "Yes — I was refused"]
-      },
-      {
-        q: "Have you had Leave to Remain for 5 or more years?",
-        options: ["No, less than 5 years", "Yes, 5 years or more"]
-      },
-    ],
-    quizResult: ["You are at Stage 1 — Just Arrived", "You are at Stage 2 — Leave to Remain", "You are at Stage 3 — Path to Citizenship"],
   },
   ku: {
     heroTitle: "گەشتەکەت لە بەریتانیا",
-    heroSub: "ڕێنمایی هەنگاو بە هەنگاو لە گەیشتن تا هاووڵاتیبوون — بە زمانی خۆت.",
-    quizTitle: "دڵنیا نیت لە کوێیت؟",
-    quizSub: "وەڵامی 3 پرسیاری خێرا بدەرەوە و قۆناغەکەت دەدۆزینەوە.",
-    startQuiz: "قۆناغی من بدۆزەرەوە",
-    allStages: "هەموو قۆناغەکان",
+    heroSub: "ڕێنمایی هەنگاو بە هەنگاو لە گەیشتن تا هاووڵاتیبوون.",
+    allStages: "قۆناغەکان",
     letterBanner: "نامەیەکت لە هۆم ئۆفیس وەرگرتووە؟",
     letterCta: "بەخۆڕایی ڕوونی بکەرەوە",
-    goToStage: "بڕۆ بۆ قۆناغی من ←",
-    retake: "دووبارە ئەنجامدانی کویزەکە",
     stages: [
       { step: "قۆناغی یەکەم", title: "تۆ تازە گەیشتووی؟", badge: "لێرەوە دەست پێ بکە", badgeColor: MINT, desc: "تازە گەیشتووی بە بەریتانیا و هەنگاوەکانی داهاتوو نازانیت.", preview: ["چی ڕوودەدات کاتێک تۆ تازە گەیشتووی؟", "لە کوێ نیشتەجێ دەکرێیت", "لیستی پشکنینی هەفتەی یەکەم"], cta: "بینینی قۆناغی یەکەم", route: "/reber/new-to-uk" },
       { step: "قۆناغی دووەم", title: "پاسپۆرتەکەت وەرگرتووە", badge: "زۆرترین باو", badgeColor: INDIGO_LIGHT, desc: "داواکاری مافی پەنابەریت جێبەجێ دەکرێت و چاوەڕێی بڕیار دەکەیت.", preview: ["42 ڕۆژ حیساب بکە", "مۆڵەتی مانەوەی بایۆمەتری", "مافە نوێیەکانت"], cta: "بینینی قۆناغی دووەم", route: "/reber/leave-to-remain" },
       { step: "قۆناغی سێیەم", title: "ڕێگای هاوڵاتیبوون", badge: "قۆناغی کۆتایی", badgeColor: "#F59E0B", desc: "پێگەی پەنابەریت پێدراوە. ئێستا داهاتووت بنیاد بنێ.", preview: ["مانەوەی نادیار", "تاقیکردنەوەی ژیان لە بەریتانیا", "هاووڵاتیبوونی بریتانی"], cta: "بینینی قۆناغی سێیەم", route: "/reber/citizenship" },
     ],
-    quiz: [
-      {
-        q: "ئایا بڕیارێک لەسەر کەیسی پەنابەریت وەرگرتووە؟",
-        options: ["نەخێر، هێشتا چاوەڕێم", "بەڵێ — مۆڵەتی مانەوەم پێدراوە", "بەڵێ — دۆسیەکەم ڕەتکرایەوە"]
-      },
-      {
-        q: "ئایا ٥ ساڵ یان زیاتر مۆڵەتی مانەوەت هەیە؟",
-        options: ["نەخێر، کەمتر لە ٥ ساڵ", "بەڵێ، ٥ ساڵ یان زیاتر"]
-      },
-    ],
-    quizResult: ["تۆ لە قۆناغی یەکەمدایت — تازە گەیشتووی", "تۆ لە قۆناغی دووەمدایت — پاسپۆرتەکەت وەرگرتووە", "تۆ لە قۆناغی سێیەمدایت — ڕێگای هاوڵاتیبوون"],
   },
   fa: {
     heroTitle: "مسیر تو در بریتانیا",
     heroSub: "راهنمای گام به گام از ورود تا شهروندی — به زبانت، با سرعت خودت.",
-    quizTitle: "مطمئن نیستی کجا هستی؟",
-    quizSub: "۳ سوال کوتاه را جواب بده تا مرحله‌ات را پیدا کنیم.",
-    startQuiz: "مرحله‌ام را پیدا کن",
     allStages: "همه مراحل",
     letterBanner: "نامه‌ای از Home Office داری؟",
     letterCta: "رایگان توضیح بده",
-    goToStage: "برو به مرحله‌ام ←",
-    retake: "دوباره امتحان کن",
     stages: [
       { step: "مرحله ۱", title: "تازه رسیدی", badge: "از اینجا شروع کن", badgeColor: MINT, desc: "تازه به بریتانیا رسیدی و نمی‌دانی چه اتفاقی می‌افتد.", preview: ["چه اتفاقی در مرز می‌افتد", "کجا اسکان می‌یابی", "چک‌لیست هفته اول"], cta: "مرحله ۱ را ببین", route: "/reber/new-to-uk" },
       { step: "مرحله ۲", title: "اجازه اقامت", badge: "رایج‌ترین", badgeColor: INDIGO_LIGHT, desc: "درخواستت در حال بررسی است. منتظر تصمیم هستی.", preview: ["مهلت ۴۲ روزه", "کارت اقامت بیومتریک", "حقوق جدیدت"], cta: "مرحله ۲ را ببین", route: "/reber/leave-to-remain" },
       { step: "مرحله ۳", title: "مسیر شهروندی", badge: "مرحله آخر", badgeColor: "#F59E0B", desc: "وضعیتت تأیید شده. حالا آینده‌ات را بساز.", preview: ["اقامت دائم", "آزمون زندگی در UK", "شهروندی بریتانیا"], cta: "مرحله ۳ را ببین", route: "/reber/citizenship" },
     ],
-    quiz: [
-      {
-        q: "آیا تصمیمی درباره پرونده پناهندگی‌ات گرفته شده؟",
-        options: ["نه، هنوز منتظرم", "بله — اجازه اقامت گرفتم", "بله — رد شدم"]
-      },
-      {
-        q: "آیا ۵ سال یا بیشتر اجازه اقامت داری؟",
-        options: ["نه، کمتر از ۵ سال", "بله، ۵ سال یا بیشتر"]
-      },
-    ],
-    quizResult: ["در مرحله ۱ هستی — تازه رسیدی", "در مرحله ۲ هستی — اجازه اقامت", "در مرحله ۳ هستی — مسیر شهروندی"],
   },
   ar: {
     heroTitle: "رحلتك في المملكة المتحدة",
     heroSub: "دليل خطوة بخطوة من الوصول إلى الجنسية — بلغتك، بسرعتك.",
-    quizTitle: "لست متأكداً أين أنت؟",
-    quizSub: "أجب على ٣ أسئلة سريعة ونجد مرحلتك.",
-    startQuiz: "اعثر على مرحلتي",
     allStages: "كل المراحل",
     letterBanner: "لديك رسالة من Home Office؟",
     letterCta: "اشرحها مجاناً",
-    goToStage: "اذهب إلى مرحلتي ←",
-    retake: "أعد الاختبار",
     stages: [
       { step: "المرحلة ١", title: "وصلت للتو", badge: "ابدأ من هنا", badgeColor: MINT, desc: "وصلت للتو إلى المملكة المتحدة ولا تعرف ماذا سيحدث.", preview: ["ما يحدث عند الحدود", "أين ستقيم", "قائمة التحقق للأسبوع الأول"], cta: "عرض المرحلة ١", route: "/reber/new-to-uk" },
       { step: "المرحلة ٢", title: "إذن البقاء", badge: "الأكثر شيوعاً", badgeColor: INDIGO_LIGHT, desc: "طلبك قيد المعالجة. أنت تنتظر قراراً.", preview: ["الموعد النهائي ٤٢ يوماً", "بطاقة الإقامة البيومترية", "حقوقك الجديدة"], cta: "عرض المرحلة ٢", route: "/reber/leave-to-remain" },
       { step: "المرحلة ٣", title: "مسار الجنسية", badge: "المرحلة الأخيرة", badgeColor: "#F59E0B", desc: "تم منحك الوضع. الآن ابنِ مستقبلك.", preview: ["إقامة دائمة غير محددة", "اختبار الحياة في المملكة المتحدة", "الجنسية البريطانية"], cta: "عرض المرحلة ٣", route: "/reber/citizenship" },
     ],
-    quiz: [
-      {
-        q: "هل تلقيت قراراً بشأن قضية لجوئك؟",
-        options: ["لا، ما زلت أنتظر", "نعم — مُنحت إذن البقاء", "نعم — رُفض طلبي"]
-      },
-      {
-        q: "هل لديك إذن بقاء منذ ٥ سنوات أو أكثر؟",
-        options: ["لا، أقل من ٥ سنوات", "نعم، ٥ سنوات أو أكثر"]
-      },
-    ],
-    quizResult: ["أنت في المرحلة ١ — وصلت للتو", "أنت في المرحلة ٢ — إذن البقاء", "أنت في المرحلة ٣ — مسار الجنسية"],
   },
 }
 
 export default function ComingToUKPage() {
   const router = useRouter()
   const [lang, setLang] = useState('en')
-  const [showQuiz, setShowQuiz] = useState(false)
-  const [quizStep, setQuizStep] = useState(0)
-  const [quizAnswers, setQuizAnswers] = useState([])
-  const [quizDone, setQuizDone] = useState(false)
 
   useEffect(() => {
     const saved = localStorage.getItem('komek_lang')
@@ -142,40 +76,12 @@ export default function ComingToUKPage() {
   }, [])
 
   const t = TX[lang] || TX.en
-
-  const handleQuizAnswer = (answer) => {
-    const next = [...quizAnswers, answer]
-    // Q1: if still waiting or refused -> Stage 1 immediately, no Q2 needed
-    if (quizStep === 0) {
-      if (answer === t.quiz[0].options[0] || answer === t.quiz[0].options[2]) {
-        // Still waiting or refused -> Stage 1
-        setQuizAnswers(next)
-        setQuizDone(true)
-      } else {
-        // Granted -> ask Q2
-        setQuizAnswers(next)
-        setQuizStep(1)
-      }
-    } else {
-      // Q2: 5 years or more -> Stage 3, less than 5 -> Stage 2
-      setQuizAnswers(next)
-      setQuizDone(true)
-    }
-  }
-
-  const getQuizResult = () => {
-    // Q1: still waiting or refused -> Stage 1
-    if (quizAnswers[0] === t.quiz[0].options[0] || quizAnswers[0] === t.quiz[0].options[2]) return 0
-    // Q1: granted, Q2: 5+ years -> Stage 3
-    if (quizAnswers[1] === t.quiz[1].options[1]) return 2
-    // Q1: granted, Q2: less than 5 years -> Stage 2
-    return 1
-  }
-
-  const resetQuiz = () => { setShowQuiz(false); setQuizStep(0); setQuizAnswers([]); setQuizDone(false) }
+  const isRtlText = lang === 'ku' || lang === 'fa' || lang === 'ar'
+  const useArabicNums = lang === 'ku' || lang === 'fa' || lang === 'ar'
 
   return (
     <div style={{ minHeight: '100vh', background: BG, fontFamily: FONT, direction: 'ltr', paddingBottom: 80 }}>
+      {/* Hero */}
       <div style={{ background: `linear-gradient(135deg, ${INDIGO_DARK} 0%, #2d2b6b 60%, #3730a3 100%)`, padding: '36px 20px 44px', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: -60, right: -60, width: 200, height: 200, borderRadius: '50%', background: 'rgba(79,70,229,0.15)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', bottom: -30, left: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(52,211,153,0.08)', pointerEvents: 'none' }} />
@@ -184,74 +90,41 @@ export default function ComingToUKPage() {
             {[0,1,2].map(i => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: i===0?MINT:i===1?INDIGO_LIGHT:'#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, color: '#fff' }}>{i+1}</div>
+                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: i===0?MINT:i===1?INDIGO_LIGHT:'#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, color: '#fff' }}>
+                    {useArabicNums ? ARABIC_NUMS[i] : i + 1}
+                  </div>
                   <span style={{ color: 'rgba(255,255,255,0.65)', fontSize: 10, fontWeight: 600 }}>{t.stages[i].step}</span>
                 </div>
                 {i < 2 && <div style={{ width: 20, height: 2, background: 'rgba(255,255,255,0.2)', marginBottom: 14 }} />}
               </div>
             ))}
           </div>
-          <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 800, margin: '0 0 10px', lineHeight: 1.2 }}>{t.heroTitle}</h1>
-          <p style={{ color: '#a5b4fc', fontSize: 14, margin: 0, lineHeight: 1.6 }}>{t.heroSub}</p>
+          <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 800, margin: '0 0 10px', lineHeight: 1.2, textAlign: isRtlText ? 'right' : 'left' }}>{t.heroTitle}</h1>
+          <p style={{ color: '#a5b4fc', fontSize: 14, margin: 0, lineHeight: 1.6, textAlign: isRtlText ? 'right' : 'left' }}>{t.heroSub}</p>
         </div>
       </div>
 
+      {/* Stage cards */}
       <div style={{ padding: '14px 16px 0' }}>
-        {!showQuiz ? (
-          <div style={{ background: `linear-gradient(135deg, ${INDIGO}, #6366f1)`, borderRadius: 16, padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 4px 20px rgba(79,70,229,0.25)' }}>
-            <div>
-              <p style={{ color: '#fff', fontWeight: 800, fontSize: 14, margin: '0 0 3px' }}>{t.quizTitle}</p>
-              <p style={{ color: '#c7d2fe', fontSize: 12, margin: 0 }}>{t.quizSub}</p>
-            </div>
-            <button onClick={() => setShowQuiz(true)} style={{ background: MINT, color: '#fff', border: 'none', borderRadius: 10, padding: '10px 14px', fontSize: 12, fontWeight: 800, cursor: 'pointer', whiteSpace: 'nowrap', marginLeft: 12, flexShrink: 0, fontFamily: FONT }}>{t.startQuiz}</button>
-          </div>
-        ) : !quizDone ? (
-          <div style={{ background: '#fff', borderRadius: 16, padding: 20, boxShadow: '0 2px 12px rgba(79,70,229,0.08)', border: `1px solid ${SOFT}` }}>
-            <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
-              {[0,1].map(i => <div key={i} style={{ flex: 1, height: 4, borderRadius: 4, background: i<=quizStep?INDIGO:SOFT, transition: 'background 0.3s' }} />)}
-            </div>
-            <p style={{ color: INDIGO_DARK, fontWeight: 800, fontSize: 16, margin: '0 0 16px', lineHeight: 1.4 }}>{t.quiz[quizStep].q}</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {t.quiz[quizStep].options.map((opt, i) => (
-                <button key={i} onClick={() => handleQuizAnswer(opt)}
-                  style={{ background: BG, border: `1.5px solid ${SOFT}`, borderRadius: 10, padding: '12px 14px', textAlign: 'left', fontSize: 14, color: INDIGO_DARK, fontWeight: 600, cursor: 'pointer', fontFamily: FONT }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor=INDIGO; e.currentTarget.style.background=SOFT }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor=SOFT; e.currentTarget.style.background=BG }}>
-                  {opt}
-                </button>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div style={{ background: '#fff', borderRadius: 16, padding: 20, border: `1.5px solid ${INDIGO}`, boxShadow: '0 2px 12px rgba(79,70,229,0.12)' }}>
-            <p style={{ fontSize: 22, margin: '0 0 8px' }}>👇</p>
-            <p style={{ color: INDIGO, fontWeight: 800, fontSize: 16, margin: '0 0 14px' }}>{t.quizResult[getQuizResult()]}</p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-              <button onClick={() => router.push(t.stages[getQuizResult()].route)} style={{ background: INDIGO, color: '#fff', border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>{t.goToStage}</button>
-              <button onClick={resetQuiz} style={{ background: 'transparent', color: INDIGO_LIGHT, border: 'none', fontSize: 12, cursor: 'pointer', fontFamily: FONT }}>{t.retake}</button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div style={{ padding: '14px 16px 0' }}>
-        <p style={{ color: '#6b7280', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, margin: '0 0 10px' }}>{t.allStages}</p>
+        <p style={{ color: '#6b7280', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, margin: '0 0 10px', textAlign: isRtlText ? 'center' : 'left' }}>{t.allStages}</p>
         {t.stages.map((stage, i) => (
           <div key={i} onClick={() => router.push(stage.route)} style={{ background: '#fff', borderRadius: 16, marginBottom: 12, border: `1px solid ${SOFT}`, boxShadow: '0 2px 10px rgba(79,70,229,0.06)', overflow: 'hidden', cursor: 'pointer' }}>
             <div style={{ padding: '16px 16px 12px', borderBottom: '1px solid #F3F4F6' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                <div style={{ width: 26, height: 26, borderRadius: '50%', background: stage.badgeColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, color: '#fff', flexShrink: 0 }}>{i+1}</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexDirection: isRtlText ? 'row-reverse' : 'row' }}>
+                <div style={{ width: 26, height: 26, borderRadius: '50%', background: stage.badgeColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, color: '#fff', flexShrink: 0 }}>
+                  {useArabicNums ? ARABIC_NUMS[i] : i + 1}
+                </div>
                 <span style={{ fontSize: 11, color: '#6b7280', fontWeight: 600 }}>{stage.step}</span>
                 <span style={{ background: stage.badgeColor+'22', color: stage.badgeColor, fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20, border: `1px solid ${stage.badgeColor}44` }}>{stage.badge}</span>
               </div>
-              <h3 style={{ color: INDIGO_DARK, fontWeight: 800, fontSize: 17, margin: '0 0 5px' }}>{stage.title}</h3>
-              <p style={{ color: '#6b7280', fontSize: 13, margin: 0, lineHeight: 1.5 }}>{stage.desc}</p>
+              <h3 style={{ color: INDIGO_DARK, fontWeight: 800, fontSize: 17, margin: '0 0 5px', textAlign: isRtlText ? 'right' : 'left' }}>{stage.title}</h3>
+              <p style={{ color: '#6b7280', fontSize: 13, margin: 0, lineHeight: 1.5, textAlign: isRtlText ? 'right' : 'left' }}>{stage.desc}</p>
             </div>
             <div style={{ padding: '10px 16px' }}>
               {stage.preview.map((item, j) => (
-                <div key={j} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 7 }}>
+                <div key={j} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 7, flexDirection: isRtlText ? 'row-reverse' : 'row' }}>
                   <div style={{ width: 5, height: 5, borderRadius: '50%', background: stage.badgeColor, flexShrink: 0 }} />
-                  <span style={{ fontSize: 13, color: '#4b5563' }}>{item}</span>
+                  <span style={{ fontSize: 13, color: '#4b5563', textAlign: isRtlText ? 'right' : 'left' }}>{item}</span>
                 </div>
               ))}
             </div>
@@ -262,12 +135,13 @@ export default function ComingToUKPage() {
         ))}
       </div>
 
+      {/* Letter banner */}
       <div style={{ padding: '4px 16px 0' }}>
         <div style={{ background: 'linear-gradient(135deg, #0f172a, #1e1b4b)', borderRadius: 16, padding: '18px 16px', display: 'flex', alignItems: 'center', gap: 14, boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}>
           <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(79,70,229,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>📄</div>
           <div style={{ flex: 1 }}>
-            <p style={{ color: '#fff', fontWeight: 800, fontSize: 14, margin: '0 0 3px' }}>{t.letterBanner}</p>
-            <p style={{ color: '#a5b4fc', fontSize: 12, margin: '0 0 10px' }}>{t.heroSub}</p>
+            <p style={{ color: '#fff', fontWeight: 800, fontSize: 14, margin: '0 0 3px', textAlign: isRtlText ? 'right' : 'left' }}>{t.letterBanner}</p>
+            <p style={{ color: '#a5b4fc', fontSize: 12, margin: '0 0 10px', textAlign: isRtlText ? 'right' : 'left' }}>{t.heroSub}</p>
             <button onClick={() => router.push('/journey/document-explainer')} style={{ background: MINT, color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>{t.letterCta} →</button>
           </div>
         </div>

@@ -12,14 +12,14 @@ const TABS = [
   {
     id: 'guide',
     icon: '🧭',
-    label: { en: 'Guide', ku: 'ڕێبەر', fa: 'راهنما', ar: 'الدليل' },
+    label: { en: 'Guide', ku: 'ڕێنمایی', fa: 'راهنما', ar: 'الدليل' },
     route: '/reber/coming-to-uk',
     match: (p) => p?.startsWith('/reber') && p !== '/reber/ask',
   },
   {
     id: 'letters',
     icon: '📄',
-label: { en: 'Letters', ku: 'شیکاری نامە', fa: 'نامه‌ها', ar: 'الرسائل' },
+    label: { en: 'Letters', ku: 'ڕوونکردنەوەی نامە', fa: 'نامه‌ها', ar: 'الرسائل' },
     route: '/journey/document-explainer',
     match: (p) => p?.startsWith('/journey'),
   },
