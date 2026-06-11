@@ -20,7 +20,7 @@ const TX = {
     letterBanner: "Got a letter from the Home Office?",
     letterCta: "Explain it free",
     stages: [
-      { step: "Stage 1", title: "Just Arrived", badge: "Start here", badgeColor: MINT, desc: "You've just arrived in the UK and don't know what happens next.", preview: ["What happens when you first arrive", "Where they will put you", "What to do in your first week"], cta: "View Stage 1", route: "/reber/new-to-uk" },
+      { step: "Stage 1", title: "Just Arrived", badge: "Start here", badgeColor: MINT, desc: "You've just arrived in the UK and don't know what happens next.", preview: ["What happens when you first arrive", "Where they will put you"], cta: "View Stage 1", route: "/reber/new-to-uk" },
       { step: "Stage 2", title: "Leave to Remain", badge: "Most common", badgeColor: INDIGO_LIGHT, desc: "Your asylum claim is being processed and you are waiting for a decision.", preview: ["The 42-day deadline", "Your Biometric Residence Permit", "Your new rights"], cta: "View Stage 2", route: "/reber/leave-to-remain" },
       { step: "Stage 3", title: "Path to Citizenship", badge: "Final stage", badgeColor: "#F59E0B", desc: "You have status. Now build your future and work toward citizenship.", preview: ["Indefinite Leave to Remain", "Life in the UK test", "British citizenship"], cta: "View Stage 3", route: "/reber/citizenship" },
     ],
@@ -32,7 +32,7 @@ const TX = {
     letterBanner: "نامەیەکت لە هۆم ئۆفیس وەرگرتووە؟",
     letterCta: "بەخۆڕایی ڕوونی بکەرەوە",
     stages: [
-      { step: "قۆناغی یەکەم", title: "تۆ تازە گەیشتووی؟", badge: "لێرەوە دەست پێ بکە", badgeColor: MINT, desc: "تازە گەیشتووی بە بەریتانیا و هەنگاوەکانی داهاتوو نازانیت.", preview: ["چی ڕوودەدات کاتێک تۆ تازە گەیشتووی؟", "لە کوێ نیشتەجێ دەکرێیت", "لیستی پشکنینی هەفتەی یەکەم"], cta: "بینینی قۆناغی یەکەم", route: "/reber/new-to-uk" },
+      { step: "قۆناغی یەکەم", title: "کاتێک تازە گەیشتووی", badge: "لێرەوە دەست پێ بکە", badgeColor: MINT, desc: "تازە گەیشتووی بە بەریتانیا و هەنگاوەکانی داهاتوو نازانیت.", preview: ["چی ڕوودەدات کاتێک تۆ تازە گەیشتووی؟", "لە کوێ نیشتەجێ دەکرێیت"], cta: "بینینی قۆناغی یەکەم", route: "/reber/new-to-uk" },
       { step: "قۆناغی دووەم", title: "پاسپۆرتەکەت وەرگرتووە", badge: "زۆرترین باو", badgeColor: INDIGO_LIGHT, desc: "داواکاری مافی پەنابەریت جێبەجێ دەکرێت و چاوەڕێی بڕیار دەکەیت.", preview: ["42 ڕۆژ حیساب بکە", "مۆڵەتی مانەوەی بایۆمەتری", "مافە نوێیەکانت"], cta: "بینینی قۆناغی دووەم", route: "/reber/leave-to-remain" },
       { step: "قۆناغی سێیەم", title: "ڕێگای هاوڵاتیبوون", badge: "قۆناغی کۆتایی", badgeColor: "#F59E0B", desc: "پێگەی پەنابەریت پێدراوە. ئێستا داهاتووت بنیاد بنێ.", preview: ["مانەوەی نادیار", "تاقیکردنەوەی ژیان لە بەریتانیا", "هاووڵاتیبوونی بریتانی"], cta: "بینینی قۆناغی سێیەم", route: "/reber/citizenship" },
     ],
