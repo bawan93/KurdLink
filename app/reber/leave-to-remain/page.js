@@ -70,7 +70,7 @@ const TX = {
       { q: 'ئایا دەتوانم گەشت بکەم لەکاتێکدا داواکارییەکەم هەڵپەسێردراوە؟', a: 'بەگشتی نەخێر — ئەگەر تۆ بەریتانیا بەجێبهێڵیت لەکاتێکدا داواکارییەکەت هەڵپەسێردراوە لەوانەیە وەک کشانەوە مامەڵەی لەگەڵدا بکرێت. پێش گەشتکردن لە ڕاوێژکاری کۆچبەری بپرسە.' },
       { q: 'تێچووی چەندە؟', a: 'تێچوونەکان بەپێی جۆری ڤیزە دەگۆڕێت. بۆ زانینی کرێی ئێستا سەیری ماڵپەڕی UKVI بکە.' },
     ],
-    helpTitle: 'یارمەتی وەربگرە',
+    helpTitle: 'داوای یارمەتی بکە',
     helpers: [
       { emoji: '📞', name: 'سەنتەری پەیوەندی UKVI', desc: 'هێڵی یارمەتی فەرمی بۆ پرسیاری ڤیزە و کۆچبەری', number: '0300 790 6268', tag: 'فەرمی' },
       { emoji: '⚖️', name: 'ئامۆژگاری یاسایی کۆچبەری', desc: 'ئامۆژگاری هاووڵاتیان دەتوانێت یارمەتیت بدات بۆ دۆزینەوەی ڕاوێژکاری ڕێکخراو لە بواری کۆچبەری', number: '0800 144 8848', tag: 'خۆڕایی' },
@@ -164,6 +164,7 @@ export default function LeaveToRemainPage() {
   }, [])
 
   const t = TX[lang] || TX.en
+  const isRtlText = lang === 'ku' || lang === 'fa' || lang === 'ar'
 
   return (
     <div style={{ fontFamily: FONT, direction: 'ltr', background: BG, minHeight: '100vh', paddingBottom: 80 }}>
@@ -174,10 +175,10 @@ export default function LeaveToRemainPage() {
         <div style={{ position: 'absolute', bottom: -30, left: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(52,211,153,0.08)', pointerEvents: 'none' }} />
         <div style={{ position: 'relative', zIndex: 1 }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(129,140,248,0.2)', border: '1px solid rgba(129,140,248,0.3)', borderRadius: 20, padding: '4px 14px', marginBottom: 16 }}>
-            <span style={{ fontSize: 11, fontWeight: 800, color: INDIGO_LIGHT, letterSpacing: 1.5 }}>STAGE 3</span>
+            <span style={{ fontSize: 11, fontWeight: 800, color: INDIGO_LIGHT, letterSpacing: 1.5 }}>STAGE 2</span>
           </div>
-          <h1 style={{ color: '#fff', fontSize: 28, fontWeight: 900, margin: '0 0 10px', lineHeight: 1.2 }}>{t.heroTitle}</h1>
-          <p style={{ color: '#a5b4fc', fontSize: 14, margin: 0, lineHeight: 1.6 }}>{t.heroSub}</p>
+          <h1 style={{ color: '#fff', fontSize: 28, fontWeight: 900, margin: '0 0 10px', lineHeight: 1.2, textAlign: isRtlText ? 'center' : 'left' }}>{t.heroTitle}</h1>
+          <p style={{ color: '#a5b4fc', fontSize: 14, margin: 0, lineHeight: 1.6, textAlign: isRtlText ? 'right' : 'left' }}>{t.heroSub}</p>
         </div>
       </div>
 
@@ -185,17 +186,17 @@ export default function LeaveToRemainPage() {
 
         {/* STEPS */}
         <div style={{ background: '#fff', borderRadius: 16, padding: 20, marginBottom: 12, border: `1px solid ${SOFT}`, boxShadow: '0 2px 10px rgba(79,70,229,0.06)' }}>
-          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 16px' }}>{t.stepsTitle}</h2>
+          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 16px', textAlign: isRtlText ? 'center' : 'left' }}>{t.stepsTitle}</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {t.steps.map((s, i) => (
-              <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+              <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', flexDirection: isRtlText ? 'row-reverse' : 'row' }}>
                 <div style={{ width: 40, height: 40, borderRadius: 12, background: SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0, position: 'relative' }}>
                   {s.icon}
                   <div style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: '50%', background: INDIGO, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 900, color: '#fff' }}>{i + 1}</div>
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: INDIGO, marginBottom: s.desc ? 4 : 0 }}>{s.title}</div>
-                  {s.desc ? <div style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6 }}>{s.desc}</div> : null}
+                  <div style={{ fontSize: 14, fontWeight: 800, color: INDIGO, marginBottom: s.desc ? 4 : 0, textAlign: isRtlText ? 'right' : 'left' }}>{s.title}</div>
+                  {s.desc ? <div style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, textAlign: isRtlText ? 'right' : 'left' }}>{s.desc}</div> : null}
                 </div>
               </div>
             ))}
@@ -204,13 +205,13 @@ export default function LeaveToRemainPage() {
 
         {/* RIGHTS */}
         <div style={{ background: '#fff', borderRadius: 16, padding: 20, marginBottom: 12, border: `1px solid ${SOFT}`, boxShadow: '0 2px 10px rgba(79,70,229,0.06)' }}>
-          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 14px' }}>{t.rightsTitle}</h2>
+          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 14px', textAlign: isRtlText ? 'center' : 'left' }}>{t.rightsTitle}</h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             {t.rights.map((r, i) => (
               <div key={i} style={{ background: SOFT, borderRadius: 12, padding: 14 }}>
-                <div style={{ fontSize: 22, marginBottom: 6 }}>{r.icon}</div>
-                <div style={{ fontSize: 13, fontWeight: 800, color: INDIGO_DARK, marginBottom: r.desc ? 4 : 0 }}>{r.title}</div>
-                {r.desc ? <div style={{ fontSize: 11, color: '#6B7280', lineHeight: 1.4 }}>{r.desc}</div> : null}
+                <div style={{ fontSize: 22, marginBottom: 6, textAlign: isRtlText ? 'right' : 'left' }}>{r.icon}</div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: INDIGO_DARK, marginBottom: r.desc ? 4 : 0, textAlign: isRtlText ? 'center' : 'left' }}>{r.title}</div>
+                {r.desc ? <div style={{ fontSize: 11, color: '#6B7280', lineHeight: 1.4, textAlign: isRtlText ? 'right' : 'left' }}>{r.desc}</div> : null}
               </div>
             ))}
           </div>
@@ -218,17 +219,17 @@ export default function LeaveToRemainPage() {
 
         {/* FAQ */}
         <div style={{ background: '#fff', borderRadius: 16, padding: 20, marginBottom: 12, border: `1px solid ${SOFT}`, boxShadow: '0 2px 10px rgba(79,70,229,0.06)' }}>
-          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 14px' }}>{t.faqTitle}</h2>
+          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 14px', textAlign: isRtlText ? 'center' : 'left' }}>{t.faqTitle}</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {t.faqs.map((f, i) => (
               <div key={i} style={{ borderRadius: 12, border: `1.5px solid ${openFaq === i ? INDIGO : SOFT}`, overflow: 'hidden', transition: 'border 0.2s' }}>
                 <button onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  style={{ width: '100%', padding: '13px 16px', background: openFaq === i ? SOFT : '#fff', border: 'none', textAlign: 'left', fontFamily: FONT, fontSize: 14, fontWeight: 700, color: INDIGO_DARK, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  style={{ width: '100%', padding: '13px 16px', background: openFaq === i ? SOFT : '#fff', border: 'none', textAlign: isRtlText ? 'right' : 'left', fontFamily: FONT, fontSize: 14, fontWeight: 700, color: INDIGO_DARK, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isRtlText ? 'row-reverse' : 'row' }}>
                   <span>{f.q}</span>
-                  <span style={{ color: INDIGO, fontSize: 18, fontWeight: 900, flexShrink: 0, marginLeft: 8 }}>{openFaq === i ? '−' : '+'}</span>
+                  <span style={{ color: INDIGO, fontSize: 18, fontWeight: 900, flexShrink: 0, marginLeft: isRtlText ? 0 : 8, marginRight: isRtlText ? 8 : 0 }}>{openFaq === i ? '−' : '+'}</span>
                 </button>
                 {openFaq === i && (
-                  <div style={{ padding: '12px 16px', background: SOFT, fontSize: 13, color: '#374151', lineHeight: 1.6, borderTop: `1px solid ${SOFT}` }}>{f.a}</div>
+                  <div style={{ padding: '12px 16px', background: SOFT, fontSize: 13, color: '#374151', lineHeight: 1.6, borderTop: `1px solid ${SOFT}`, textAlign: isRtlText ? 'right' : 'left' }}>{f.a}</div>
                 )}
               </div>
             ))}
@@ -237,17 +238,17 @@ export default function LeaveToRemainPage() {
 
         {/* HELP */}
         <div style={{ background: '#fff', borderRadius: 16, padding: 20, marginBottom: 12, border: `1px solid ${SOFT}`, boxShadow: '0 2px 10px rgba(79,70,229,0.06)' }}>
-          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 14px' }}>{t.helpTitle}</h2>
+          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 14px', textAlign: isRtlText ? 'center' : 'left' }}>{t.helpTitle}</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {t.helpers.map((h, i) => (
-              <div key={i} style={{ background: SOFT, borderRadius: 12, padding: 14, display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div key={i} style={{ background: SOFT, borderRadius: 12, padding: 14, display: 'flex', alignItems: 'center', gap: 12, flexDirection: isRtlText ? 'row-reverse' : 'row' }}>
                 <div style={{ width: 40, height: 40, borderRadius: 12, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{h.emoji}</div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2, flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2, flexWrap: 'wrap', flexDirection: isRtlText ? 'row-reverse' : 'row' }}>
                     <span style={{ fontSize: 13, fontWeight: 800, color: INDIGO_DARK }}>{h.name}</span>
                     <span style={{ background: INDIGO + '22', color: INDIGO, fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20 }}>{h.tag}</span>
                   </div>
-                  <div style={{ fontSize: 11, color: '#6B7280' }}>{h.desc}</div>
+                  <div style={{ fontSize: 11, color: '#6B7280', textAlign: isRtlText ? 'right' : 'left' }}>{h.desc}</div>
                 </div>
                 <a href={`tel:${h.number.replace(/\s/g, '')}`}
                   style={{ background: MINT, color: '#fff', fontWeight: 800, fontSize: 11, padding: '8px 12px', borderRadius: 10, textDecoration: 'none', flexShrink: 0, whiteSpace: 'nowrap' }}>

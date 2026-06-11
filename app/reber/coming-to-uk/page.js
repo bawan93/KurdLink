@@ -33,7 +33,7 @@ const TX = {
     letterCta: "بەخۆڕایی ڕوونی بکەرەوە",
     stages: [
       { step: "قۆناغی یەکەم", title: "کاتێک تازە گەیشتووی", badge: "لێرەوە دەست پێ بکە", badgeColor: MINT, desc: "تازە گەیشتووی بە بەریتانیا و هەنگاوەکانی داهاتوو نازانیت.", preview: ["چی ڕوودەدات کاتێک تۆ تازە گەیشتووی؟", "لە کوێ نیشتەجێ دەکرێیت"], cta: "بینینی قۆناغی یەکەم", route: "/reber/new-to-uk" },
-      { step: "قۆناغی دووەم", title: "پاسپۆرتەکەت وەرگرتووە", badge: "زۆرترین باو", badgeColor: INDIGO_LIGHT, desc: "داواکاری مافی پەنابەریت جێبەجێ دەکرێت و چاوەڕێی بڕیار دەکەیت.", preview: ["42 ڕۆژ حیساب بکە", "مۆڵەتی مانەوەی بایۆمەتری", "مافە نوێیەکانت"], cta: "بینینی قۆناغی دووەم", route: "/reber/leave-to-remain" },
+      { step: "قۆناغی دووەم", title: "پاسپۆرتەکەت وەرگرتووە", badge: "باوترین قۆناغ", badgeColor: INDIGO_LIGHT, desc: "داواکاری مافی پەنابەریت جێبەجێ دەکرێت و چاوەڕێی بڕیار دەکەیت.", preview: ["٤٢ ڕۆژ مۆڵەتت هەییە", "مۆڵەتی مانەوەی بایۆمەتری", "مافە نوێیەکانت"], cta: "بینینی قۆناغی دووەم", route: "/reber/leave-to-remain" },
       { step: "قۆناغی سێیەم", title: "ڕێگای هاوڵاتیبوون", badge: "قۆناغی کۆتایی", badgeColor: "#F59E0B", desc: "پێگەی پەنابەریت پێدراوە. ئێستا داهاتووت بنیاد بنێ.", preview: ["مانەوەی نادیار", "تاقیکردنەوەی ژیان لە بەریتانیا", "هاووڵاتیبوونی بریتانی"], cta: "بینینی قۆناغی سێیەم", route: "/reber/citizenship" },
     ],
   },
@@ -99,7 +99,7 @@ export default function ComingToUKPage() {
               </div>
             ))}
           </div>
-          <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 800, margin: '0 0 10px', lineHeight: 1.2, textAlign: isRtlText ? 'right' : 'left' }}>{t.heroTitle}</h1>
+          <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 800, margin: '0 0 10px', lineHeight: 1.2, textAlign: isRtlText ? 'center' : 'left' }}>{t.heroTitle}</h1>
           <p style={{ color: '#a5b4fc', fontSize: 14, margin: 0, lineHeight: 1.6, textAlign: isRtlText ? 'right' : 'left' }}>{t.heroSub}</p>
         </div>
       </div>
@@ -117,7 +117,7 @@ export default function ComingToUKPage() {
                 <span style={{ fontSize: 11, color: '#6b7280', fontWeight: 600 }}>{stage.step}</span>
                 <span style={{ background: stage.badgeColor+'22', color: stage.badgeColor, fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20, border: `1px solid ${stage.badgeColor}44` }}>{stage.badge}</span>
               </div>
-              <h3 style={{ color: INDIGO_DARK, fontWeight: 800, fontSize: 17, margin: '0 0 5px', textAlign: isRtlText ? 'right' : 'left' }}>{stage.title}</h3>
+              <h3 style={{ color: INDIGO_DARK, fontWeight: 800, fontSize: 17, margin: '0 0 5px', textAlign: isRtlText ? 'center' : 'left' }}>{stage.title}</h3>
               <p style={{ color: '#6b7280', fontSize: 13, margin: 0, lineHeight: 1.5, textAlign: isRtlText ? 'right' : 'left' }}>{stage.desc}</p>
             </div>
             <div style={{ padding: '10px 16px' }}>
@@ -140,7 +140,7 @@ export default function ComingToUKPage() {
         <div style={{ background: 'linear-gradient(135deg, #0f172a, #1e1b4b)', borderRadius: 16, padding: '18px 16px', display: 'flex', alignItems: 'center', gap: 14, boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}>
           <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(79,70,229,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>📄</div>
           <div style={{ flex: 1 }}>
-            <p style={{ color: '#fff', fontWeight: 800, fontSize: 14, margin: '0 0 3px', textAlign: isRtlText ? 'right' : 'left' }}>{t.letterBanner}</p>
+            <p style={{ color: '#fff', fontWeight: 800, fontSize: 14, margin: '0 0 3px', textAlign: isRtlText ? 'center' : 'left' }}>{t.letterBanner}</p>
             <p style={{ color: '#a5b4fc', fontSize: 12, margin: '0 0 10px', textAlign: isRtlText ? 'right' : 'left' }}>{t.heroSub}</p>
             <button onClick={() => router.push('/journey/document-explainer')} style={{ background: MINT, color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>{t.letterCta} →</button>
           </div>
