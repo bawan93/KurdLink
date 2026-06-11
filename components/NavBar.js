@@ -33,7 +33,7 @@ label: { en: 'Letters', ku: 'شیکاری نامە', fa: 'نامه‌ها', ar: 
   {
     id: 'find',
     icon: '🔍',
-    label: { en: 'Find', ku: 'بدۆزەرەوە', fa: 'جستجو', ar: 'ابحث' },
+    label: { en: 'Search', ku: 'گەڕان', fa: 'جستجو', ar: 'بحث' },
     route: '/find',
     match: (p) => p?.startsWith('/find'),
   },

@@ -254,7 +254,7 @@ export default function SplashPage() {
             boxShadow: "0 8px 32px rgba(52,211,153,0.35)",
             letterSpacing: 0.3, fontFamily: "Nunito, sans-serif",
             position: "relative", zIndex: 20,
-          }}>{startLabel[lang]} →</button>
+          }}>{startLabel[lang]}</button>
 
         <p style={{ marginTop: 14, fontSize: 10, color: "rgba(255,255,255,0.3)", fontWeight: 600, textAlign: "center", pointerEvents: "none" }}>
           English · کوردی · فارسی · عربي
