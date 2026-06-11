@@ -84,7 +84,7 @@ export default function AskPage() {
   return (
     <div style={{ fontFamily: 'Nunito, sans-serif', background: BG, minHeight: '100vh', paddingBottom: 80, direction: 'ltr' }}>
       <div style={{ background: `linear-gradient(135deg, ${INDIGO_DARK} 0%, #2D2A7A 100%)`, padding: '40px 20px 48px', textAlign: 'center' }}>
-        <div style={{ fontSize: 44, marginBottom: 12 }}>❓</div>
+        <div style={{ fontSize: 44, marginBottom: 12, transform: (lang === 'ku' || lang === 'fa' || lang === 'ar') ? 'scaleX(-1)' : 'none' }}>❓</div>
         <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 900, margin: '0 0 10px' }}>{t.heroTitle}</h1>
         <p style={{ color: INDIGO_LIGHT, fontSize: 14, fontWeight: 500, margin: 0 }}>{t.heroSub}</p>
       </div>

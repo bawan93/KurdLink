@@ -119,7 +119,7 @@ export default function NavBar() {
                 whiteSpace: 'nowrap',
               }}
             >
-              <span style={{ fontSize: 14 }}>{tab.icon}</span>
+              <span style={{ fontSize: 14, display: 'inline-block', transform: tab.id === 'ask' && (lang === 'ku' || lang === 'fa' || lang === 'ar') ? 'scaleX(-1)' : 'none' }}>{tab.icon}</span>
               <span>{label}</span>
             </button>
           )
