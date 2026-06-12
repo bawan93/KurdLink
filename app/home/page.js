@@ -16,6 +16,24 @@ const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 )
 
+function Badge({ text }) {
+  return (
+    <span style={{
+      display: 'inline-block',
+      background: INDIGO,
+      color: '#fff',
+      fontSize: 10,
+      fontWeight: 800,
+      borderRadius: 6,
+      padding: '1px 6px',
+      margin: '0 2px',
+      letterSpacing: 0.3,
+      verticalAlign: 'middle',
+      fontFamily: "'Nunito', sans-serif",
+    }}>{text}</span>
+  )
+}
+
 const TX = {
   en: {
     heroSub: 'Built for Kurdish, Farsi and Arabic speaking people in the UK',
@@ -46,7 +64,7 @@ const TX = {
     jobsServices: 'کار و خزمەتگوزاریەکان',
     featuresTitle: 'کۆمەک بێ بەرامبەر یارمەتیت دەدات',
     features: [
-      { icon: '📄', title: 'ڕوونکردنەوەی نامە', desc: 'لە هۆم ئۆفیس یان ئەنجومەن یان (HMRC) واتا حوکمەت یان خاوەن خانوەکەت نامەیەکت بۆ هاتووە دەتەوێ لێی تێبگەیت ؟ وێنەی بگرە یاخود AI دەقەکە بنوسەوە و بینێرە لە ڕێگەی بە زمانی خۆت بۆت ڕوون دەکرێتەوە .', cta: 'تاقی بکەرەوە', route: '/journey/document-explainer' },
+      { icon: '📄', title: 'ڕوونکردنەوەی نامە', descJsx: true, cta: 'تاقی بکەرەوە', route: '/journey/document-explainer' },
       { icon: '🧭', title: 'ژیان لە بەریتانیا', desc: 'ڕێنمایی هەنگاو بە هەنگاو لە ساتەوەختی گەیشتنتەوە — پرۆسەی پەنابەری، مۆڵەت بۆ مانەوە، ڕێگا بۆ ڕەگەزنامەی بەریتانیا. بە کوردی و فارسی و عەرەبی.', cta: 'ڕێنمایی بکەرەوە', route: '/reber/coming-to-uk' },
       { icon: '❓', title: 'پرسیارێک بکە', desc: 'هەر شتێک دەربارەی ژیانی بەریتانیا بپرسە. تیمەکەمان لە ماوەی ٢٤ کاتژمێردا بە شێوەیەکی شەخسی وەڵام دەداتەوە.', cta: 'ئێستا پرسیار بکە', route: '/reber/ask' },
       { icon: '🔍', title: 'هەلی کار و خزمەتگوزاری بدۆزەرەوە', desc: 'گەڕان بەدوای ئەو هەلی کار و خزمەتگوزارییانەی کە لەلایەن بازرگان و کەسانی کورد لە سەرانسەری بەریتانیادا بڵاوکراونەتەوە — شۆفێر، میکانیک، پارێزەر، ژمێریار و زۆر شتی تر.', cta: 'گەڕان', route: '/find' },
@@ -145,6 +163,14 @@ function SproutLogo({ size = 40 }) {
   )
 }
 
+function KuLetterDesc() {
+  return (
+    <p style={{ fontSize: 13, color: '#6b7280', margin: '0 0 12px', lineHeight: 1.9, textAlign: 'right' }}>
+      لە هۆم ئۆفیس یان ئەنجومەن یان <Badge text="HMRC" /> واتا حوکمەت یان خاوەن خانوەکەت نامەیەکت بۆ هاتووە دەتەوێ لێی تێبگەیت ؟ وێنەی بگرە یاخود دەقەکە بنوسەوە و بینێرە لە ڕێگەی <Badge text="AI" /> بە زمانی خۆت بۆت ڕوون دەکرێتەوە .
+    </p>
+  )
+}
+
 export default function HomePage() {
   const router = useRouter()
   const [lang, setLang] = useState('en')
@@ -234,7 +260,10 @@ export default function HomePage() {
             <div style={{ width: 52, height: 52, borderRadius: 16, background: SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, flexShrink: 0 }}>{f.icon}</div>
             <div style={{ flex: 1 }}>
               <h3 style={{ fontSize: 15, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 6px', textAlign: ta }}>{f.title}</h3>
-              <p style={{ fontSize: 13, color: '#6b7280', margin: '0 0 12px', lineHeight: 1.6, textAlign: ta }}>{f.desc}</p>
+              {f.descJsx && lang === 'ku'
+                ? <KuLetterDesc />
+                : <p style={{ fontSize: 13, color: '#6b7280', margin: '0 0 12px', lineHeight: 1.6, textAlign: ta }}>{f.desc}</p>
+              }
               <div style={{ display: 'flex', justifyContent: isRtl ? 'flex-end' : 'flex-start' }}>
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: INDIGO, borderRadius: 10, padding: '7px 14px' }}>
                   <span style={{ fontSize: 12, fontWeight: 800, color: '#fff' }}>{f.cta} {isRtl ? '←' : '→'}</span>
