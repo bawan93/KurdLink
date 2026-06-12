@@ -81,12 +81,15 @@ export default function ComingToUKPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: BG, fontFamily: FONT, direction: 'ltr', paddingBottom: 80 }}>
+
       {/* Hero */}
       <div style={{ background: `linear-gradient(135deg, ${INDIGO_DARK} 0%, #2d2b6b 60%, #3730a3 100%)`, padding: '36px 20px 44px', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: -60, right: -60, width: 200, height: 200, borderRadius: '50%', background: 'rgba(79,70,229,0.15)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', bottom: -30, left: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(52,211,153,0.08)', pointerEvents: 'none' }} />
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 20 }}>
+
+          {/* Step indicators — centered */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 24 }}>
             {[0,1,2].map(i => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
@@ -99,8 +102,10 @@ export default function ComingToUKPage() {
               </div>
             ))}
           </div>
-          <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 800, margin: '0 0 10px', lineHeight: 1.2, textAlign: isRtlText ? 'right' : 'left' }}>{t.heroTitle}</h1>
-          <p style={{ color: '#a5b4fc', fontSize: 14, margin: 0, lineHeight: 1.6, textAlign: isRtlText ? 'right' : 'left' }}>{t.heroSub}</p>
+
+          {/* Title and subtitle — always centered */}
+          <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 800, margin: '0 0 10px', lineHeight: 1.2, textAlign: 'center' }}>{t.heroTitle}</h1>
+          <p style={{ color: '#a5b4fc', fontSize: 14, margin: 0, lineHeight: 1.6, textAlign: 'center' }}>{t.heroSub}</p>
         </div>
       </div>
 
@@ -135,6 +140,7 @@ export default function ComingToUKPage() {
           </div>
         </div>
       </div>
+
     </div>
   )
 }
