@@ -112,6 +112,26 @@ export default function AskPage() {
 
   const isAdmin = user?.email === ADMIN_EMAIL
 
+  function renderAnswer(text) {
+    const urlRegex = /(https?:\/\/[^\s]+)/g
+    const parts = text.split(urlRegex)
+    return parts.map((part, i) =>
+      urlRegex.test(part) ? (
+        <a
+          key={i}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: INDIGO, fontWeight: 700, wordBreak: 'break-all', textDecoration: 'underline' }}
+        >
+          {part}
+        </a>
+      ) : (
+        <span key={i}>{part}</span>
+      )
+    )
+  }
+
   return (
     <div style={{ fontFamily: 'Nunito, sans-serif', background: BG, minHeight: '100vh', paddingBottom: 80, direction: 'ltr' }}>
       <div style={{ background: `linear-gradient(135deg, ${INDIGO_DARK} 0%, #2D2A7A 100%)`, padding: '40px 20px 48px', textAlign: 'center' }}>
@@ -211,7 +231,7 @@ export default function AskPage() {
                         </div>
                       ) : (
                         // Display mode
-                        <p style={{ fontSize: 13, color: '#065F46', margin: 0, lineHeight: 1.5 }}>{q.answer}</p>
+                        <p style={{ fontSize: 13, color: '#065F46', margin: 0, lineHeight: 1.5 }}>{renderAnswer(q.answer)}</p>
                       )}
                     </div>
                   )}
