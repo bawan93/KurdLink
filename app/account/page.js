@@ -148,8 +148,7 @@ export default function AccountPage() {
         <div style={{ fontSize: 44, marginBottom: 12 }}>👤</div>
         <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 900, margin: '0 0 8px', textAlign: 'center' }}>{t.heroTitle}</h1>
         {mode === 'signup' && (
-          <p style={{ color: INDIGO_LIGHT, fontSize: 14, fontWeight: 500, margin: 0, textAlign: isRTL ? 'right' : 'left', padding: '0 20px' }}>{t.heroSub}</p>
-        )}
+<p style={{ color: INDIGO_LIGHT, fontSize: 14, fontWeight: 500, margin: 0, textAlign: 'center', padding: '0 20px' }}>{t.heroSub}</p>        )}
       </div>
 
       <div style={{ maxWidth: 560, margin: '0 auto', padding: '0 16px', marginTop: -24, animation: 'fadeIn 0.4s ease' }}>
