@@ -28,7 +28,7 @@ function getTitle(listing) {
 export default function AccountPage() {
   const router = useRouter()
   const [lang, setLang] = useState('en')
-  const [mode, setMode] = useState('login')
+  const [mode, setMode] = useState('signup')
   const [user, setUser] = useState(null)
   const [pageLoading, setPageLoading] = useState(true)
   const [listings, setListings] = useState([])
@@ -128,6 +128,12 @@ export default function AccountPage() {
 
   const inpStyle = { width: '100%', padding: '12px 14px', border: `1.5px solid ${SOFT}`, borderRadius: 12, fontSize: 14, fontFamily: FONT, color: INDIGO_DARK, outline: 'none', background: BG, boxSizing: 'border-box' }
 
+  // Tab order: for RTL languages signup is on the right (rendered first in ltr container = left visually),
+  // so we reverse the array so signup appears on the right side for RTL.
+  const tabs = isRTL
+    ? [['signup', t.signup], ['login', t.login]]
+    : [['login', t.login], ['signup', t.signup]]
+
   if (pageLoading) return (
     <div style={{ minHeight: '100vh', background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ width: 36, height: 36, border: `3px solid ${SOFT}`, borderTopColor: INDIGO, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
@@ -136,19 +142,21 @@ export default function AccountPage() {
   )
 
   return (
-    <div style={{ minHeight: '100vh', background: BG, fontFamily: FONT, direction: isRTL ? 'rtl' : 'ltr', paddingBottom: 80 }}>
+    <div style={{ minHeight: '100vh', background: BG, fontFamily: FONT, direction: 'ltr', paddingBottom: 80 }}>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } } @keyframes fadeIn { from { opacity:0; transform:translateY(16px) } to { opacity:1; transform:translateY(0) } }`}</style>
       <div style={{ background: `linear-gradient(135deg, ${INDIGO_DARK} 0%, #2D2A7A 100%)`, padding: '40px 20px 56px', textAlign: 'center' }}>
         <div style={{ fontSize: 44, marginBottom: 12 }}>👤</div>
-        <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 900, margin: '0 0 8px' }}>{t.heroTitle}</h1>
-        <p style={{ color: INDIGO_LIGHT, fontSize: 14, fontWeight: 500, margin: 0 }}>{t.heroSub}</p>
+        <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 900, margin: '0 0 8px', textAlign: 'center' }}>{t.heroTitle}</h1>
+        {mode === 'signup' && (
+          <p style={{ color: INDIGO_LIGHT, fontSize: 14, fontWeight: 500, margin: 0, textAlign: isRTL ? 'right' : 'left', padding: '0 20px' }}>{t.heroSub}</p>
+        )}
       </div>
 
       <div style={{ maxWidth: 560, margin: '0 auto', padding: '0 16px', marginTop: -24, animation: 'fadeIn 0.4s ease' }}>
         {!user ? (
           <div>
             <div style={{ display: 'flex', background: '#fff', borderRadius: 16, padding: 4, marginBottom: 16, boxShadow: '0 4px 24px rgba(79,70,229,0.10)' }}>
-              {[['login', t.login], ['signup', t.signup]].map(([m, label]) => (
+              {tabs.map(([m, label]) => (
                 <button key={m} onClick={() => { setMode(m); setAuthError(''); setAuthSuccess('') }}
                   style={{ flex: 1, padding: '11px 0', borderRadius: 12, background: mode === m ? INDIGO : 'transparent', color: mode === m ? '#fff' : '#9CA3AF', fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer', transition: 'all 0.2s', fontFamily: FONT }}>
                   {label}
@@ -156,21 +164,21 @@ export default function AccountPage() {
               ))}
             </div>
             <div style={{ background: '#fff', borderRadius: 20, padding: '24px 20px', boxShadow: '0 4px 24px rgba(79,70,229,0.10)' }}>
-              {authError && <div style={{ background: '#FEF2F2', borderRadius: 10, padding: '12px 14px', marginBottom: 16, color: RED, fontSize: 13, fontWeight: 600 }}>{authError}</div>}
-              {authSuccess && <div style={{ background: '#F0FDF4', borderRadius: 10, padding: '12px 14px', marginBottom: 16, color: GREEN, fontSize: 13, fontWeight: 600 }}>{authSuccess}</div>}
+              {authError && <div style={{ background: '#FEF2F2', borderRadius: 10, padding: '12px 14px', marginBottom: 16, color: RED, fontSize: 13, fontWeight: 600, textAlign: isRTL ? 'right' : 'left' }}>{authError}</div>}
+              {authSuccess && <div style={{ background: '#F0FDF4', borderRadius: 10, padding: '12px 14px', marginBottom: 16, color: GREEN, fontSize: 13, fontWeight: 600, textAlign: isRTL ? 'right' : 'left' }}>{authSuccess}</div>}
               {mode === 'signup' && (
                 <div style={{ marginBottom: 14 }}>
-                  <label style={{ display: 'block', fontSize: 13, fontWeight: 800, color: INDIGO_DARK, marginBottom: 6 }}>{t.fullName}</label>
-                  <input value={name} onChange={e => setName(e.target.value)} placeholder={t.namePh} style={inpStyle} />
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 800, color: INDIGO_DARK, marginBottom: 6, textAlign: isRTL ? 'right' : 'left' }}>{t.fullName}</label>
+                  <input value={name} onChange={e => setName(e.target.value)} placeholder={t.namePh} style={{ ...inpStyle, textAlign: isRTL ? 'right' : 'left' }} />
                 </div>
               )}
               <div style={{ marginBottom: 14 }}>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 800, color: INDIGO_DARK, marginBottom: 6 }}>{t.email}</label>
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="example@email.com" style={inpStyle} />
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 800, color: INDIGO_DARK, marginBottom: 6, textAlign: isRTL ? 'right' : 'left' }}>{t.email}</label>
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="example@email.com" style={{ ...inpStyle, textAlign: 'left' }} />
               </div>
               <div style={{ marginBottom: 20 }}>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 800, color: INDIGO_DARK, marginBottom: 6 }}>{t.password}</label>
-                <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder={t.passPh} style={inpStyle} />
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 800, color: INDIGO_DARK, marginBottom: 6, textAlign: isRTL ? 'right' : 'left' }}>{t.password}</label>
+                <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder={t.passPh} style={{ ...inpStyle, textAlign: isRTL ? 'right' : 'left' }} />
               </div>
               <button onClick={mode === 'login' ? handleLogin : handleSignup} disabled={authLoading}
                 style={{ width: '100%', padding: '14px 0', background: authLoading ? '#E5E7EB' : INDIGO, color: authLoading ? '#9CA3AF' : '#fff', borderRadius: 14, fontSize: 15, fontWeight: 800, border: 'none', cursor: authLoading ? 'not-allowed' : 'pointer', transition: 'all 0.2s', fontFamily: FONT }}>
@@ -182,8 +190,8 @@ export default function AccountPage() {
           <div>
             <div style={{ background: '#fff', borderRadius: 20, padding: '20px', marginBottom: 14, boxShadow: '0 4px 24px rgba(79,70,229,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <p style={{ color: '#9CA3AF', fontSize: 12, fontWeight: 600, margin: '0 0 4px' }}>{t.welcome}</p>
-                <h2 style={{ color: INDIGO_DARK, fontSize: 18, fontWeight: 900, margin: 0 }}>{user.user_metadata?.full_name || user.email}</h2>
+                <p style={{ color: '#9CA3AF', fontSize: 12, fontWeight: 600, margin: '0 0 4px', textAlign: isRTL ? 'right' : 'left' }}>{t.welcome}</p>
+                <h2 style={{ color: INDIGO_DARK, fontSize: 18, fontWeight: 900, margin: 0, textAlign: isRTL ? 'right' : 'left' }}>{user.user_metadata?.full_name || user.email}</h2>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{ width: 44, height: 44, background: INDIGO, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 900, color: '#fff' }}>
@@ -196,7 +204,7 @@ export default function AccountPage() {
               style={{ width: '100%', padding: '15px 0', background: INDIGO, color: '#fff', borderRadius: 14, fontSize: 15, fontWeight: 800, marginBottom: 24, border: 'none', cursor: 'pointer', transition: 'all 0.2s', fontFamily: FONT }}>
               {t.postNew}
             </button>
-            <h3 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, marginBottom: 14 }}>{t.myListings}</h3>
+            <h3 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, marginBottom: 14, textAlign: isRTL ? 'right' : 'left' }}>{t.myListings}</h3>
             {listingsLoading ? (
               <div style={{ textAlign: 'center', padding: 40 }}>
                 <div style={{ width: 32, height: 32, border: `3px solid ${SOFT}`, borderTopColor: INDIGO, borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto' }} />
@@ -222,24 +230,24 @@ export default function AccountPage() {
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                           <div style={{ width: 38, height: 38, background: SOFT, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>{typeCfg.icon}</div>
                           <div>
-                            <p style={{ fontWeight: 800, fontSize: 14, color: INDIGO_DARK, margin: 0 }}>{title}</p>
-                            <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>{typeCfg.label}</p>
+                            <p style={{ fontWeight: 800, fontSize: 14, color: INDIGO_DARK, margin: 0, textAlign: isRTL ? 'right' : 'left' }}>{title}</p>
+                            <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0', textAlign: isRTL ? 'right' : 'left' }}>{typeCfg.label}</p>
                           </div>
                         </div>
                         <span style={{ background: statusCfg.bg, color: statusCfg.color, padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 800, whiteSpace: 'nowrap' }}>{statusCfg.label}</span>
                       </div>
                       {listing.status === 'pending' && !listing.paused && (
-                        <div style={{ background: '#FFFBEB', padding: '8px 16px', fontSize: 12, color: '#92400E', borderBottom: `1px solid #FDE68A` }}>⏳ {t.pendingNote}</div>
+                        <div style={{ background: '#FFFBEB', padding: '8px 16px', fontSize: 12, color: '#92400E', borderBottom: `1px solid #FDE68A`, textAlign: isRTL ? 'right' : 'left' }}>⏳ {t.pendingNote}</div>
                       )}
                       {listing.status === 'rejected' && (
-                        <div style={{ background: '#FEF2F2', padding: '8px 16px', fontSize: 12, color: RED, borderBottom: `1px solid #FECACA` }}>❌ {listing.reject_reason || t.rejected}</div>
+                        <div style={{ background: '#FEF2F2', padding: '8px 16px', fontSize: 12, color: RED, borderBottom: `1px solid #FECACA`, textAlign: isRTL ? 'right' : 'left' }}>❌ {listing.reject_reason || t.rejected}</div>
                       )}
                       {isEditing && (
                         <div style={{ padding: '14px 16px', background: BG, borderBottom: `1px solid ${SOFT}` }}>
-                          <p style={{ fontSize: 12, color: INDIGO, fontWeight: 700, marginBottom: 10 }}>✏️ {t.editNote}</p>
+                          <p style={{ fontSize: 12, color: INDIGO, fontWeight: 700, marginBottom: 10, textAlign: isRTL ? 'right' : 'left' }}>✏️ {t.editNote}</p>
                           {editableFields.map(([key, val]) => (
                             <div key={key} style={{ marginBottom: 10 }}>
-                              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6B7280', marginBottom: 4, textTransform: 'capitalize' }}>{key.replace(/_/g, ' ')}</label>
+                              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6B7280', marginBottom: 4, textTransform: 'capitalize', textAlign: isRTL ? 'right' : 'left' }}>{key.replace(/_/g, ' ')}</label>
                               <input defaultValue={val} onChange={e => setEditData(prev => ({ ...prev, [key]: e.target.value }))}
                                 style={{ width: '100%', padding: '9px 12px', border: `1.5px solid ${SOFT}`, borderRadius: 10, fontSize: 13, fontFamily: FONT, direction: 'ltr', outline: 'none', background: '#fff' }} />
                             </div>

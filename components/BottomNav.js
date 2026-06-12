@@ -8,7 +8,7 @@ const FONT = "'Nunito', 'Plus Jakarta Sans', sans-serif"
 
 const TX = {
   en: { home: 'Komek', post: 'Post', account: 'Account' },
-  ku: { home: 'کۆمەک', post: 'بڵاوکردنەوە', account: 'ئەکاونت' },
+  ku: { home: 'کۆمەک', post: 'بڵاوکردنەوە', account: 'هەژمار' },
   fa: { home: 'کومک', post: 'ارسال', account: 'حساب' },
   ar: { home: 'كومك', post: 'نشر', account: 'حسابي' },
 }
