@@ -61,7 +61,7 @@ const TX = {
   ku: {
     heroSub: 'کۆمەک وەک دەستی یارمەتی دروست کراوە',
     tagline: 'لە خزمەتی ئێوەی بەڕێزدا',
-    peopleHelped: 'کەسی یارمەتی دراو',
+    peopleHelped: 'نامەی ڕوونکراوە',
     jobsServices: 'کار و خزمەتگوزاریەکان',
     questionsAnswered: 'پرسیارە وەڵامدراوەکان',
     featuresTitle: 'کۆمەک بێ بەرامبەر یارمەتیت دەدات',
