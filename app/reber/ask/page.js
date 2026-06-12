@@ -113,23 +113,25 @@ export default function AskPage() {
   const isAdmin = user?.email === ADMIN_EMAIL
 
   function renderAnswer(text) {
-    const urlRegex = /(https?:\/\/[^\s]+)/g
+    // Matches https://example.com AND bare domains like gov.uk/path or www.example.com
+    const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?:\/[^\s]*)?)/g
     const parts = text.split(urlRegex)
-    return parts.map((part, i) =>
-      urlRegex.test(part) ? (
+    return parts.map((part, i) => {
+      const isUrl = /(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?:\/[^\s]*)?)/.test(part)
+      if (!isUrl) return <span key={i}>{part}</span>
+      const href = /^https?:\/\//.test(part) ? part : `https://${part}`
+      return (
         <a
           key={i}
-          href={part}
+          href={href}
           target="_blank"
           rel="noopener noreferrer"
           style={{ color: INDIGO, fontWeight: 700, wordBreak: 'break-all', textDecoration: 'underline' }}
         >
           {part}
         </a>
-      ) : (
-        <span key={i}>{part}</span>
       )
-    )
+    })
   }
 
   return (
