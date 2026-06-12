@@ -27,6 +27,12 @@ export default function AskPage() {
   const [answerPosting, setAnswerPosting] = useState({})
   const [deleting, setDeleting] = useState({})
   const [user, setUser] = useState(null)
+
+  // Edit answer state
+  const [editingAnswer, setEditingAnswer] = useState(null) // question id being edited
+  const [editAnswer, setEditAnswer] = useState('')         // current textarea value
+  const [editSaving, setEditSaving] = useState(false)
+
   const t = (TX[lang] || TX.en).ask
 
   useEffect(() => {
@@ -81,6 +87,31 @@ export default function AskPage() {
     setDeleting(v => ({ ...v, [q.id]: false }))
   }
 
+  function startEdit(q) {
+    setEditingAnswer(q.id)
+    setEditAnswer(q.answer || '')
+  }
+
+  function cancelEdit() {
+    setEditingAnswer(null)
+    setEditAnswer('')
+  }
+
+  async function saveEdit(q) {
+    if (!editAnswer.trim()) return
+    setEditSaving(true)
+    await supabase
+      .from('questions')
+      .update({ answer: editAnswer.trim(), answered_at: new Date().toISOString() })
+      .eq('id', q.id)
+    setEditSaving(false)
+    setEditingAnswer(null)
+    setEditAnswer('')
+    fetchQuestions()
+  }
+
+  const isAdmin = user?.email === ADMIN_EMAIL
+
   return (
     <div style={{ fontFamily: 'Nunito, sans-serif', background: BG, minHeight: '100vh', paddingBottom: 80, direction: 'ltr' }}>
       <div style={{ background: `linear-gradient(135deg, ${INDIGO_DARK} 0%, #2D2A7A 100%)`, padding: '40px 20px 48px', textAlign: 'center' }}>
@@ -113,6 +144,8 @@ export default function AskPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {questions.map(q => (
               <div key={q.id} style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px rgba(79,70,229,0.07)', overflow: 'hidden' }}>
+
+                {/* Status bar */}
                 <div style={{ background: q.status === 'answered' ? '#F0FDF4' : SOFT, padding: '6px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <div style={{ width: 7, height: 7, borderRadius: '50%', background: q.status === 'answered' ? MINT : INDIGO_LIGHT }} />
@@ -120,7 +153,7 @@ export default function AskPage() {
                       {q.status === 'answered' ? t.answered : t.awaiting}
                     </span>
                   </div>
-                  {user?.email === ADMIN_EMAIL && (
+                  {isAdmin && (
                     <button
                       onClick={() => handleDelete(q)}
                       disabled={deleting[q.id]}
@@ -130,21 +163,68 @@ export default function AskPage() {
                     </button>
                   )}
                 </div>
+
                 <div style={{ padding: '14px 16px' }}>
                   <p style={{ fontSize: 15, fontWeight: 700, color: INDIGO_DARK, margin: '0 0 10px', lineHeight: 1.4 }}>{q.question}</p>
+
+                  {/* Answer display or edit mode */}
                   {q.answer && (
                     <div style={{ background: '#F0FDF4', borderRadius: 10, padding: '10px 14px', marginBottom: 10 }}>
-                      <div style={{ fontSize: 11, fontWeight: 800, color: '#059669', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>Komek</div>
-                      <p style={{ fontSize: 13, color: '#065F46', margin: 0, lineHeight: 1.5 }}>{q.answer}</p>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                        <div style={{ fontSize: 11, fontWeight: 800, color: '#059669', textTransform: 'uppercase', letterSpacing: 0.5 }}>Komek</div>
+                        {isAdmin && editingAnswer !== q.id && (
+                          <button
+                            onClick={() => startEdit(q)}
+                            style={{ background: 'none', border: `1.5px solid ${INDIGO_LIGHT}`, borderRadius: 8, padding: '2px 10px', fontSize: 11, fontWeight: 800, color: INDIGO, cursor: 'pointer', fontFamily: 'Nunito, sans-serif' }}
+                          >
+                            ✏️ Edit
+                          </button>
+                        )}
+                      </div>
+
+                      {editingAnswer === q.id ? (
+                        // Edit mode
+                        <div>
+                          <textarea
+                            value={editAnswer}
+                            onChange={e => setEditAnswer(e.target.value)}
+                            rows={4}
+                            autoFocus
+                            style={{ width: '100%', border: `1.5px solid ${INDIGO}`, borderRadius: 10, padding: 10, fontFamily: 'Nunito, sans-serif', fontSize: 13, color: INDIGO_DARK, resize: 'none', outline: 'none', background: '#fff', boxSizing: 'border-box', marginBottom: 8 }}
+                          />
+                          <div style={{ display: 'flex', gap: 8 }}>
+                            <button
+                              onClick={() => saveEdit(q)}
+                              disabled={editSaving || !editAnswer.trim()}
+                              style={{ flex: 1, padding: '8px', background: MINT, color: '#fff', border: 'none', borderRadius: 10, fontFamily: 'Nunito, sans-serif', fontSize: 13, fontWeight: 800, cursor: editSaving ? 'not-allowed' : 'pointer' }}
+                            >
+                              {editSaving ? 'Saving…' : 'Save'}
+                            </button>
+                            <button
+                              onClick={cancelEdit}
+                              disabled={editSaving}
+                              style={{ flex: 1, padding: '8px', background: '#F3F4F6', color: '#6B7280', border: 'none', borderRadius: 10, fontFamily: 'Nunito, sans-serif', fontSize: 13, fontWeight: 800, cursor: 'pointer' }}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        // Display mode
+                        <p style={{ fontSize: 13, color: '#065F46', margin: 0, lineHeight: 1.5 }}>{q.answer}</p>
+                      )}
                     </div>
                   )}
+
                   <button
                     onClick={() => handleUpvote(q)}
                     style={{ display: 'flex', alignItems: 'center', gap: 6, background: voted[q.id] ? SOFT : 'transparent', border: `1.5px solid ${voted[q.id] ? INDIGO : '#E5E7EB'}`, borderRadius: 20, padding: '6px 14px', fontFamily: 'Nunito, sans-serif', fontSize: 12, fontWeight: 700, color: voted[q.id] ? INDIGO : '#6B7280', cursor: 'pointer', transition: 'all 0.2s' }}
                   >
                     👍 {t.upvote} · {q.upvotes || 0}
                   </button>
-                  {user?.email === ADMIN_EMAIL && q.status !== 'answered' && (
+
+                  {/* Post new answer (unanswered questions only) */}
+                  {isAdmin && q.status !== 'answered' && (
                     <div style={{ marginTop: 12 }}>
                       <textarea
                         value={adminAnswer[q.id] || ''}
