@@ -196,7 +196,7 @@ export default function CitizenshipPage() {
 
         {/* STEPS */}
         <div style={{ background: '#fff', borderRadius: 16, padding: 20, marginBottom: 12, border: `1px solid ${SOFT}`, boxShadow: '0 2px 10px rgba(79,70,229,0.06)' }}>
-          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 16px', textAlign: isRtlText ? 'right' : 'left' }}>{t.stepsTitle}</h2>
+          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 16px', textAlign: isRtlText ? 'center' : 'left' }}>{t.stepsTitle}</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {t.steps.map((s, i) => (
               <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', flexDirection: isRtlText ? 'row-reverse' : 'row' }}>
