@@ -11,6 +11,7 @@ const FONT = "'Nunito', sans-serif"
 
 const TX = {
   en: {
+    heroLabel: 'STAGE 2',
     heroTitle: 'Leave to Remain',
     heroSub: 'Everything you need to know about extending your stay in the UK',
     stepsTitle: 'The Process',
@@ -46,6 +47,7 @@ const TX = {
   },
 
   ku: {
+    heroLabel: 'قۆناغی دووەم',
     heroTitle: 'پاسپۆرتەکەت وەرگرتووە',
     heroSub: 'هەموو ئەو شتانەی کە پێویستە بزانیت دەربارەی درێژکردنەوەی مانەوەت لە بەریتانیا',
     stepsTitle: 'پرۆسەکە',
@@ -81,6 +83,7 @@ const TX = {
   },
 
   fa: {
+    heroLabel: 'مرحله ۲',
     heroTitle: 'اجازه اقامت',
     heroSub: 'همه چیزی که باید درباره تمدید اقامت در بریتانیا بدانی',
     stepsTitle: 'مراحل',
@@ -116,6 +119,7 @@ const TX = {
   },
 
   ar: {
+    heroLabel: 'المرحلة ٢',
     heroTitle: 'الإذن بالبقاء',
     heroSub: 'كل ما تحتاج معرفته حول تمديد إقامتك في المملكة المتحدة',
     stepsTitle: 'الخطوات',
@@ -175,9 +179,9 @@ export default function LeaveToRemainPage() {
         <div style={{ position: 'absolute', bottom: -30, left: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(52,211,153,0.08)', pointerEvents: 'none' }} />
         <div style={{ position: 'relative', zIndex: 1 }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(129,140,248,0.2)', border: '1px solid rgba(129,140,248,0.3)', borderRadius: 20, padding: '4px 14px', marginBottom: 16 }}>
-            <span style={{ fontSize: 11, fontWeight: 800, color: INDIGO_LIGHT, letterSpacing: 1.5 }}>STAGE 2</span>
+            <span style={{ fontSize: 11, fontWeight: 800, color: INDIGO_LIGHT, letterSpacing: 1.5 }}>{t.heroLabel}</span>
           </div>
-          <h1 style={{ color: '#fff', fontSize: 28, fontWeight: 900, margin: '0 0 10px', lineHeight: 1.2, textAlign: isRtlText ? 'center' : 'left' }}>{t.heroTitle}</h1>
+          <h1 style={{ color: '#fff', fontSize: 28, fontWeight: 900, margin: '0 0 10px', lineHeight: 1.2, textAlign: isRtlText ? 'right' : 'left' }}>{t.heroTitle}</h1>
           <p style={{ color: '#a5b4fc', fontSize: 14, margin: 0, lineHeight: 1.6, textAlign: isRtlText ? 'right' : 'left' }}>{t.heroSub}</p>
         </div>
       </div>
@@ -186,7 +190,7 @@ export default function LeaveToRemainPage() {
 
         {/* STEPS */}
         <div style={{ background: '#fff', borderRadius: 16, padding: 20, marginBottom: 12, border: `1px solid ${SOFT}`, boxShadow: '0 2px 10px rgba(79,70,229,0.06)' }}>
-          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 16px', textAlign: isRtlText ? 'center' : 'left' }}>{t.stepsTitle}</h2>
+          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 16px', textAlign: isRtlText ? 'right' : 'left' }}>{t.stepsTitle}</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {t.steps.map((s, i) => (
               <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', flexDirection: isRtlText ? 'row-reverse' : 'row' }}>
@@ -205,12 +209,12 @@ export default function LeaveToRemainPage() {
 
         {/* RIGHTS */}
         <div style={{ background: '#fff', borderRadius: 16, padding: 20, marginBottom: 12, border: `1px solid ${SOFT}`, boxShadow: '0 2px 10px rgba(79,70,229,0.06)' }}>
-          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 14px', textAlign: isRtlText ? 'center' : 'left' }}>{t.rightsTitle}</h2>
+          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 14px', textAlign: isRtlText ? 'right' : 'left' }}>{t.rightsTitle}</h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             {t.rights.map((r, i) => (
               <div key={i} style={{ background: SOFT, borderRadius: 12, padding: 14 }}>
                 <div style={{ fontSize: 22, marginBottom: 6, textAlign: isRtlText ? 'right' : 'left' }}>{r.icon}</div>
-                <div style={{ fontSize: 13, fontWeight: 800, color: INDIGO_DARK, marginBottom: r.desc ? 4 : 0, textAlign: isRtlText ? 'center' : 'left' }}>{r.title}</div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: INDIGO_DARK, marginBottom: r.desc ? 4 : 0, textAlign: isRtlText ? 'right' : 'left' }}>{r.title}</div>
                 {r.desc ? <div style={{ fontSize: 11, color: '#6B7280', lineHeight: 1.4, textAlign: isRtlText ? 'right' : 'left' }}>{r.desc}</div> : null}
               </div>
             ))}
@@ -219,7 +223,7 @@ export default function LeaveToRemainPage() {
 
         {/* FAQ */}
         <div style={{ background: '#fff', borderRadius: 16, padding: 20, marginBottom: 12, border: `1px solid ${SOFT}`, boxShadow: '0 2px 10px rgba(79,70,229,0.06)' }}>
-          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 14px', textAlign: isRtlText ? 'center' : 'left' }}>{t.faqTitle}</h2>
+          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 14px', textAlign: isRtlText ? 'right' : 'left' }}>{t.faqTitle}</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {t.faqs.map((f, i) => (
               <div key={i} style={{ borderRadius: 12, border: `1.5px solid ${openFaq === i ? INDIGO : SOFT}`, overflow: 'hidden', transition: 'border 0.2s' }}>
@@ -238,7 +242,7 @@ export default function LeaveToRemainPage() {
 
         {/* HELP */}
         <div style={{ background: '#fff', borderRadius: 16, padding: 20, marginBottom: 12, border: `1px solid ${SOFT}`, boxShadow: '0 2px 10px rgba(79,70,229,0.06)' }}>
-          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 14px', textAlign: isRtlText ? 'center' : 'left' }}>{t.helpTitle}</h2>
+          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 14px', textAlign: isRtlText ? 'right' : 'left' }}>{t.helpTitle}</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {t.helpers.map((h, i) => (
               <div key={i} style={{ background: SOFT, borderRadius: 12, padding: 14, display: 'flex', alignItems: 'center', gap: 12, flexDirection: isRtlText ? 'row-reverse' : 'row' }}>

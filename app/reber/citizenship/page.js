@@ -49,8 +49,7 @@ const TX = {
 
   ku: {
     heroLabel: 'قۆناغی سێیەم',
-    heroTitle: 'بریتانیایی بوون',
-    heroSub: 'ڕێنماییەکەت بۆ بریتانیایی بوون',
+    heroTitle: 'ڕێگای بوون بە هاوڵاتیی بەریتانی',
     stepsTitle: 'پرۆسەی داواکاری',
     steps: [
       { icon: '✅', title: 'شەرتەکان بپشکنە', desc: 'دەبێت لانیکەم ٥ ساڵ لە بریتانیا ژیابیت (٣ ساڵ ئەگەر هاوسەرەکەت بریتانیاییە)، مۆڵەتی نامحدود هەبێت، و تاقیکردنەوەی ژیان لە بریتانیا دەرباز کرد بێت.' },
@@ -62,7 +61,7 @@ const TX = {
     ],
     reqTitle: 'مەرجە سەرەکیەکان',
     requirements: [
-      { icon: '📅', title: '٥ ساڵ مانەوە', desc: 'دەبێت لانیکەم ٥ ساڵ لە بریتانیا ژیابیت' },
+      { icon: '📅', title: 'چەند کات دەخایەنێت', desc: 'دەبێت لانیکەم ٥ ساڵ لە بریتانیا ژیابیت' },
       { icon: '📄', title: 'مۆڵەتی دانیشتن', desc: 'دەبێت ILR یان Settled Status هەبێت' },
       { icon: '🧪', title: 'تاقیکردنەوەی ژیان', desc: 'پێویستە بڕوانامەی دەرباز کردنی تاقیکردنەوەی فەرمی هەبێت' },
       { icon: '🗣️', title: 'ئینگلیزی B1+', desc: 'ئیسپاتی توانای زمانی ئینگلیزی لە ئاستی B1 یان سەروو' },
@@ -76,7 +75,7 @@ const TX = {
       { emoji: '🛂', q: 'پێویستە پاسپۆرتی دیکەم بدەم؟', a: 'بریتانیا دووملیەتی قبووڵ دەکات، لەبەر ئەوە زۆرینەی کات پێویست ناکات ملیەتی دیکەت بدەیت.' },
       { emoji: '📖', q: 'تاقیکردنەوەی ژیان لە بریتانیا چییە؟', a: 'تاقیکردنەوەیەکی کۆمپیوتەریە ٤٥ خولەکی، ٢٤ پرسیار. پێویستە ١٨ وەڵامی دروست بدەیت. کرێکەی ٥٠ پاوندە.' },
     ],
-    helpTitle: 'یارمەتی وەربگرە',
+    helpTitle: 'داوای یارمەتی بکە',
     helpers: [
       { emoji: '📞', name: 'هێڵی یارمەتی ملیەتی UKVI', desc: 'هێڵی فەرمی بۆ پرسیارەکانی بریتانیایی بوون', number: '0300 790 6268', tag: 'فەرمی' },
       { emoji: '📚', name: 'تاقیکردنەوەی ژیان لە بریتانیا', desc: 'تاقیکردنەوەکەت تۆمار بکە لە ماڵپەڕی فەرمی', number: '0800 015 4033', tag: 'تاقیکردنەوە' },
@@ -172,6 +171,7 @@ export default function CitizenshipPage() {
   }, [])
 
   const t = TX[lang] || TX.en
+  const isRtlText = lang === 'ku' || lang === 'fa' || lang === 'ar'
 
   return (
     <div style={{ fontFamily: FONT, direction: 'ltr', background: BG, minHeight: '100vh', paddingBottom: 80 }}>
@@ -184,9 +184,11 @@ export default function CitizenshipPage() {
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(129,140,248,0.2)', border: '1px solid rgba(129,140,248,0.3)', borderRadius: 20, padding: '4px 14px', marginBottom: 16 }}>
             <span style={{ fontSize: 11, fontWeight: 800, color: INDIGO_LIGHT, letterSpacing: 1.5 }}>{t.heroLabel}</span>
           </div>
-          <div style={{ fontSize: 36, marginBottom: 12 }}>🎖️</div>
-          <h1 style={{ color: '#fff', fontSize: 28, fontWeight: 900, margin: '0 0 10px', lineHeight: 1.2 }}>{t.heroTitle}</h1>
-          <p style={{ color: '#a5b4fc', fontSize: 14, margin: 0, lineHeight: 1.6 }}>{t.heroSub}</p>
+          <div style={{ fontSize: 36, marginBottom: 12, textAlign: isRtlText ? 'right' : 'left' }}>🎖️</div>
+          <h1 style={{ color: '#fff', fontSize: 28, fontWeight: 900, margin: '0 0 10px', lineHeight: 1.2, textAlign: 'center' }}>{t.heroTitle}</h1>
+          {t.heroSub && (
+            <p style={{ color: '#a5b4fc', fontSize: 14, margin: 0, lineHeight: 1.6, textAlign: isRtlText ? 'right' : 'left' }}>{t.heroSub}</p>
+          )}
         </div>
       </div>
 
@@ -194,17 +196,17 @@ export default function CitizenshipPage() {
 
         {/* STEPS */}
         <div style={{ background: '#fff', borderRadius: 16, padding: 20, marginBottom: 12, border: `1px solid ${SOFT}`, boxShadow: '0 2px 10px rgba(79,70,229,0.06)' }}>
-          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 16px' }}>{t.stepsTitle}</h2>
+          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 16px', textAlign: isRtlText ? 'right' : 'left' }}>{t.stepsTitle}</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {t.steps.map((s, i) => (
-              <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+              <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', flexDirection: isRtlText ? 'row-reverse' : 'row' }}>
                 <div style={{ width: 40, height: 40, borderRadius: 12, background: SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0, position: 'relative' }}>
                   {s.icon}
                   <div style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: '50%', background: INDIGO, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 900, color: '#fff' }}>{i + 1}</div>
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: INDIGO, marginBottom: 4 }}>{s.title}</div>
-                  <div style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6 }}>{s.desc}</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: INDIGO, marginBottom: 4, textAlign: isRtlText ? 'right' : 'left' }}>{s.title}</div>
+                  <div style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, textAlign: isRtlText ? 'right' : 'left' }}>{s.desc}</div>
                 </div>
               </div>
             ))}
@@ -213,13 +215,13 @@ export default function CitizenshipPage() {
 
         {/* REQUIREMENTS */}
         <div style={{ background: '#fff', borderRadius: 16, padding: 20, marginBottom: 12, border: `1px solid ${SOFT}`, boxShadow: '0 2px 10px rgba(79,70,229,0.06)' }}>
-          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 14px' }}>{t.reqTitle}</h2>
+          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 14px', textAlign: isRtlText ? 'center' : 'left' }}>{t.reqTitle}</h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             {t.requirements.map((r, i) => (
               <div key={i} style={{ background: SOFT, borderRadius: 12, padding: 14 }}>
-                <div style={{ fontSize: 22, marginBottom: 6 }}>{r.icon}</div>
-                <div style={{ fontSize: 13, fontWeight: 800, color: INDIGO_DARK, marginBottom: 4 }}>{r.title}</div>
-                <div style={{ fontSize: 11, color: '#6B7280', lineHeight: 1.4 }}>{r.desc}</div>
+                <div style={{ fontSize: 22, marginBottom: 6, textAlign: isRtlText ? 'right' : 'left' }}>{r.icon}</div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: INDIGO_DARK, marginBottom: 4, textAlign: isRtlText ? 'right' : 'left' }}>{r.title}</div>
+                <div style={{ fontSize: 11, color: '#6B7280', lineHeight: 1.4, textAlign: isRtlText ? 'right' : 'left' }}>{r.desc}</div>
               </div>
             ))}
           </div>
@@ -227,20 +229,20 @@ export default function CitizenshipPage() {
 
         {/* FAQ */}
         <div style={{ background: '#fff', borderRadius: 16, padding: 20, marginBottom: 12, border: `1px solid ${SOFT}`, boxShadow: '0 2px 10px rgba(79,70,229,0.06)' }}>
-          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 14px' }}>{t.faqTitle}</h2>
+          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 14px', textAlign: isRtlText ? 'center' : 'left' }}>{t.faqTitle}</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {t.faqs.map((f, i) => (
               <div key={i} style={{ borderRadius: 12, border: `1.5px solid ${openFaq === i ? INDIGO : SOFT}`, overflow: 'hidden', transition: 'border 0.2s' }}>
                 <button onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  style={{ width: '100%', padding: '13px 16px', background: openFaq === i ? SOFT : '#fff', border: 'none', textAlign: 'left', fontFamily: FONT, fontSize: 14, fontWeight: 700, color: INDIGO_DARK, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  style={{ width: '100%', padding: '13px 16px', background: openFaq === i ? SOFT : '#fff', border: 'none', textAlign: isRtlText ? 'right' : 'left', fontFamily: FONT, fontSize: 14, fontWeight: 700, color: INDIGO_DARK, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexDirection: isRtlText ? 'row-reverse' : 'row' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexDirection: isRtlText ? 'row-reverse' : 'row' }}>
                     <span style={{ fontSize: 16, flexShrink: 0 }}>{f.emoji}</span>
                     <span>{f.q}</span>
                   </div>
                   <span style={{ color: INDIGO, fontSize: 18, fontWeight: 900, flexShrink: 0 }}>{openFaq === i ? '−' : '+'}</span>
                 </button>
                 {openFaq === i && (
-                  <div style={{ padding: '12px 16px', background: SOFT, fontSize: 13, color: '#374151', lineHeight: 1.6, borderTop: `1px solid ${SOFT}` }}>{f.a}</div>
+                  <div style={{ padding: '12px 16px', background: SOFT, fontSize: 13, color: '#374151', lineHeight: 1.6, borderTop: `1px solid ${SOFT}`, textAlign: isRtlText ? 'right' : 'left' }}>{f.a}</div>
                 )}
               </div>
             ))}
@@ -249,17 +251,17 @@ export default function CitizenshipPage() {
 
         {/* HELP */}
         <div style={{ background: '#fff', borderRadius: 16, padding: 20, marginBottom: 12, border: `1px solid ${SOFT}`, boxShadow: '0 2px 10px rgba(79,70,229,0.06)' }}>
-          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 14px' }}>{t.helpTitle}</h2>
+          <h2 style={{ fontSize: 16, fontWeight: 900, color: INDIGO_DARK, margin: '0 0 14px', textAlign: isRtlText ? 'center' : 'left' }}>{t.helpTitle}</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {t.helpers.map((h, i) => (
-              <div key={i} style={{ background: SOFT, borderRadius: 12, padding: 14, display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div key={i} style={{ background: SOFT, borderRadius: 12, padding: 14, display: 'flex', alignItems: 'center', gap: 12, flexDirection: isRtlText ? 'row-reverse' : 'row' }}>
                 <div style={{ width: 40, height: 40, borderRadius: 12, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{h.emoji}</div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2, flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2, flexWrap: 'wrap', flexDirection: isRtlText ? 'row-reverse' : 'row' }}>
                     <span style={{ fontSize: 13, fontWeight: 800, color: INDIGO_DARK }}>{h.name}</span>
                     <span style={{ background: INDIGO + '22', color: INDIGO, fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20 }}>{h.tag}</span>
                   </div>
-                  <div style={{ fontSize: 11, color: '#6B7280' }}>{h.desc}</div>
+                  <div style={{ fontSize: 11, color: '#6B7280', textAlign: isRtlText ? 'right' : 'left' }}>{h.desc}</div>
                 </div>
                 <a href={`tel:${h.number.replace(/\s/g, '')}`}
                   style={{ background: MINT, color: '#fff', fontWeight: 800, fontSize: 11, padding: '8px 12px', borderRadius: 10, textDecoration: 'none', flexShrink: 0, whiteSpace: 'nowrap' }}>

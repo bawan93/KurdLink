@@ -99,14 +99,14 @@ export default function ComingToUKPage() {
               </div>
             ))}
           </div>
-          <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 800, margin: '0 0 10px', lineHeight: 1.2, textAlign: isRtlText ? 'center' : 'left' }}>{t.heroTitle}</h1>
+          <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 800, margin: '0 0 10px', lineHeight: 1.2, textAlign: isRtlText ? 'right' : 'left' }}>{t.heroTitle}</h1>
           <p style={{ color: '#a5b4fc', fontSize: 14, margin: 0, lineHeight: 1.6, textAlign: isRtlText ? 'right' : 'left' }}>{t.heroSub}</p>
         </div>
       </div>
 
       {/* Stage cards */}
       <div style={{ padding: '14px 16px 0' }}>
-        <p style={{ color: '#6b7280', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, margin: '0 0 10px', textAlign: isRtlText ? 'center' : 'left' }}>{t.allStages}</p>
+        <p style={{ color: '#6b7280', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, margin: '0 0 10px', textAlign: isRtlText ? 'right' : 'left' }}>{t.allStages}</p>
         {t.stages.map((stage, i) => (
           <div key={i} onClick={() => router.push(stage.route)} style={{ background: '#fff', borderRadius: 16, marginBottom: 12, border: `1px solid ${SOFT}`, boxShadow: '0 2px 10px rgba(79,70,229,0.06)', overflow: 'hidden', cursor: 'pointer' }}>
             <div style={{ padding: '16px 16px 12px', borderBottom: '1px solid #F3F4F6' }}>
@@ -117,7 +117,7 @@ export default function ComingToUKPage() {
                 <span style={{ fontSize: 11, color: '#6b7280', fontWeight: 600 }}>{stage.step}</span>
                 <span style={{ background: stage.badgeColor+'22', color: stage.badgeColor, fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20, border: `1px solid ${stage.badgeColor}44` }}>{stage.badge}</span>
               </div>
-              <h3 style={{ color: INDIGO_DARK, fontWeight: 800, fontSize: 17, margin: '0 0 5px', textAlign: isRtlText ? 'center' : 'left' }}>{stage.title}</h3>
+              <h3 style={{ color: INDIGO_DARK, fontWeight: 800, fontSize: 17, margin: '0 0 5px', textAlign: isRtlText ? 'right' : 'left' }}>{stage.title}</h3>
               <p style={{ color: '#6b7280', fontSize: 13, margin: 0, lineHeight: 1.5, textAlign: isRtlText ? 'right' : 'left' }}>{stage.desc}</p>
             </div>
             <div style={{ padding: '10px 16px' }}>
@@ -140,7 +140,7 @@ export default function ComingToUKPage() {
         <div style={{ background: 'linear-gradient(135deg, #0f172a, #1e1b4b)', borderRadius: 16, padding: '18px 16px', display: 'flex', alignItems: 'center', gap: 14, boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}>
           <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(79,70,229,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>📄</div>
           <div style={{ flex: 1 }}>
-            <p style={{ color: '#fff', fontWeight: 800, fontSize: 14, margin: '0 0 3px', textAlign: isRtlText ? 'center' : 'left' }}>{t.letterBanner}</p>
+            <p style={{ color: '#fff', fontWeight: 800, fontSize: 14, margin: '0 0 3px', textAlign: isRtlText ? 'right' : 'left' }}>{t.letterBanner}</p>
             <p style={{ color: '#a5b4fc', fontSize: 12, margin: '0 0 10px', textAlign: isRtlText ? 'right' : 'left' }}>{t.heroSub}</p>
             <button onClick={() => router.push('/journey/document-explainer')} style={{ background: MINT, color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>{t.letterCta} →</button>
           </div>
