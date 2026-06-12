@@ -40,6 +40,7 @@ const TX = {
     tagline: 'Free. Always.',
     peopleHelped: 'People helped',
     jobsServices: 'Jobs & services',
+    questionsAnswered: 'Questions answered',
     featuresTitle: 'Everything Komek does for you — free, always',
     features: [
       { icon: '📄', title: 'Understand Any Letter', desc: 'Got a letter from the Home Office, HMRC, the council or your landlord? Take a photo or paste the text and our AI explains it in your language in seconds.', cta: 'Try it free', route: '/journey/document-explainer' },
@@ -62,6 +63,7 @@ const TX = {
     tagline: 'لە خزمەتی ئێوەی بەڕێزدا',
     peopleHelped: 'کەسی یارمەتی دراو',
     jobsServices: 'کار و خزمەتگوزاریەکان',
+    questionsAnswered: 'پرسیارە وەڵامدراوەکان',
     featuresTitle: 'کۆمەک بێ بەرامبەر یارمەتیت دەدات',
     features: [
       { icon: '📄', title: 'ڕوونکردنەوەی نامە', descJsx: true, cta: 'تاقی بکەرەوە', route: '/journey/document-explainer' },
@@ -84,6 +86,7 @@ const TX = {
     tagline: 'رایگان. همیشه.',
     peopleHelped: 'نفر کمک شده',
     jobsServices: 'شغل و خدمات',
+    questionsAnswered: 'سوال پاسخ داده شده',
     featuresTitle: 'همه کارهایی که کومک برایت انجام می‌دهد — رایگان، همیشه',
     features: [
       { icon: '📄', title: 'هر نامه‌ای را بفهم', desc: 'نامه‌ای از Home Office، HMRC، شورا یا صاحبخانه داری؟ عکس بگیر یا متن را بچسبان، هوش مصنوعی ما در چند ثانیه به زبانت توضیح می‌دهد.', cta: 'رایگان امتحان کن', route: '/journey/document-explainer' },
@@ -106,6 +109,7 @@ const TX = {
     tagline: 'مجاني. دائماً.',
     peopleHelped: 'شخص تمت مساعدته',
     jobsServices: 'الوظائف والخدمات',
+    questionsAnswered: 'الأسئلة التي تمت إجابتها',
     featuresTitle: 'كل ما تفعله كومك من أجلك — مجاناً، دائماً',
     features: [
       { icon: '📄', title: 'افهم أي رسالة', desc: 'هل لديك رسالة من وزارة الداخلية أو HMRC أو المجلس أو المالك؟ التقط صورة أو الصق النص وسيشرحها الذكاء الاصطناعي بلغتك في ثوانٍ.', cta: 'جرّبه مجاناً', route: '/journey/document-explainer' },
@@ -174,7 +178,7 @@ function KuLetterDesc() {
 export default function HomePage() {
   const router = useRouter()
   const [lang, setLang] = useState('en')
-  const [stats, setStats] = useState({ explained: 0, listings: 0 })
+  const [stats, setStats] = useState({ explained: 0, listings: 0, questionsAnswered: 0 })
   const [questions, setQuestions] = useState([])
   const [listings, setListings] = useState([])
   const [loading, setLoading] = useState(true)
@@ -200,9 +204,10 @@ export default function HomePage() {
     setLoading(true)
     const { count: explainCount } = await supabase.from('explainer_usage').select('*', { count: 'exact', head: true })
     const { count: listingCount } = await supabase.from('listings').select('*', { count: 'exact', head: true }).in('type', ['hire_staff', 'list_service']).in('status', ['approved', 'filled'])
+    const { count: answeredCount } = await supabase.from('questions').select('*', { count: 'exact', head: true }).eq('status', 'answered')
     const { data: topQuestions } = await supabase.from('questions').select('id, question, status, upvotes').order('upvotes', { ascending: false }).limit(2)
     const { data: latestListings } = await supabase.from('listings').select('id, type, data, status').in('type', ['hire_staff', 'list_service']).in('status', ['approved', 'filled']).order('created_at', { ascending: false }).limit(3)
-    setStats({ explained: explainCount || 0, listings: listingCount || 0 })
+    setStats({ explained: explainCount || 0, listings: listingCount || 0, questionsAnswered: answeredCount || 0 })
     setQuestions(topQuestions || [])
     setListings(latestListings || [])
     setLoading(false)
@@ -232,17 +237,18 @@ export default function HomePage() {
             <span style={{ fontSize: 13, fontWeight: 800, color: MINT }}>{t.tagline}</span>
           </div>
 
-          {/* STATS */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, maxWidth: 320, margin: '0 auto' }}>
+          {/* STATS — 3 cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, maxWidth: 360, margin: '0 auto' }}>
             {[
               { value: stats.explained, suffix: '+', label: t.peopleHelped, color: MINT },
               { value: stats.listings, suffix: '', label: t.jobsServices, color: INDIGO_LIGHT },
+              { value: stats.questionsAnswered, suffix: '', label: t.questionsAnswered, color: '#F59E0B' },
             ].map((s, i) => (
-              <div key={i} style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 14, padding: '14px 16px', textAlign: 'center' }}>
-                <div style={{ fontSize: 28, fontWeight: 900, color: s.color, lineHeight: 1 }}>
+              <div key={i} style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 14, padding: '12px 8px', textAlign: 'center' }}>
+                <div style={{ fontSize: 24, fontWeight: 900, color: s.color, lineHeight: 1 }}>
                   {loading ? '—' : <Counter target={s.value} suffix={s.suffix} />}
                 </div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', fontWeight: 600, marginTop: 5, lineHeight: 1.3 }}>{s.label}</div>
+                <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.55)', fontWeight: 600, marginTop: 5, lineHeight: 1.3 }}>{s.label}</div>
               </div>
             ))}
           </div>
