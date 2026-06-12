@@ -20,9 +20,9 @@ const TX = {
     letterBanner: "Got a letter from the Home Office?",
     letterCta: "Explain it free",
     stages: [
-      { step: "Stage 1", title: "Just Arrived", badge: "Start here", badgeColor: MINT, desc: "You've just arrived in the UK and don't know what happens next.", preview: ["What happens when you first arrive", "Where they will put you"], cta: "View Stage 1", route: "/reber/new-to-uk" },
-      { step: "Stage 2", title: "Leave to Remain", badge: "Most common", badgeColor: INDIGO_LIGHT, desc: "Your asylum claim is being processed and you are waiting for a decision.", preview: ["The 42-day deadline", "Your Biometric Residence Permit", "Your new rights"], cta: "View Stage 2", route: "/reber/leave-to-remain" },
-      { step: "Stage 3", title: "Path to Citizenship", badge: "Final stage", badgeColor: "#F59E0B", desc: "You have status. Now build your future and work toward citizenship.", preview: ["Indefinite Leave to Remain", "Life in the UK test", "British citizenship"], cta: "View Stage 3", route: "/reber/citizenship" },
+      { step: "Stage 1", title: "Just Arrived", badge: "Start here", badgeColor: MINT, cta: "View Stage 1", route: "/reber/new-to-uk" },
+      { step: "Stage 2", title: "Leave to Remain", badge: "Most common", badgeColor: INDIGO_LIGHT, cta: "View Stage 2", route: "/reber/leave-to-remain" },
+      { step: "Stage 3", title: "Path to Citizenship", badge: "Final stage", badgeColor: "#F59E0B", cta: "View Stage 3", route: "/reber/citizenship" },
     ],
   },
   ku: {
@@ -32,9 +32,9 @@ const TX = {
     letterBanner: "نامەیەکت لە هۆم ئۆفیس وەرگرتووە؟",
     letterCta: "بەخۆڕایی ڕوونی بکەرەوە",
     stages: [
-      { step: "قۆناغی یەکەم", title: "کاتێک تازە گەیشتووی", badge: "لێرەوە دەست پێ بکە", badgeColor: MINT, desc: "تازە گەیشتووی بە بەریتانیا و هەنگاوەکانی داهاتوو نازانیت.", preview: ["چی ڕوودەدات کاتێک تۆ تازە گەیشتووی؟", "لە کوێ نیشتەجێ دەکرێیت"], cta: "بینینی قۆناغی یەکەم", route: "/reber/new-to-uk" },
-      { step: "قۆناغی دووەم", title: "پاسپۆرتەکەت وەرگرتووە", badge: "باوترین قۆناغ", badgeColor: INDIGO_LIGHT, desc: "داواکاری مافی پەنابەریت جێبەجێ دەکرێت و چاوەڕێی بڕیار دەکەیت.", preview: ["٤٢ ڕۆژ مۆڵەتت هەییە", "مۆڵەتی مانەوەی بایۆمەتری", "مافە نوێیەکانت"], cta: "بینینی قۆناغی دووەم", route: "/reber/leave-to-remain" },
-      { step: "قۆناغی سێیەم", title: "ڕێگای هاوڵاتیبوون", badge: "قۆناغی کۆتایی", badgeColor: "#F59E0B", desc: "پێگەی پەنابەریت پێدراوە. ئێستا داهاتووت بنیاد بنێ.", preview: ["مانەوەی نادیار", "تاقیکردنەوەی ژیان لە بەریتانیا", "هاووڵاتیبوونی بریتانی"], cta: "بینینی قۆناغی سێیەم", route: "/reber/citizenship" },
+      { step: "قۆناغی یەکەم", title: "کاتێک تازە گەیشتووی", badge: "لێرەوە دەست پێ بکە", badgeColor: MINT, cta: "بینینی قۆناغی یەکەم", route: "/reber/new-to-uk" },
+      { step: "قۆناغی دووەم", title: "پاسپۆرتەکەت وەرگرتووە", badge: "باوترین قۆناغ", badgeColor: INDIGO_LIGHT, cta: "بینینی قۆناغی دووەم", route: "/reber/leave-to-remain" },
+      { step: "قۆناغی سێیەم", title: "ڕێگای هاوڵاتیبوون", badge: "قۆناغی کۆتایی", badgeColor: "#F59E0B", cta: "بینینی قۆناغی سێیەم", route: "/reber/citizenship" },
     ],
   },
   fa: {
@@ -44,9 +44,9 @@ const TX = {
     letterBanner: "نامه‌ای از Home Office داری؟",
     letterCta: "رایگان توضیح بده",
     stages: [
-      { step: "مرحله ۱", title: "تازه رسیدی", badge: "از اینجا شروع کن", badgeColor: MINT, desc: "تازه به بریتانیا رسیدی و نمی‌دانی چه اتفاقی می‌افتد.", preview: ["چه اتفاقی در مرز می‌افتد", "کجا اسکان می‌یابی", "چک‌لیست هفته اول"], cta: "مرحله ۱ را ببین", route: "/reber/new-to-uk" },
-      { step: "مرحله ۲", title: "اجازه اقامت", badge: "رایج‌ترین", badgeColor: INDIGO_LIGHT, desc: "درخواستت در حال بررسی است. منتظر تصمیم هستی.", preview: ["مهلت ۴۲ روزه", "کارت اقامت بیومتریک", "حقوق جدیدت"], cta: "مرحله ۲ را ببین", route: "/reber/leave-to-remain" },
-      { step: "مرحله ۳", title: "مسیر شهروندی", badge: "مرحله آخر", badgeColor: "#F59E0B", desc: "وضعیتت تأیید شده. حالا آینده‌ات را بساز.", preview: ["اقامت دائم", "آزمون زندگی در UK", "شهروندی بریتانیا"], cta: "مرحله ۳ را ببین", route: "/reber/citizenship" },
+      { step: "مرحله ۱", title: "تازه رسیدی", badge: "از اینجا شروع کن", badgeColor: MINT, cta: "مرحله ۱ را ببین", route: "/reber/new-to-uk" },
+      { step: "مرحله ۲", title: "اجازه اقامت", badge: "رایج‌ترین", badgeColor: INDIGO_LIGHT, cta: "مرحله ۲ را ببین", route: "/reber/leave-to-remain" },
+      { step: "مرحله ۳", title: "مسیر شهروندی", badge: "مرحله آخر", badgeColor: "#F59E0B", cta: "مرحله ۳ را ببین", route: "/reber/citizenship" },
     ],
   },
   ar: {
@@ -56,9 +56,9 @@ const TX = {
     letterBanner: "لديك رسالة من Home Office؟",
     letterCta: "اشرحها مجاناً",
     stages: [
-      { step: "المرحلة ١", title: "وصلت للتو", badge: "ابدأ من هنا", badgeColor: MINT, desc: "وصلت للتو إلى المملكة المتحدة ولا تعرف ماذا سيحدث.", preview: ["ما يحدث عند الحدود", "أين ستقيم", "قائمة التحقق للأسبوع الأول"], cta: "عرض المرحلة ١", route: "/reber/new-to-uk" },
-      { step: "المرحلة ٢", title: "إذن البقاء", badge: "الأكثر شيوعاً", badgeColor: INDIGO_LIGHT, desc: "طلبك قيد المعالجة. أنت تنتظر قراراً.", preview: ["الموعد النهائي ٤٢ يوماً", "بطاقة الإقامة البيومترية", "حقوقك الجديدة"], cta: "عرض المرحلة ٢", route: "/reber/leave-to-remain" },
-      { step: "المرحلة ٣", title: "مسار الجنسية", badge: "المرحلة الأخيرة", badgeColor: "#F59E0B", desc: "تم منحك الوضع. الآن ابنِ مستقبلك.", preview: ["إقامة دائمة غير محددة", "اختبار الحياة في المملكة المتحدة", "الجنسية البريطانية"], cta: "عرض المرحلة ٣", route: "/reber/citizenship" },
+      { step: "المرحلة ١", title: "وصلت للتو", badge: "ابدأ من هنا", badgeColor: MINT, cta: "عرض المرحلة ١", route: "/reber/new-to-uk" },
+      { step: "المرحلة ٢", title: "إذن البقاء", badge: "الأكثر شيوعاً", badgeColor: INDIGO_LIGHT, cta: "عرض المرحلة ٢", route: "/reber/leave-to-remain" },
+      { step: "المرحلة ٣", title: "مسار الجنسية", badge: "المرحلة الأخيرة", badgeColor: "#F59E0B", cta: "عرض المرحلة ٣", route: "/reber/citizenship" },
     ],
   },
 }
@@ -109,26 +109,15 @@ export default function ComingToUKPage() {
         <p style={{ color: '#6b7280', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, margin: '0 0 10px', textAlign: isRtlText ? 'right' : 'left' }}>{t.allStages}</p>
         {t.stages.map((stage, i) => (
           <div key={i} onClick={() => router.push(stage.route)} style={{ background: '#fff', borderRadius: 16, marginBottom: 12, border: `1px solid ${SOFT}`, boxShadow: '0 2px 10px rgba(79,70,229,0.06)', overflow: 'hidden', cursor: 'pointer' }}>
-            <div style={{ padding: '16px 16px 12px', borderBottom: '1px solid #F3F4F6' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexDirection: isRtlText ? 'row-reverse' : 'row' }}>
+            <div style={{ padding: '16px 16px 14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexDirection: isRtlText ? 'row-reverse' : 'row' }}>
                 <div style={{ width: 26, height: 26, borderRadius: '50%', background: stage.badgeColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, color: '#fff', flexShrink: 0 }}>
                   {useArabicNums ? ARABIC_NUMS[i] : i + 1}
                 </div>
                 <span style={{ fontSize: 11, color: '#6b7280', fontWeight: 600 }}>{stage.step}</span>
                 <span style={{ background: stage.badgeColor+'22', color: stage.badgeColor, fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20, border: `1px solid ${stage.badgeColor}44` }}>{stage.badge}</span>
               </div>
-              <h3 style={{ color: INDIGO_DARK, fontWeight: 800, fontSize: 17, margin: '0 0 5px', textAlign: isRtlText ? 'right' : 'left' }}>{stage.title}</h3>
-              <p style={{ color: '#6b7280', fontSize: 13, margin: 0, lineHeight: 1.5, textAlign: isRtlText ? 'right' : 'left' }}>{stage.desc}</p>
-            </div>
-            <div style={{ padding: '10px 16px' }}>
-              {stage.preview.map((item, j) => (
-                <div key={j} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 7, flexDirection: isRtlText ? 'row-reverse' : 'row' }}>
-                  <div style={{ width: 5, height: 5, borderRadius: '50%', background: stage.badgeColor, flexShrink: 0 }} />
-                  <span style={{ fontSize: 13, color: '#4b5563', textAlign: isRtlText ? 'right' : 'left' }}>{item}</span>
-                </div>
-              ))}
-            </div>
-            <div style={{ padding: '0 16px 14px' }}>
+              <h3 style={{ color: INDIGO_DARK, fontWeight: 800, fontSize: 17, margin: '0 0 14px', textAlign: isRtlText ? 'right' : 'left' }}>{stage.title}</h3>
               <div style={{ background: INDIGO_DARK, color: '#fff', borderRadius: 10, padding: 12, textAlign: 'center', fontSize: 14, fontWeight: 700 }}>{stage.cta} →</div>
             </div>
           </div>
