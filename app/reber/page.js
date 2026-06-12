@@ -227,27 +227,28 @@ const INFO_SECTIONS = [
 ]
 
 const TX = {
-  en: { myStage: '📍 My Stage', infoHelp: '📋 Info & Help', ask: '❓ Ask', reberTitle: 'Rêber', reberSub: 'ڕێبەر — Your guide to life in the UK', selectStage: 'Where are you in your journey?', askTitle: 'Ask a Question', askSub: 'Ask anything about life in the UK. Bawan will answer personally.', askPlaceholder: 'Type your question here…', askBtn: 'Submit Question', askSuccess: 'Your question has been submitted!', awaitingAnswer: 'Awaiting answer…', answeredBy: 'Answered by Bawan', upvote: 'Helpful', questions: 'Questions', noQuestions: 'No questions yet — be the first to ask!', back: '← Back' },
-  ku: { myStage: '📍 قۆناغەکەم', infoHelp: '📋 زانیاری و یارمەتی', ask: '❓ پرسیار', reberTitle: 'ڕێبەر', reberSub: 'ڕێنمای ژیانت لە UK', selectStage: 'لە کوێیت لە گەشتەکەتدا؟', askTitle: 'پرسیار بکە', askSub: 'هەر شتێک بپرسە دەربارەی ژیان لە UK. باوان بە خۆی وەڵام دەداتەوە.', askPlaceholder: 'پرسیارەکەت ئێرە بنووسە…', askBtn: 'پرسیار بنێرە', askSuccess: 'پرسیارەکەت نێردرا!', awaitingAnswer: 'چاوەڕوانی وەڵامە…', answeredBy: 'وەڵامدراوەتەوە لەلایەن باوان', upvote: 'یارمەتیدەر', questions: 'پرسیارەکان', noQuestions: 'هێشتا هیچ پرسیارێک نییە — یەکەمین بە!', back: '→ گەڕانەوە' },
-  fa: { myStage: '📍 مرحله من', infoHelp: '📋 اطلاعات و کمک', ask: '❓ سوال', reberTitle: 'ڕێبەر', reberSub: 'راهنمای زندگی در بریتانیا', selectStage: 'در کجای سفرت هستی؟', askTitle: 'سوال بپرس', askSub: 'هر چیزی درباره زندگی در UK بپرس. باوان شخصاً پاسخ می‌دهد.', askPlaceholder: 'سوالت را اینجا بنویس…', askBtn: 'ارسال سوال', askSuccess: 'سوالت ارسال شد!', awaitingAnswer: 'در انتظار پاسخ…', answeredBy: 'پاسخ داده شده توسط باوان', upvote: 'مفید', questions: 'سوالات', noQuestions: 'هنوز سوالی نیست — اولین نفر باش!', back: '→ بازگشت' },
-  ar: { myStage: '📍 مرحلتي', infoHelp: '📋 معلومات ومساعدة', ask: '❓ اسأل', reberTitle: 'ڕێبەر', reberSub: 'دليلك للحياة في المملكة المتحدة', selectStage: 'أين أنت في رحلتك؟', askTitle: 'اطرح سؤالاً', askSub: 'اسأل أي شيء عن الحياة في المملكة المتحدة. سيجيب باوان شخصياً.', askPlaceholder: 'اكتب سؤالك هنا…', askBtn: 'إرسال السؤال', askSuccess: 'تم إرسال سؤالك!', awaitingAnswer: 'في انتظار الإجابة…', answeredBy: 'أجاب عليه باوان', upvote: 'مفيد', questions: 'الأسئلة', noQuestions: 'لا توجد أسئلة بعد — كن الأول!', back: '→ رجوع' },
+  en: { myStage: '📍 My Stage', infoHelp: '📋 Info & Help', ask: '❓ Ask', reberTitle: 'Rêber', reberSub: 'Your step-by-step guide from arrival to citizenship', selectStage: 'Where are you in your journey?', askTitle: 'Ask a Question', askSub: 'Ask anything about life in the UK. Bawan will answer personally.', askPlaceholder: 'Type your question here…', askBtn: 'Submit Question', askSuccess: 'Your question has been submitted!', awaitingAnswer: 'Awaiting answer…', answeredBy: 'Answered by Bawan', upvote: 'Helpful', questions: 'Questions', noQuestions: 'No questions yet — be the first to ask!', back: '← Back' },
+  ku: { myStage: '📍 قۆناغەکەم', infoHelp: '📋 زانیاری و یارمەتی', ask: '❓ پرسیار', reberTitle: 'ڕێبەر', reberSub: 'ڕێنمای هەنگاو بە هەنگاوت لە گەیشتن تا هاووڵاتیبوون', selectStage: 'لە کوێیت لە گەشتەکەتدا؟', askTitle: 'پرسیار بکە', askSub: 'هەر شتێک بپرسە دەربارەی ژیان لە UK. باوان بە خۆی وەڵام دەداتەوە.', askPlaceholder: 'پرسیارەکەت ئێرە بنووسە…', askBtn: 'پرسیار بنێرە', askSuccess: 'پرسیارەکەت نێردرا!', awaitingAnswer: 'چاوەڕوانی وەڵامە…', answeredBy: 'وەڵامدراوەتەوە لەلایەن باوان', upvote: 'یارمەتیدەر', questions: 'پرسیارەکان', noQuestions: 'هێشتا هیچ پرسیارێک نییە — یەکەمین بە!', back: '→ گەڕانەوە' },
+  fa: { myStage: '📍 مرحله من', infoHelp: '📋 اطلاعات و کمک', ask: '❓ سوال', reberTitle: 'ڕێبەر', reberSub: 'راهنمای گام به گام از ورود تا شهروندی', selectStage: 'در کجای سفرت هستی؟', askTitle: 'سوال بپرس', askSub: 'هر چیزی درباره زندگی در UK بپرس. باوان شخصاً پاسخ می‌دهد.', askPlaceholder: 'سوالت را اینجا بنویس…', askBtn: 'ارسال سوال', askSuccess: 'سوالت ارسال شد!', awaitingAnswer: 'در انتظار پاسخ…', answeredBy: 'پاسخ داده شده توسط باوان', upvote: 'مفید', questions: 'سوالات', noQuestions: 'هنوز سوالی نیست — اولین نفر باش!', back: '→ بازگشت' },
+  ar: { myStage: '📍 مرحلتي', infoHelp: '📋 معلومات ومساعدة', ask: '❓ اسأل', reberTitle: 'ڕێبەر', reberSub: 'دليلك خطوة بخطوة من الوصول إلى الجنسية', selectStage: 'أين أنت في رحلتك؟', askTitle: 'اطرح سؤالاً', askSub: 'اسأل أي شيء عن الحياة في المملكة المتحدة. سيجيب باوان شخصياً.', askPlaceholder: 'اكتب سؤالك هنا…', askBtn: 'إرسال السؤال', askSuccess: 'تم إرسال سؤالك!', awaitingAnswer: 'في انتظار الإجابة…', answeredBy: 'أجاب عليه باوان', upvote: 'مفيد', questions: 'الأسئلة', noQuestions: 'لا توجد أسئلة بعد — كن الأول!', back: '→ رجوع' },
 }
 
 function SectionCard({ section, lang, color }) {
   const [open, setOpen] = useState(false)
+  const isRTL = lang === 'ku' || lang === 'fa' || lang === 'ar'
   return (
     <div onClick={() => setOpen(!open)} style={{ background: '#fff', borderRadius: 16, marginBottom: 12, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', cursor: 'pointer', border: `1.5px solid ${open ? color : 'transparent'}`, transition: 'border 0.2s' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px' }}>
         <span style={{ fontSize: 26, flexShrink: 0 }}>{section.icon}</span>
-        <span style={{ fontFamily: FONT, fontWeight: 700, fontSize: 15, color: INDIGO_DARK, flex: 1 }}>{section.title[lang] || section.title.en}</span>
+        <span style={{ fontFamily: FONT, fontWeight: 700, fontSize: 15, color: INDIGO_DARK, flex: 1, textAlign: isRTL ? 'right' : 'left' }}>{section.title[lang] || section.title.en}</span>
         <span style={{ fontSize: 18, color, transform: open ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }}>›</span>
       </div>
       {open && (
         <div style={{ borderTop: `2px solid ${color}20`, padding: '4px 16px 16px' }}>
           {(section.points[lang] || section.points.en).map((point, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginTop: 10 }}>
+            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginTop: 10, flexDirection: isRTL ? 'row-reverse' : 'row' }}>
               <span style={{ color, fontWeight: 900, fontSize: 16, flexShrink: 0, marginTop: 1 }}>•</span>
-              <span style={{ fontFamily: FONT, fontSize: 14, color: '#333', lineHeight: 1.6 }}>{point}</span>
+              <span style={{ fontFamily: FONT, fontSize: 14, color: '#333', lineHeight: 1.6, textAlign: isRTL ? 'right' : 'left' }}>{point}</span>
             </div>
           ))}
         </div>
@@ -258,19 +259,20 @@ function SectionCard({ section, lang, color }) {
 
 function InfoCard({ section, lang }) {
   const [open, setOpen] = useState(false)
+  const isRTL = lang === 'ku' || lang === 'fa' || lang === 'ar'
   return (
     <div onClick={() => setOpen(!open)} style={{ background: '#fff', borderRadius: 16, marginBottom: 12, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', cursor: 'pointer', border: `1.5px solid ${open ? section.color : 'transparent'}`, transition: 'border 0.2s' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px' }}>
         <div style={{ width: 44, height: 44, borderRadius: 12, background: `${section.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>{section.icon}</div>
-        <span style={{ fontFamily: FONT, fontWeight: 700, fontSize: 15, color: INDIGO_DARK, flex: 1 }}>{section.title[lang] || section.title.en}</span>
+        <span style={{ fontFamily: FONT, fontWeight: 700, fontSize: 15, color: INDIGO_DARK, flex: 1, textAlign: isRTL ? 'right' : 'left' }}>{section.title[lang] || section.title.en}</span>
         <span style={{ fontSize: 18, color: section.color, transform: open ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }}>›</span>
       </div>
       {open && (
         <div style={{ borderTop: `2px solid ${section.color}20`, padding: '4px 16px 16px' }}>
           {(section.points[lang] || section.points.en).map((point, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginTop: 10 }}>
+            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginTop: 10, flexDirection: isRTL ? 'row-reverse' : 'row' }}>
               <span style={{ color: section.color, fontWeight: 900, fontSize: 16, flexShrink: 0, marginTop: 1 }}>•</span>
-              <span style={{ fontFamily: FONT, fontSize: 14, color: '#333', lineHeight: 1.6 }}>{point}</span>
+              <span style={{ fontFamily: FONT, fontSize: 14, color: '#333', lineHeight: 1.6, textAlign: isRTL ? 'right' : 'left' }}>{point}</span>
             </div>
           ))}
         </div>
@@ -292,6 +294,7 @@ export default function ReberPage() {
   const [isAdmin, setIsAdmin] = useState(false)
   const [adminAnswer, setAdminAnswer] = useState({})
   const t = TX[lang] || TX.en
+  const isRTL = lang === 'ku' || lang === 'fa' || lang === 'ar'
 
   useEffect(() => {
     const saved = localStorage.getItem('komek_lang')
@@ -348,18 +351,18 @@ export default function ReberPage() {
   const stageContent = activeStage ? STAGE_CONTENT[activeStage] : null
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F5F4FF', fontFamily: FONT, direction: 'ltr' }}>
+    <div style={{ minHeight: '100vh', background: '#F5F4FF', fontFamily: FONT, direction: 'ltr', paddingBottom: 80 }}>
 
       {/* Header */}
       <div style={{ background: `linear-gradient(135deg, ${INDIGO_DARK} 0%, #2d2b6b 100%)`, padding: '16px 16px 0', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <button onClick={() => activeStage ? setActiveStage(null) : router.push('/home')} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', fontSize: 22, cursor: 'pointer', padding: 0 }}>←</button>
-            <div>
-              <div style={{ fontSize: 20, fontWeight: 900, color: '#fff' }}>🧭 {t.reberTitle}</div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 1 }}>{t.reberSub}</div>
-            </div>
+          <button onClick={() => activeStage ? setActiveStage(null) : router.push('/home')} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', fontSize: 22, cursor: 'pointer', padding: 0, flexShrink: 0 }}>←</button>
+
+          <div style={{ flex: 1, textAlign: 'center' }}>
+            <div style={{ fontSize: 20, fontWeight: 900, color: '#fff' }}>🧭 {t.reberTitle}</div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{t.reberSub}</div>
           </div>
+
           <LangDropdown lang={lang} onChange={setLang} />
         </div>
 
@@ -415,8 +418,8 @@ export default function ReberPage() {
               {STAGES.find(s => s.id === activeStage)?.emoji}
             </div>
             <div style={{ fontSize: 28, marginBottom: 8 }}>{STAGES.find(s => s.id === activeStage)?.emoji}</div>
-            <div style={{ fontSize: 20, fontWeight: 900, color: '#fff', marginBottom: 6 }}>{stageContent.title[lang] || stageContent.title.en}</div>
-            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', lineHeight: 1.5 }}>{stageContent.subtitle[lang] || stageContent.subtitle.en}</div>
+            <div style={{ fontSize: 20, fontWeight: 900, color: '#fff', marginBottom: 6, textAlign: isRTL ? 'right' : 'left' }}>{stageContent.title[lang] || stageContent.title.en}</div>
+            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', lineHeight: 1.5, textAlign: isRTL ? 'right' : 'left' }}>{stageContent.subtitle[lang] || stageContent.subtitle.en}</div>
           </div>
           {stageContent.sections.map((section, i) => (
             <SectionCard key={i} section={section} lang={lang} color={stageContent.color} />
@@ -437,14 +440,14 @@ export default function ReberPage() {
       {activeTab === 'ask' && (
         <div style={{ padding: '16px 16px 32px' }}>
           <div style={{ background: '#fff', borderRadius: 20, padding: '20px', marginBottom: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-            <div style={{ fontSize: 18, fontWeight: 800, color: INDIGO_DARK, marginBottom: 6 }}>❓ {t.askTitle}</div>
-            <div style={{ fontSize: 13, color: '#888', marginBottom: 16, lineHeight: 1.5 }}>{t.askSub}</div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: INDIGO_DARK, marginBottom: 6, textAlign: isRTL ? 'right' : 'left' }}>❓ {t.askTitle}</div>
+            <div style={{ fontSize: 13, color: '#888', marginBottom: 16, lineHeight: 1.5, textAlign: isRTL ? 'right' : 'left' }}>{t.askSub}</div>
             <textarea
               value={newQuestion}
               onChange={e => setNewQuestion(e.target.value)}
               placeholder={t.askPlaceholder}
               rows={3}
-              style={{ width: '100%', padding: '12px 14px', border: '1.5px solid rgba(0,0,0,0.1)', borderRadius: 12, fontSize: 14, fontFamily: FONT, outline: 'none', resize: 'vertical', lineHeight: 1.5, boxSizing: 'border-box' }}
+              style={{ width: '100%', padding: '12px 14px', border: '1.5px solid rgba(0,0,0,0.1)', borderRadius: 12, fontSize: 14, fontFamily: FONT, outline: 'none', resize: 'vertical', lineHeight: 1.5, boxSizing: 'border-box', textAlign: isRTL ? 'right' : 'left' }}
             />
             {submitted && (
               <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 10, padding: '10px 14px', marginTop: 10, color: '#166534', fontSize: 13, fontWeight: 600 }}>
@@ -460,17 +463,17 @@ export default function ReberPage() {
             </button>
           </div>
 
-          <div style={{ fontSize: 15, fontWeight: 800, color: INDIGO_DARK, marginBottom: 14 }}>💬 {t.questions}</div>
+          <div style={{ fontSize: 15, fontWeight: 800, color: INDIGO_DARK, marginBottom: 14, textAlign: isRTL ? 'right' : 'left' }}>💬 {t.questions}</div>
           {questions.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '40px 20px', color: '#aaa', fontSize: 14 }}>{t.noQuestions}</div>
           ) : (
             questions.map(q => (
               <div key={q.id} style={{ background: '#fff', borderRadius: 16, padding: '16px', marginBottom: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-                <p style={{ fontSize: 15, fontWeight: 600, color: '#1a1a1a', margin: '0 0 12px', lineHeight: 1.5 }}>{q.question}</p>
+                <p style={{ fontSize: 15, fontWeight: 600, color: '#1a1a1a', margin: '0 0 12px', lineHeight: 1.5, textAlign: isRTL ? 'right' : 'left' }}>{q.question}</p>
                 {q.answer ? (
                   <div style={{ background: '#F0F9FF', borderRadius: 12, padding: '12px 14px', marginBottom: 12, borderLeft: `3px solid ${INDIGO_DARK}` }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: INDIGO_DARK, marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.5 }}>🧭 {t.answeredBy}</div>
-                    <p style={{ fontSize: 14, color: '#1a1a1a', margin: 0, lineHeight: 1.6 }}>{q.answer}</p>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: INDIGO_DARK, marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.5, textAlign: isRTL ? 'right' : 'left' }}>🧭 {t.answeredBy}</div>
+                    <p style={{ fontSize: 14, color: '#1a1a1a', margin: 0, lineHeight: 1.6, textAlign: isRTL ? 'right' : 'left' }}>{q.answer}</p>
                   </div>
                 ) : (
                   <div style={{ background: '#FFFBEB', borderRadius: 10, padding: '8px 12px', marginBottom: 12, display: 'inline-block' }}>
