@@ -63,6 +63,8 @@ const TX = {
   },
 }
 
+const STEP_COLORS = [MINT, INDIGO_LIGHT, '#F59E0B']
+
 export default function ComingToUKPage() {
   const router = useRouter()
   const [lang, setLang] = useState('en')
@@ -79,6 +81,9 @@ export default function ComingToUKPage() {
   const isRtlText = lang === 'ku' || lang === 'fa' || lang === 'ar'
   const useArabicNums = lang === 'ku' || lang === 'fa' || lang === 'ar'
 
+  // For RTL languages: show steps 3→2→1 (right to left reading order)
+  const stepIndices = isRtlText ? [2, 1, 0] : [0, 1, 2]
+
   return (
     <div style={{ minHeight: '100vh', background: BG, fontFamily: FONT, direction: 'ltr', paddingBottom: 80 }}>
 
@@ -88,17 +93,17 @@ export default function ComingToUKPage() {
         <div style={{ position: 'absolute', bottom: -30, left: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(52,211,153,0.08)', pointerEvents: 'none' }} />
         <div style={{ position: 'relative', zIndex: 1 }}>
 
-          {/* Step indicators — centered */}
+          {/* Step indicators — centered, RTL-aware order */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 24 }}>
-            {[0,1,2].map(i => (
+            {stepIndices.map((i, pos) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: i===0?MINT:i===1?INDIGO_LIGHT:'#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, color: '#fff' }}>
+                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: STEP_COLORS[i], display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, color: '#fff' }}>
                     {useArabicNums ? ARABIC_NUMS[i] : i + 1}
                   </div>
                   <span style={{ color: 'rgba(255,255,255,0.65)', fontSize: 10, fontWeight: 600 }}>{t.stages[i].step}</span>
                 </div>
-                {i < 2 && <div style={{ width: 20, height: 2, background: 'rgba(255,255,255,0.2)', marginBottom: 14 }} />}
+                {pos < 2 && <div style={{ width: 20, height: 2, background: 'rgba(255,255,255,0.2)', marginBottom: 14 }} />}
               </div>
             ))}
           </div>
