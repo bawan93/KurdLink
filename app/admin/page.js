@@ -21,17 +21,33 @@ const TYPE_LABELS = {
   list_service: { label: 'Service',     icon: '🛠️', color: '#059669' },
 }
 
-const FILTERS = [
+const LISTING_FILTERS = [
   { id: 'pending',  label: 'Pending',  color: '#F59E0B' },
   { id: 'approved', label: 'Approved', color: '#22C55E' },
   { id: 'rejected', label: 'Rejected', color: '#EF4444' },
   { id: 'filled',   label: 'Filled',   color: '#9CA3AF' },
 ]
 
+const ERROR_TYPE_META = {
+  rate_limited:     { label: 'Rate Limited',    color: '#F59E0B', bg: '#FFFBEB', icon: '🚦' },
+  api_error:        { label: 'API Error',       color: '#EF4444', bg: '#FEF2F2', icon: '🔴' },
+  parse_error:      { label: 'Parse Error',     color: '#8B5CF6', bg: '#F5F3FF', icon: '⚠️' },
+  no_content:       { label: 'No Content',      color: '#6B7280', bg: '#F9FAFB', icon: '📭' },
+  unexpected_error: { label: 'Unexpected',      color: '#DC2626', bg: '#FEF2F2', icon: '💥' },
+}
+
+const MAIN_TABS = [
+  { id: 'listings', label: '📋 Listings' },
+  { id: 'errors',   label: '⚠️ Explainer Errors' },
+]
+
 function AdminInner() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [authorized, setAuthorized] = useState(false)
+  const [mainTab, setMainTab] = useState('listings')
+
+  // Listings state
   const [listings, setListings] = useState([])
   const [selected, setSelected] = useState(null)
   const [filter, setFilter] = useState('pending')
@@ -40,8 +56,15 @@ function AdminInner() {
   const [actionLoading, setActionLoading] = useState(false)
   const [counts, setCounts] = useState({})
 
+  // Errors state
+  const [errors, setErrors] = useState([])
+  const [errorLoading, setErrorLoading] = useState(false)
+  const [expandedError, setExpandedError] = useState(null)
+  const [errorCount, setErrorCount] = useState(0)
+
   useEffect(() => { checkAuth() }, [])
   useEffect(() => { if (authorized) fetchListings() }, [authorized, filter])
+  useEffect(() => { if (authorized && mainTab === 'errors') fetchErrors() }, [authorized, mainTab])
 
   const checkAuth = async () => {
     const supabase = getSupabase()
@@ -56,11 +79,42 @@ function AdminInner() {
     const { data } = await supabase.from('listings').select('*').eq('status', filter).order('created_at', { ascending: false })
     setListings(data || [])
     const newCounts = {}
-    for (const f of FILTERS) {
+    for (const f of LISTING_FILTERS) {
       const { count } = await supabase.from('listings').select('*', { count: 'exact', head: true }).eq('status', f.id)
       newCounts[f.id] = count || 0
     }
     setCounts(newCounts)
+    // Also update error count badge
+    const { count: ec } = await supabase.from('explainer_errors').select('*', { count: 'exact', head: true })
+    setErrorCount(ec || 0)
+  }
+
+  const fetchErrors = async () => {
+    setErrorLoading(true)
+    const supabase = getSupabase()
+    const { data } = await supabase
+      .from('explainer_errors')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(200)
+    setErrors(data || [])
+    setErrorCount(data?.length || 0)
+    setErrorLoading(false)
+  }
+
+  const handleDeleteError = async (id) => {
+    await getSupabase().from('explainer_errors').delete().eq('id', id)
+    setErrors(prev => prev.filter(e => e.id !== id))
+    setExpandedError(null)
+    setErrorCount(prev => Math.max(0, prev - 1))
+  }
+
+  const handleClearAllErrors = async () => {
+    if (!confirm('Clear all explainer errors? This cannot be undone.')) return
+    await getSupabase().from('explainer_errors').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+    setErrors([])
+    setErrorCount(0)
+    setExpandedError(null)
   }
 
   const handleApprove = async (id) => {
@@ -100,6 +154,7 @@ function AdminInner() {
 
   if (!authorized) return null
 
+  // --- LISTING DETAIL VIEW ---
   if (selected) {
     const d = selected.data || {}
     const type = TYPE_LABELS[selected.type] || { label: selected.type, icon: '📋', color: INDIGO }
@@ -107,7 +162,6 @@ function AdminInner() {
 
     return (
       <div style={{ minHeight: '100vh', background: BG, fontFamily: FONT }}>
-        {/* Header */}
         <div style={{ background: `linear-gradient(135deg, ${INDIGO_DARK} 0%, #2D2A7A 100%)`, padding: '16px 20px', position: 'sticky', top: 0, zIndex: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <button onClick={() => { setSelected(null); setShowReject(false); setRejectReason('') }} style={{ background: 'none', border: 'none', color: '#fff', fontSize: 15, cursor: 'pointer', fontFamily: FONT, fontWeight: 700 }}>← Back</button>
           <div style={{ fontSize: 16, fontWeight: 800, color: '#fff' }}>Review Listing</div>
@@ -115,7 +169,6 @@ function AdminInner() {
         </div>
 
         <div style={{ maxWidth: 600, margin: '0 auto', padding: '20px 16px 80px' }}>
-          {/* Type + status */}
           <div style={{ background: '#fff', borderRadius: 16, padding: '16px', marginBottom: 14, boxShadow: '0 2px 12px rgba(79,70,229,0.07)', display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 44, height: 44, borderRadius: 12, background: SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>{type.icon}</div>
             <div style={{ flex: 1 }}>
@@ -127,7 +180,6 @@ function AdminInner() {
             </div>
           </div>
 
-          {/* Fields */}
           <div style={{ background: '#fff', borderRadius: 16, padding: '16px', marginBottom: 14, boxShadow: '0 2px 12px rgba(79,70,229,0.07)' }}>
             {fields.map(([key, val]) => (
               <div key={key} style={{ marginBottom: 12, paddingBottom: 12, borderBottom: `1px solid ${SOFT}` }}>
@@ -137,7 +189,6 @@ function AdminInner() {
             ))}
           </div>
 
-          {/* Actions */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {selected.status === 'pending' && !showReject && (
               <>
@@ -178,6 +229,7 @@ function AdminInner() {
     )
   }
 
+  // --- MAIN VIEW ---
   return (
     <div style={{ minHeight: '100vh', background: BG, fontFamily: FONT }}>
       {/* Header */}
@@ -187,54 +239,157 @@ function AdminInner() {
           <button onClick={() => router.push('/home')} style={{ background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', fontSize: 12, cursor: 'pointer', fontFamily: FONT, fontWeight: 700, padding: '6px 14px', borderRadius: 20 }}>← App</button>
         </div>
 
-        {/* Counts */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, marginBottom: 12 }}>
-          {FILTERS.map(f => (
-            <div key={f.id} style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 10, padding: '8px 4px', textAlign: 'center' }}>
-              <div style={{ fontSize: 18, fontWeight: 900, color: f.color }}>{counts[f.id] ?? 0}</div>
-              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>{f.label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Filter tabs */}
-        <div style={{ display: 'flex', gap: 6 }}>
-          {FILTERS.map(f => (
-            <button key={f.id} onClick={() => setFilter(f.id)}
-              style={{ flex: 1, padding: '7px 0', background: filter === f.id ? '#fff' : 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 10, fontSize: 11, fontWeight: 700, color: filter === f.id ? INDIGO_DARK : 'rgba(255,255,255,0.7)', cursor: 'pointer', fontFamily: FONT }}>
-              {f.label}
+        {/* Main tabs: Listings / Errors */}
+        <div style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
+          {MAIN_TABS.map(t => (
+            <button key={t.id} onClick={() => setMainTab(t.id)}
+              style={{ flex: 1, padding: '9px 0', background: mainTab === t.id ? '#fff' : 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 800, color: mainTab === t.id ? INDIGO_DARK : 'rgba(255,255,255,0.8)', cursor: 'pointer', fontFamily: FONT, position: 'relative' }}>
+              {t.label}
+              {t.id === 'errors' && errorCount > 0 && (
+                <span style={{ position: 'absolute', top: -6, right: -4, background: '#EF4444', color: '#fff', fontSize: 10, fontWeight: 900, borderRadius: 20, padding: '2px 6px', minWidth: 18, textAlign: 'center' }}>{errorCount}</span>
+              )}
             </button>
           ))}
         </div>
-      </div>
 
-      <div style={{ maxWidth: 600, margin: '0 auto', padding: '16px 16px 80px' }}>
-        {listings.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>📭</div>
-            <p style={{ fontSize: 14, color: '#9CA3AF', fontWeight: 600 }}>No {filter} listings</p>
-          </div>
-        ) : (
-          listings.map(listing => {
-            const type = TYPE_LABELS[listing.type] || { label: listing.type, icon: '📋', color: INDIGO }
-            const d = listing.data || {}
-            const title = d.jobTitle || d.serviceName || 'Untitled'
-            const subtitle = d.location || ''
-            return (
-              <button key={listing.id} onClick={() => setSelected(listing)}
-                style={{ width: '100%', background: '#fff', border: `1.5px solid ${SOFT}`, borderRadius: 16, padding: '14px 16px', marginBottom: 10, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left', boxSizing: 'border-box', boxShadow: '0 2px 8px rgba(79,70,229,0.06)' }}>
-                <div style={{ width: 42, height: 42, borderRadius: 12, background: SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{type.icon}</div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: INDIGO_DARK, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</div>
-                  <div style={{ fontSize: 12, color: '#9CA3AF' }}>{type.label}{subtitle ? ` • ${subtitle}` : ''}</div>
-                  <div style={{ fontSize: 11, color: '#C4B5FD', marginTop: 2 }}>{formatDate(listing.created_at)}</div>
+        {/* Listing sub-filters — only shown on listings tab */}
+        {mainTab === 'listings' && (
+          <>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, marginBottom: 12 }}>
+              {LISTING_FILTERS.map(f => (
+                <div key={f.id} style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 10, padding: '8px 4px', textAlign: 'center' }}>
+                  <div style={{ fontSize: 18, fontWeight: 900, color: f.color }}>{counts[f.id] ?? 0}</div>
+                  <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>{f.label}</div>
                 </div>
-                <div style={{ fontSize: 18, color: INDIGO, opacity: 0.4, flexShrink: 0 }}>›</div>
-              </button>
-            )
-          })
+              ))}
+            </div>
+            <div style={{ display: 'flex', gap: 6 }}>
+              {LISTING_FILTERS.map(f => (
+                <button key={f.id} onClick={() => setFilter(f.id)}
+                  style={{ flex: 1, padding: '7px 0', background: filter === f.id ? '#fff' : 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 10, fontSize: 11, fontWeight: 700, color: filter === f.id ? INDIGO_DARK : 'rgba(255,255,255,0.7)', cursor: 'pointer', fontFamily: FONT }}>
+                  {f.label}
+                </button>
+              ))}
+            </div>
+          </>
         )}
       </div>
+
+      {/* --- LISTINGS TAB --- */}
+      {mainTab === 'listings' && (
+        <div style={{ maxWidth: 600, margin: '0 auto', padding: '16px 16px 80px' }}>
+          {listings.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+              <div style={{ fontSize: 40, marginBottom: 12 }}>📭</div>
+              <p style={{ fontSize: 14, color: '#9CA3AF', fontWeight: 600 }}>No {filter} listings</p>
+            </div>
+          ) : (
+            listings.map(listing => {
+              const type = TYPE_LABELS[listing.type] || { label: listing.type, icon: '📋', color: INDIGO }
+              const d = listing.data || {}
+              const title = d.jobTitle || d.serviceName || 'Untitled'
+              const subtitle = d.location || ''
+              return (
+                <button key={listing.id} onClick={() => setSelected(listing)}
+                  style={{ width: '100%', background: '#fff', border: `1.5px solid ${SOFT}`, borderRadius: 16, padding: '14px 16px', marginBottom: 10, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left', boxSizing: 'border-box', boxShadow: '0 2px 8px rgba(79,70,229,0.06)' }}>
+                  <div style={{ width: 42, height: 42, borderRadius: 12, background: SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{type.icon}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: INDIGO_DARK, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</div>
+                    <div style={{ fontSize: 12, color: '#9CA3AF' }}>{type.label}{subtitle ? ` • ${subtitle}` : ''}</div>
+                    <div style={{ fontSize: 11, color: '#C4B5FD', marginTop: 2 }}>{formatDate(listing.created_at)}</div>
+                  </div>
+                  <div style={{ fontSize: 18, color: INDIGO, opacity: 0.4, flexShrink: 0 }}>›</div>
+                </button>
+              )
+            })
+          )}
+        </div>
+      )}
+
+      {/* --- ERRORS TAB --- */}
+      {mainTab === 'errors' && (
+        <div style={{ maxWidth: 600, margin: '0 auto', padding: '16px 16px 80px' }}>
+          {errorLoading ? (
+            <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+              <div style={{ width: 32, height: 32, border: `3px solid ${SOFT}`, borderTopColor: INDIGO, borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto' }} />
+              <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            </div>
+          ) : errors.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+              <div style={{ fontSize: 40, marginBottom: 12 }}>✅</div>
+              <p style={{ fontSize: 14, color: '#9CA3AF', fontWeight: 600 }}>No errors logged</p>
+            </div>
+          ) : (
+            <>
+              {/* Clear all button */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+                <button onClick={handleClearAllErrors}
+                  style={{ background: '#FEF2F2', border: '1.5px solid #FECACA', color: '#EF4444', borderRadius: 10, padding: '7px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>
+                  🗑️ Clear All
+                </button>
+              </div>
+
+              {errors.map(err => {
+                const meta = ERROR_TYPE_META[err.error_type] || { label: err.error_type, color: '#6B7280', bg: '#F9FAFB', icon: '❓' }
+                const isExpanded = expandedError === err.id
+                return (
+                  <div key={err.id} style={{ background: '#fff', border: `1.5px solid ${isExpanded ? meta.color : SOFT}`, borderRadius: 16, marginBottom: 10, overflow: 'hidden', boxShadow: '0 2px 8px rgba(79,70,229,0.05)', transition: 'border-color 0.2s' }}>
+                    {/* Row */}
+                    <button onClick={() => setExpandedError(isExpanded ? null : err.id)}
+                      style={{ width: '100%', background: 'none', border: 'none', padding: '14px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left', fontFamily: FONT, boxSizing: 'border-box' }}>
+                      {/* Error type badge */}
+                      <div style={{ width: 42, height: 42, borderRadius: 12, background: meta.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>
+                        {meta.icon}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
+                          <span style={{ fontSize: 13, fontWeight: 800, color: meta.color }}>{meta.label}</span>
+                          <span style={{ fontSize: 11, background: err.input_type === 'image' ? '#EFF6FF' : '#F0FDF4', color: err.input_type === 'image' ? '#3B82F6' : '#059669', borderRadius: 6, padding: '2px 7px', fontWeight: 700 }}>{err.input_type || '—'}</span>
+                          <span style={{ fontSize: 11, background: SOFT, color: INDIGO, borderRadius: 6, padding: '2px 7px', fontWeight: 700 }}>{err.lang || '—'}</span>
+                        </div>
+                        <div style={{ fontSize: 11, color: '#9CA3AF' }}>{formatDate(err.created_at)}</div>
+                        {/* Preview of error detail */}
+                        {!isExpanded && err.error_detail && (
+                          <div style={{ fontSize: 12, color: '#6B7280', marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {err.error_detail}
+                          </div>
+                        )}
+                      </div>
+                      <div style={{ fontSize: 16, color: '#9CA3AF', flexShrink: 0, transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }}>›</div>
+                    </button>
+
+                    {/* Expanded detail */}
+                    {isExpanded && (
+                      <div style={{ padding: '0 16px 16px', borderTop: `1px solid ${SOFT}` }}>
+                        <div style={{ marginTop: 12 }}>
+                          <div style={{ fontSize: 11, fontWeight: 800, color: INDIGO, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>Error Detail</div>
+                          <div style={{ background: '#1F2937', borderRadius: 10, padding: '12px 14px', fontSize: 12, color: '#E5E7EB', fontFamily: 'monospace', lineHeight: 1.6, wordBreak: 'break-all', whiteSpace: 'pre-wrap' }}>
+                            {err.error_detail || '(no detail)'}
+                          </div>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 12 }}>
+                          <div style={{ background: BG, borderRadius: 10, padding: '10px 12px' }}>
+                            <div style={{ fontSize: 10, fontWeight: 800, color: INDIGO, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 3 }}>Identifier</div>
+                            <div style={{ fontSize: 12, color: INDIGO_DARK, fontWeight: 600, wordBreak: 'break-all' }}>{err.identifier || '—'}</div>
+                          </div>
+                          <div style={{ background: BG, borderRadius: 10, padding: '10px 12px' }}>
+                            <div style={{ fontSize: 10, fontWeight: 800, color: INDIGO, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 3 }}>User Type</div>
+                            <div style={{ fontSize: 12, color: INDIGO_DARK, fontWeight: 600 }}>{err.identifier_type === 'user' ? '👤 Account' : '🌐 Anonymous'}</div>
+                          </div>
+                        </div>
+                        <button onClick={() => handleDeleteError(err.id)}
+                          style={{ marginTop: 12, width: '100%', padding: '10px', background: '#1F2937', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: FONT }}>
+                          🗑️ Delete This Error
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </>
+          )}
+        </div>
+      )}
     </div>
   )
 }

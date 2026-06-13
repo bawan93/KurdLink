@@ -14,7 +14,6 @@ const systemPrompts = {
   en: `You are a helpful assistant for people living in the UK. Explain the letter in simple plain English. Respond with ONLY a raw JSON object, no markdown, no backticks. Use this exact structure: {"letterType":"type of letter","summary":"plain explanation of what this letter means","deadlines":["any important dates or deadlines as array items"],"whatToDo":["step 1","step 2"],"warning":"any urgent warning or null if none"}`
 }
 
-// Anonymous: count ALL time (no 24h window) — limit is permanent until account created
 async function getAnonTotalCount(identifier) {
   const { count } = await supabaseAdmin
     .from('explainer_usage')
@@ -24,7 +23,6 @@ async function getAnonTotalCount(identifier) {
   return count || 0
 }
 
-// Logged-in: 24h rolling window for image limit
 async function getUsageCount(identifier, identifierType, inputType) {
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
   const { count } = await supabaseAdmin
@@ -45,31 +43,62 @@ async function recordUsage(identifier, identifierType, inputType) {
   })
 }
 
+async function logError(identifier, identifierType, inputType, lang, errorType, errorDetail) {
+  try {
+    await supabaseAdmin.from('explainer_errors').insert({
+      identifier,
+      identifier_type: identifierType,
+      input_type: inputType,
+      lang,
+      error_type: errorType,
+      error_detail: errorDetail,
+    })
+  } catch (e) {
+    console.error('Failed to log error to Supabase:', e)
+  }
+}
+
 export async function POST(req) {
+  let ip = 'unknown'
+  let userId = null
+  let inputType = 'text'
+  let lang = 'en'
+
   try {
     const body = await req.json()
-    const { lang, text, imageData, imageType, userId } = body
-    const inputType = imageData ? 'image' : 'text'
+    lang = body.lang || 'en'
+    const { text, imageData, imageType } = body
+    userId = body.userId || null
+    inputType = imageData ? 'image' : 'text'
 
-    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-                req.headers.get('x-real-ip') ||
-                'unknown'
+    ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+         req.headers.get('x-real-ip') ||
+         'unknown'
+
+    const identifier = userId || ip
+    const identifierType = userId ? 'user' : 'ip'
 
     // --- RATE LIMITING ---
     if (userId) {
-      // Logged-in: 10 images/day, unlimited text
       if (inputType === 'image') {
         const count = await getUsageCount(userId, 'user', 'image')
         if (count >= 10) {
+          await logError(identifier, identifierType, inputType, lang, 'rate_limited', 'Account image limit reached (10/day)')
           return NextResponse.json({ error: 'limit_reached', limitType: 'image_account' }, { status: 429 })
         }
       }
     } else {
-      // Anonymous: 3 total uses ever (no reset — must create account)
       const total = await getAnonTotalCount(ip)
       if (total >= 3) {
+        await logError(identifier, identifierType, inputType, lang, 'rate_limited', 'Anonymous total limit reached (3 lifetime)')
         return NextResponse.json({ error: 'limit_reached', limitType: 'total_anon' }, { status: 429 })
       }
+    }
+
+    // --- VALIDATE CONTENT ---
+    if (!imageData && (!text || !text.trim())) {
+      await logError(identifier, identifierType, inputType, lang, 'no_content', 'Request arrived with no text or image')
+      return NextResponse.json({ error: 'No content provided' }, { status: 400 })
     }
 
     // --- BUILD MESSAGE ---
@@ -92,10 +121,8 @@ export async function POST(req) {
           }
         ]
       }]
-    } else if (text && text.trim()) {
-      messages = [{ role: 'user', content: `Explain this letter:\n\n${text}` }]
     } else {
-      return NextResponse.json({ error: 'No content provided' }, { status: 400 })
+      messages = [{ role: 'user', content: `Explain this letter:\n\n${text}` }]
     }
 
     // --- CALL ANTHROPIC ---
@@ -107,7 +134,7 @@ export async function POST(req) {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-6",
+        model: 'claude-sonnet-4-6',
         max_tokens: 1200,
         system: systemPrompt,
         messages
@@ -117,19 +144,25 @@ export async function POST(req) {
     const data = await res.json()
 
     if (!res.ok) {
-      console.error('Anthropic API error:', JSON.stringify(data))
+      const detail = JSON.stringify(data)
+      console.error('Anthropic API error:', detail)
+      await logError(identifier, identifierType, inputType, lang, 'api_error', detail)
       return NextResponse.json({ error: 'API error' }, { status: 500 })
     }
 
-    // Record usage after successful response
-    if (userId) {
-      await recordUsage(userId, 'user', inputType)
-    } else {
-      await recordUsage(ip, 'ip', inputType)
+    // --- PARSE RESPONSE ---
+    let parsed
+    try {
+      const raw = data.content[0].text.replace(/```json|```/g, '').trim()
+      parsed = JSON.parse(raw)
+    } catch (parseErr) {
+      const raw = data.content?.[0]?.text || '(no response text)'
+      await logError(identifier, identifierType, inputType, lang, 'parse_error', `JSON parse failed. Raw response: ${raw.slice(0, 500)}`)
+      return NextResponse.json({ error: 'Failed to parse response' }, { status: 500 })
     }
 
-    const raw = data.content[0].text.replace(/```json|```/g, '').trim()
-    const parsed = JSON.parse(raw)
+    // Record usage only after full success
+    await recordUsage(identifier, identifierType, inputType)
 
     return NextResponse.json({
       letterType: String(parsed.letterType || ''),
@@ -141,6 +174,9 @@ export async function POST(req) {
 
   } catch (e) {
     console.error('Explain route error:', e)
+    const identifier = userId || ip
+    const identifierType = userId ? 'user' : 'ip'
+    await logError(identifier, identifierType, inputType, lang, 'unexpected_error', e?.message || 'Unknown error')
     return NextResponse.json({ error: 'Failed' }, { status: 500 })
   }
 }
