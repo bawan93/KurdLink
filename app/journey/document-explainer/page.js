@@ -36,11 +36,10 @@ const translations = {
     errorMsg: 'Something went wrong. Please try again.',
     imageReady: 'Tap Explain to continue',
     removeImage: '✕ Remove image',
-    limitImage_anon: "You've used your 3 free image explanations today. Create a free account for 10 per day.",
-    limitText_anon: "You've used your 10 free text explanations today. Come back tomorrow.",
+    limitTotal_anon: "You've used your 3 free explanations today. Create a free account to continue.",
     limitImage_account: "You've used your 10 image explanations today. Come back tomorrow.",
     createAccount: 'Create Free Account',
-    imagesLeft: 'images left',
+    usesLeft: 'free uses left',
     resetsIn: 'Resets in',
   },
   ku: {
@@ -62,11 +61,10 @@ const translations = {
     errorMsg: 'هەڵەیەک ڕوویدا. دووبارە هەوڵ بدەوە.',
     imageReady: 'دەستی بکە بۆ ڕوونکردنەوە',
     removeImage: '✕ وێنەکە بسڕەوە',
-    limitImage_anon: '٣ جارت بەخۆڕایی وێنە ڕوونکردوەتەوە ئەمڕۆ. ئەکاونت دروست بکە بۆ ١٠ جار.',
-    limitText_anon: '١٠ جارت بەخۆڕایی دەق ڕوونکردوەتەوە ئەمڕۆ. سبەی دەگەڕێیتەوە.',
+    limitTotal_anon: '٣ جارت بەخۆڕایی بەکاریهێناوە ئەمڕۆ. ئەکاونت دروست بکە بۆ بەردەوامبوون.',
     limitImage_account: '١٠ جارت وێنە ڕوونکردوەتەوە ئەمڕۆ. سبەی دەگەڕێیتەوە.',
     createAccount: 'ئەکاونتی خۆڕای دروست بکە',
-    imagesLeft: 'وێنە ماوە',
+    usesLeft: 'جار ماوە',
     resetsIn: 'نوێ دەبێتەوە لە',
   },
   fa: {
@@ -88,11 +86,10 @@ const translations = {
     errorMsg: 'مشکلی پیش آمد. دوباره تلاش کنید.',
     imageReady: 'برای توضیح ادامه بده',
     removeImage: '✕ حذف تصویر',
-    limitImage_anon: 'امروز ۳ توضیح تصویر رایگان استفاده کردی. حساب رایگان بساز برای ۱۰ در روز.',
-    limitText_anon: 'امروز ۱۰ توضیح متن رایگان استفاده کردی. فردا برگرد.',
+    limitTotal_anon: 'امروز ۳ توضیح رایگان استفاده کردی. حساب رایگان بساز برای ادامه.',
     limitImage_account: 'امروز ۱۰ توضیح تصویر استفاده کردی. فردا برگرد.',
     createAccount: 'ایجاد حساب رایگان',
-    imagesLeft: 'تصویر باقی مانده',
+    usesLeft: 'استفاده باقی مانده',
     resetsIn: 'بازنشینی در',
   },
   ar: {
@@ -114,13 +111,24 @@ const translations = {
     errorMsg: 'حدث خطأ. حاول مرة أخرى.',
     imageReady: 'اضغط للشرح',
     removeImage: '✕ إزالة الصورة',
-    limitImage_anon: 'استخدمت ٣ شروحات صور مجانية اليوم. أنشئ حساباً مجانياً للحصول على ١٠ يومياً.',
-    limitText_anon: 'استخدمت ١٠ شروحات نص مجانية اليوم. ارجع غداً.',
+    limitTotal_anon: 'استخدمت ٣ شروحات مجانية اليوم. أنشئ حساباً مجانياً للمتابعة.',
     limitImage_account: 'استخدمت ١٠ شروحات صور اليوم. ارجع غداً.',
     createAccount: 'إنشاء حساب مجاني',
-    imagesLeft: 'صور متبقية',
+    usesLeft: 'استخدامات متبقية',
     resetsIn: 'يتجدد في',
   },
+}
+
+// Combined total usage for anonymous users (no input_type filter)
+async function fetchAnonTotalCount(ip) {
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+  const { count } = await supabase
+    .from('explainer_usage')
+    .select('*', { count: 'exact', head: true })
+    .eq('identifier', ip)
+    .eq('identifier_type', 'ip')
+    .gte('created_at', since)
+  return count || 0
 }
 
 async function fetchUsageCount(identifier, identifierType, inputType) {
@@ -133,6 +141,19 @@ async function fetchUsageCount(identifier, identifierType, inputType) {
     .eq('input_type', inputType)
     .gte('created_at', since)
   return count || 0
+}
+
+async function fetchOldestAnonUsage(ip) {
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+  const { data } = await supabase
+    .from('explainer_usage')
+    .select('created_at')
+    .eq('identifier', ip)
+    .eq('identifier_type', 'ip')
+    .gte('created_at', since)
+    .order('created_at', { ascending: true })
+    .limit(1)
+  return data?.[0]?.created_at || null
 }
 
 async function fetchOldestUsage(identifier, identifierType, inputType) {
@@ -182,15 +203,29 @@ export default function DocumentExplainerPage() {
   const [userId, setUserId] = useState(null)
   const [userIp, setUserIp] = useState(null)
   const [dragOver, setDragOver] = useState(false)
+
+  // Anonymous: combined total uses (image + text)
+  const [anonTotalUsed, setAnonTotalUsed] = useState(0)
+  const [oldestAnonUsage, setOldestAnonUsage] = useState(null)
+
+  // Logged-in: image uses only
   const [imageUsed, setImageUsed] = useState(0)
   const [oldestImageUsage, setOldestImageUsage] = useState(null)
+
   const fileRef = useRef(null)
   const cameraRef = useRef(null)
   const t = translations[lang] || translations.en
   const canSubmit = tab === 'paste' ? text.trim().length > 0 : imageData !== null
-  const imageLimit = userId ? 10 : 3
-  const imageLeft = Math.max(0, imageLimit - imageUsed)
-  const countdown = useCountdown(imageUsed > 0 ? oldestImageUsage : null)
+
+  // What to show in the hero pill
+  const isAnon = !userId
+  const anonUsesLeft = Math.max(0, 3 - anonTotalUsed)
+  const imageLeft = Math.max(0, 10 - imageUsed)
+
+  const countdownSource = isAnon
+    ? (anonTotalUsed > 0 ? oldestAnonUsage : null)
+    : (imageUsed > 0 ? oldestImageUsage : null)
+  const countdown = useCountdown(countdownSource)
 
   useEffect(() => {
     const stored = localStorage.getItem('komek_lang')
@@ -207,11 +242,11 @@ export default function DocumentExplainerPage() {
           const res = await fetch('https://api.ipify.org?format=json')
           const d = await res.json()
           setUserIp(d.ip)
-          const imgCount = await fetchUsageCount(d.ip, 'ip', 'image')
-          setImageUsed(imgCount)
-          if (imgCount > 0) {
-            const oldest = await fetchOldestUsage(d.ip, 'ip', 'image')
-            setOldestImageUsage(oldest)
+          const total = await fetchAnonTotalCount(d.ip)
+          setAnonTotalUsed(total)
+          if (total > 0) {
+            const oldest = await fetchOldestAnonUsage(d.ip)
+            setOldestAnonUsage(oldest)
           }
         } catch {
           // IP fetch failed, continue without
@@ -230,14 +265,21 @@ export default function DocumentExplainerPage() {
   }, [])
 
   async function refreshUsage() {
-    const identifier = userId || userIp
-    const identifierType = userId ? 'user' : 'ip'
-    if (!identifier) return
-    const imgCount = await fetchUsageCount(identifier, identifierType, 'image')
-    setImageUsed(imgCount)
-    if (imgCount > 0) {
-      const oldest = await fetchOldestUsage(identifier, identifierType, 'image')
-      setOldestImageUsage(oldest)
+    if (isAnon) {
+      if (!userIp) return
+      const total = await fetchAnonTotalCount(userIp)
+      setAnonTotalUsed(total)
+      if (total > 0) {
+        const oldest = await fetchOldestAnonUsage(userIp)
+        setOldestAnonUsage(oldest)
+      }
+    } else {
+      const imgCount = await fetchUsageCount(userId, 'user', 'image')
+      setImageUsed(imgCount)
+      if (imgCount > 0) {
+        const oldest = await fetchOldestUsage(userId, 'user', 'image')
+        setOldestImageUsage(oldest)
+      }
     }
   }
 
@@ -311,12 +353,14 @@ export default function DocumentExplainerPage() {
 
   const LimitBanner = () => {
     if (!limitType) return null
-    const isAnon = limitType.includes('anon')
-    const msg = t[`limit${limitType.includes('image') ? 'Image' : 'Text'}_${isAnon ? 'anon' : 'account'}`]
+    const isAnonLimit = limitType.includes('anon')
+    const msg = limitType === 'total_anon'
+      ? t.limitTotal_anon
+      : t.limitImage_account
     return (
       <div style={{ background: '#FFF7ED', border: '1.5px solid #FDE68A', borderRadius: 14, padding: '16px', marginTop: 12 }}>
         <p style={{ fontSize: 13, fontWeight: 700, color: '#92400E', margin: '0 0 10px' }}>{msg}</p>
-        {isAnon && (
+        {isAnonLimit && (
           <button onClick={() => router.push('/account')}
             style={{ background: INDIGO, color: '#fff', border: 'none', borderRadius: 10, padding: '10px 18px', fontFamily: 'Nunito, sans-serif', fontWeight: 800, fontSize: 13, cursor: 'pointer' }}>
             {t.createAccount}
@@ -326,30 +370,40 @@ export default function DocumentExplainerPage() {
     )
   }
 
-  const barColor = imageLeft === 0 ? '#EF4444' : imageLeft === 1 ? '#F59E0B' : MINT
+  // Pill colour: green → amber → red as uses deplete
+  const anonPillColor = anonUsesLeft === 0 ? '#EF4444' : anonUsesLeft === 1 ? '#F59E0B' : MINT
+  const imagePillColor = imageLeft === 0 ? '#EF4444' : imageLeft <= 2 ? '#F59E0B' : MINT
+
+  const textAlign = ['ku', 'fa', 'ar'].includes(lang) ? 'right' : 'left'
 
   return (
     <div style={{ fontFamily: 'Nunito, sans-serif', background: BG, minHeight: '100vh', paddingBottom: 80, direction: 'ltr' }}>
       {/* Hero */}
       <div style={{ background: `linear-gradient(135deg, ${INDIGO_DARK} 0%, #2D2A7A 100%)`, padding: '40px 20px 32px', textAlign: 'center' }}>
         <div style={{ fontSize: 44, marginBottom: 12 }}>📄</div>
-        <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 900, margin: '0 0 10px', lineHeight: 1.2 }}>{t.heroTitle}</h1>
-        <p style={{ color: INDIGO_LIGHT, fontSize: 14, fontWeight: 500, margin: '0 0 20px', maxWidth: 320, marginLeft: 'auto', marginRight: 'auto' }}>{t.heroSub}</p>
+        <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 900, margin: '0 0 10px', lineHeight: 1.2, textAlign: 'center' }}>{t.heroTitle}</h1>
+        <p style={{ color: INDIGO_LIGHT, fontSize: 14, fontWeight: 500, margin: '0 0 20px', maxWidth: 320, marginLeft: 'auto', marginRight: 'auto', textAlign: 'center' }}>{t.heroSub}</p>
 
-        {tab === 'upload' && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+        {/* Usage pill — always visible so users know their allowance */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+          {isAnon ? (
             <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 22, fontWeight: 900, color: barColor, lineHeight: 1 }}>{imageLeft}</span>
-              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', fontWeight: 600, lineHeight: 1 }}>{t.imagesLeft}</span>
+              <span style={{ fontSize: 22, fontWeight: 900, color: anonPillColor, lineHeight: 1 }}>{anonUsesLeft}</span>
+              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', fontWeight: 600, lineHeight: 1 }}>{t.usesLeft}</span>
             </div>
-            {countdown ? (
-              <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 600, lineHeight: 1 }}>{t.resetsIn}</span>
-                <span style={{ fontSize: 13, fontWeight: 900, color: '#fff', lineHeight: 1 }}>{countdown}</span>
-              </div>
-            ) : null}
-          </div>
-        )}
+          ) : tab === 'upload' ? (
+            <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 22, fontWeight: 900, color: imagePillColor, lineHeight: 1 }}>{imageLeft}</span>
+              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', fontWeight: 600, lineHeight: 1 }}>{t.usesLeft}</span>
+            </div>
+          ) : null}
+          {countdown ? (
+            <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 600, lineHeight: 1 }}>{t.resetsIn}</span>
+              <span style={{ fontSize: 13, fontWeight: 900, color: '#fff', lineHeight: 1 }}>{countdown}</span>
+            </div>
+          ) : null}
+        </div>
       </div>
 
       {/* Main card */}
@@ -367,7 +421,7 @@ export default function DocumentExplainerPage() {
           <div style={{ padding: 20 }}>
             {tab === 'paste' ? (
               <textarea value={text} onChange={e => setText(e.target.value)} placeholder={t.placeholder}
-                style={{ width: '100%', minHeight: 160, border: `1.5px solid ${SOFT}`, borderRadius: 12, padding: 14, fontFamily: 'Nunito, sans-serif', fontSize: 14, color: INDIGO_DARK, resize: 'vertical', outline: 'none', background: BG, boxSizing: 'border-box', direction: 'ltr' }} />
+                style={{ width: '100%', minHeight: 160, border: `1.5px solid ${SOFT}`, borderRadius: 12, padding: 14, fontFamily: 'Nunito, sans-serif', fontSize: 14, color: INDIGO_DARK, resize: 'vertical', outline: 'none', background: BG, boxSizing: 'border-box', direction: 'ltr', textAlign }} />
             ) : (
               <div>
                 {imageData ? (
@@ -379,8 +433,8 @@ export default function DocumentExplainerPage() {
                     />
                     <div style={{ padding: '10px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <div>
-                        <p style={{ color: '#059669', fontSize: 13, fontWeight: 700, margin: '0 0 2px' }}>{imageName}</p>
-                        <p style={{ color: '#6B7280', fontSize: 12, margin: 0 }}>{t.imageReady}</p>
+                        <p style={{ color: '#059669', fontSize: 13, fontWeight: 700, margin: '0 0 2px', textAlign }}>{imageName}</p>
+                        <p style={{ color: '#6B7280', fontSize: 12, margin: 0, textAlign }}>{t.imageReady}</p>
                       </div>
                       <button
                         onClick={() => { setImageData(null); setImageType(null); setImageName(null) }}
@@ -412,7 +466,7 @@ export default function DocumentExplainerPage() {
               </div>
             )}
 
-            {error && <p style={{ color: '#EF4444', fontSize: 13, fontWeight: 600, marginTop: 10 }}>{error}</p>}
+            {error && <p style={{ color: '#EF4444', fontSize: 13, fontWeight: 600, marginTop: 10, textAlign }}>{error}</p>}
             <LimitBanner />
 
             {!limitType && (
@@ -435,32 +489,32 @@ export default function DocumentExplainerPage() {
           <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
             {result.letterType && (
               <div style={{ background: '#fff', borderRadius: 16, padding: 18, boxShadow: '0 2px 12px rgba(79,70,229,0.08)' }}>
-                <div style={{ fontSize: 11, fontWeight: 800, color: INDIGO, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>{t.letterType}</div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: INDIGO_DARK }}>{result.letterType}</div>
+                <div style={{ fontSize: 11, fontWeight: 800, color: INDIGO, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6, textAlign }}>{t.letterType}</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: INDIGO_DARK, textAlign }}>{result.letterType}</div>
               </div>
             )}
             {result.summary && (
               <div style={{ background: SOFT, borderRadius: 16, padding: 18 }}>
-                <div style={{ fontSize: 11, fontWeight: 800, color: INDIGO, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>{t.summary}</div>
-                <div style={{ fontSize: 14, color: INDIGO_DARK, lineHeight: 1.6 }}>{result.summary}</div>
+                <div style={{ fontSize: 11, fontWeight: 800, color: INDIGO, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6, textAlign }}>{t.summary}</div>
+                <div style={{ fontSize: 14, color: INDIGO_DARK, lineHeight: 1.6, textAlign }}>{result.summary}</div>
               </div>
             )}
             {result.deadlines && result.deadlines.length > 0 && (
               <div style={{ background: '#FFF7ED', borderRadius: 16, padding: 18 }}>
-                <div style={{ fontSize: 11, fontWeight: 800, color: '#D97706', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>{t.deadlines}</div>
-                {result.deadlines.map((d, i) => <div key={i} style={{ fontSize: 14, color: '#92400E', fontWeight: 600, marginBottom: 4 }}>⏰ {d}</div>)}
+                <div style={{ fontSize: 11, fontWeight: 800, color: '#D97706', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8, textAlign }}>{t.deadlines}</div>
+                {result.deadlines.map((d, i) => <div key={i} style={{ fontSize: 14, color: '#92400E', fontWeight: 600, marginBottom: 4, textAlign }}>⏰ {d}</div>)}
               </div>
             )}
             {result.whatToDo && result.whatToDo.length > 0 && (
               <div style={{ background: '#F0FDF4', borderRadius: 16, padding: 18 }}>
-                <div style={{ fontSize: 11, fontWeight: 800, color: '#059669', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>{t.whatToDo}</div>
-                {result.whatToDo.map((d, i) => <div key={i} style={{ fontSize: 14, color: '#065F46', fontWeight: 600, marginBottom: 4 }}>✅ {d}</div>)}
+                <div style={{ fontSize: 11, fontWeight: 800, color: '#059669', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8, textAlign }}>{t.whatToDo}</div>
+                {result.whatToDo.map((d, i) => <div key={i} style={{ fontSize: 14, color: '#065F46', fontWeight: 600, marginBottom: 4, textAlign }}>✅ {d}</div>)}
               </div>
             )}
             {result.warning && (
               <div style={{ background: '#FEF2F2', borderRadius: 16, padding: 18 }}>
-                <div style={{ fontSize: 11, fontWeight: 800, color: '#DC2626', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>{t.warning}</div>
-                <div style={{ fontSize: 14, color: '#7F1D1D', lineHeight: 1.6 }}>{result.warning}</div>
+                <div style={{ fontSize: 11, fontWeight: 800, color: '#DC2626', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6, textAlign }}>{t.warning}</div>
+                <div style={{ fontSize: 14, color: '#7F1D1D', lineHeight: 1.6, textAlign }}>{result.warning}</div>
               </div>
             )}
           </div>
