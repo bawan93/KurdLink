@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
 
@@ -11,6 +11,7 @@ const SOFT = '#EDE9FE'
 const BG = '#F5F4FF'
 const MINT = '#34D399'
 const ADMIN_EMAIL = 'bawanhozhin@outlook.com'
+const LIVE_THRESHOLD = 2 * 60 * 1000 // 2 minutes
 
 function getSupabase() {
   return createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
@@ -29,42 +30,83 @@ const LISTING_FILTERS = [
 ]
 
 const ERROR_TYPE_META = {
-  rate_limited:     { label: 'Rate Limited',    color: '#F59E0B', bg: '#FFFBEB', icon: '🚦' },
-  api_error:        { label: 'API Error',       color: '#EF4444', bg: '#FEF2F2', icon: '🔴' },
-  parse_error:      { label: 'Parse Error',     color: '#8B5CF6', bg: '#F5F3FF', icon: '⚠️' },
-  no_content:       { label: 'No Content',      color: '#6B7280', bg: '#F9FAFB', icon: '📭' },
-  unexpected_error: { label: 'Unexpected',      color: '#DC2626', bg: '#FEF2F2', icon: '💥' },
+  rate_limited:     { label: 'Rate Limited',  color: '#F59E0B', bg: '#FFFBEB', icon: '🚦' },
+  api_error:        { label: 'API Error',     color: '#EF4444', bg: '#FEF2F2', icon: '🔴' },
+  parse_error:      { label: 'Parse Error',   color: '#8B5CF6', bg: '#F5F3FF', icon: '⚠️' },
+  no_content:       { label: 'No Content',    color: '#6B7280', bg: '#F9FAFB', icon: '📭' },
+  unexpected_error: { label: 'Unexpected',    color: '#DC2626', bg: '#FEF2F2', icon: '💥' },
 }
 
 const MAIN_TABS = [
-  { id: 'listings', label: '📋 Listings' },
-  { id: 'errors',   label: '⚠️ Explainer Errors' },
+  { id: 'listings',  label: '📋 Listings'  },
+  { id: 'visitors',  label: '👥 Visitors'  },
+  { id: 'errors',    label: '⚠️ Errors'    },
 ]
+
+function formatDate(d) {
+  return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+}
+
+function formatDuration(ms) {
+  if (ms < 60000) return '<1 min'
+  const h = Math.floor(ms / 3600000)
+  const m = Math.floor((ms % 3600000) / 60000)
+  if (h > 0) return `${h}h ${m}m`
+  return `${m}m`
+}
+
+function timeAgo(dateStr) {
+  const diff = Date.now() - new Date(dateStr).getTime()
+  if (diff < 60000) return 'just now'
+  const m = Math.floor(diff / 60000)
+  if (m < 60) return `${m}m ago`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `${h}h ago`
+  return `${Math.floor(h / 24)}d ago`
+}
 
 function AdminInner() {
   const router = useRouter()
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading]       = useState(true)
   const [authorized, setAuthorized] = useState(false)
-  const [mainTab, setMainTab] = useState('listings')
+  const [mainTab, setMainTab]       = useState('listings')
 
-  // Listings state
-  const [listings, setListings] = useState([])
-  const [selected, setSelected] = useState(null)
-  const [filter, setFilter] = useState('pending')
+  // Listings
+  const [listings, setListings]         = useState([])
+  const [selected, setSelected]         = useState(null)
+  const [filter, setFilter]             = useState('pending')
   const [rejectReason, setRejectReason] = useState('')
-  const [showReject, setShowReject] = useState(false)
+  const [showReject, setShowReject]     = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
-  const [counts, setCounts] = useState({})
+  const [counts, setCounts]             = useState({})
 
-  // Errors state
-  const [errors, setErrors] = useState([])
+  // Errors
+  const [errors, setErrors]           = useState([])
   const [errorLoading, setErrorLoading] = useState(false)
   const [expandedError, setExpandedError] = useState(null)
-  const [errorCount, setErrorCount] = useState(0)
+  const [errorCount, setErrorCount]   = useState(0)
+
+  // Visitors
+  const [sessions, setSessions]         = useState([])
+  const [visitorLoading, setVisitorLoading] = useState(false)
+  const [expandedVisitor, setExpandedVisitor] = useState(null)
+  const [visitorStats, setVisitorStats] = useState({ total: 0, live: 0, returning: 0 })
+  const liveTimer = useRef(null)
 
   useEffect(() => { checkAuth() }, [])
   useEffect(() => { if (authorized) fetchListings() }, [authorized, filter])
-  useEffect(() => { if (authorized && mainTab === 'errors') fetchErrors() }, [authorized, mainTab])
+  useEffect(() => {
+    if (authorized && mainTab === 'errors') fetchErrors()
+    if (authorized && mainTab === 'visitors') fetchVisitors()
+  }, [authorized, mainTab])
+
+  // Auto-refresh live count every 30s when on visitors tab
+  useEffect(() => {
+    if (mainTab === 'visitors' && authorized) {
+      liveTimer.current = setInterval(fetchVisitors, 30000)
+    }
+    return () => { if (liveTimer.current) clearInterval(liveTimer.current) }
+  }, [mainTab, authorized])
 
   const checkAuth = async () => {
     const supabase = getSupabase()
@@ -84,7 +126,6 @@ function AdminInner() {
       newCounts[f.id] = count || 0
     }
     setCounts(newCounts)
-    // Also update error count badge
     const { count: ec } = await supabase.from('explainer_errors').select('*', { count: 'exact', head: true })
     setErrorCount(ec || 0)
   }
@@ -92,14 +133,65 @@ function AdminInner() {
   const fetchErrors = async () => {
     setErrorLoading(true)
     const supabase = getSupabase()
-    const { data } = await supabase
-      .from('explainer_errors')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(200)
+    const { data } = await supabase.from('explainer_errors').select('*').order('created_at', { ascending: false }).limit(200)
     setErrors(data || [])
     setErrorCount(data?.length || 0)
     setErrorLoading(false)
+  }
+
+  // Visitors: group sessions by identifier to build per-visitor picture
+  const fetchVisitors = async () => {
+    setVisitorLoading(true)
+    const supabase = getSupabase()
+    const { data: rawSessions } = await supabase
+      .from('app_sessions')
+      .select('*')
+      .order('last_seen_at', { ascending: false })
+
+    if (!rawSessions) { setVisitorLoading(false); return }
+
+    const now = Date.now()
+    const liveThreshold = new Date(now - LIVE_THRESHOLD).toISOString()
+
+    // Group by identifier
+    const visitorMap = {}
+    for (const s of rawSessions) {
+      const key = s.identifier
+      if (!visitorMap[key]) {
+        visitorMap[key] = {
+          identifier: s.identifier,
+          identifier_type: s.identifier_type,
+          sessions: [],
+          firstSeen: s.started_at,
+          lastSeen: s.last_seen_at,
+          isLive: false,
+          currentPage: null,
+          totalVisits: 0,
+          totalTimeMs: 0,
+        }
+      }
+      const v = visitorMap[key]
+      v.sessions.push(s)
+      // Accumulate time: last_seen - started per session
+      const sessionMs = new Date(s.last_seen_at).getTime() - new Date(s.started_at).getTime()
+      v.totalTimeMs += Math.max(0, sessionMs)
+      v.totalVisits = s.visit_count // visit_count on latest row is cumulative
+      if (s.last_seen_at > v.lastSeen) {
+        v.lastSeen = s.last_seen_at
+        v.currentPage = s.page_path
+      }
+      if (s.last_seen_at >= liveThreshold) v.isLive = true
+      if (s.started_at < v.firstSeen) v.firstSeen = s.started_at
+    }
+
+    const visitors = Object.values(visitorMap).sort((a, b) => new Date(b.lastSeen) - new Date(a.lastSeen))
+
+    const liveCount = visitors.filter(v => v.isLive).length
+    const returningCount = visitors.filter(v => v.totalVisits > 1).length
+
+    setSessions(visitors)
+    setVisitorStats({ total: visitors.length, live: liveCount, returning: returningCount })
+    setVisitorLoading(false)
   }
 
   const handleDeleteError = async (id) => {
@@ -143,8 +235,6 @@ function AdminInner() {
     setActionLoading(false)
   }
 
-  const formatDate = (d) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-
   if (loading) return (
     <div style={{ minHeight: '100vh', background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: FONT }}>
       <div style={{ width: 36, height: 36, border: `3px solid ${SOFT}`, borderTopColor: INDIGO, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
@@ -154,12 +244,11 @@ function AdminInner() {
 
   if (!authorized) return null
 
-  // --- LISTING DETAIL VIEW ---
+  // --- LISTING DETAIL ---
   if (selected) {
     const d = selected.data || {}
     const type = TYPE_LABELS[selected.type] || { label: selected.type, icon: '📋', color: INDIGO }
     const fields = Object.entries(d).filter(([k]) => k !== 'imageUrls')
-
     return (
       <div style={{ minHeight: '100vh', background: BG, fontFamily: FONT }}>
         <div style={{ background: `linear-gradient(135deg, ${INDIGO_DARK} 0%, #2D2A7A 100%)`, padding: '16px 20px', position: 'sticky', top: 0, zIndex: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -167,7 +256,6 @@ function AdminInner() {
           <div style={{ fontSize: 16, fontWeight: 800, color: '#fff' }}>Review Listing</div>
           <div style={{ width: 60 }} />
         </div>
-
         <div style={{ maxWidth: 600, margin: '0 auto', padding: '20px 16px 80px' }}>
           <div style={{ background: '#fff', borderRadius: 16, padding: '16px', marginBottom: 14, boxShadow: '0 2px 12px rgba(79,70,229,0.07)', display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 44, height: 44, borderRadius: 12, background: SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>{type.icon}</div>
@@ -179,7 +267,6 @@ function AdminInner() {
               {selected.status}
             </div>
           </div>
-
           <div style={{ background: '#fff', borderRadius: 16, padding: '16px', marginBottom: 14, boxShadow: '0 2px 12px rgba(79,70,229,0.07)' }}>
             {fields.map(([key, val]) => (
               <div key={key} style={{ marginBottom: 12, paddingBottom: 12, borderBottom: `1px solid ${SOFT}` }}>
@@ -188,7 +275,6 @@ function AdminInner() {
               </div>
             ))}
           </div>
-
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {selected.status === 'pending' && !showReject && (
               <>
@@ -202,7 +288,6 @@ function AdminInner() {
                 </button>
               </>
             )}
-
             {selected.status === 'pending' && showReject && (
               <div style={{ background: '#fff', borderRadius: 16, padding: 16, border: '1.5px solid #FECACA' }}>
                 <p style={{ fontSize: 13, fontWeight: 800, color: '#EF4444', margin: '0 0 10px' }}>Reason for rejection:</p>
@@ -218,7 +303,6 @@ function AdminInner() {
                 </div>
               </div>
             )}
-
             <button onClick={() => handleDelete(selected.id)} disabled={actionLoading}
               style={{ width: '100%', padding: '15px', background: '#1F2937', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 800, color: '#fff', cursor: 'pointer', fontFamily: FONT }}>
               🗑️ Delete Permanently
@@ -232,6 +316,8 @@ function AdminInner() {
   // --- MAIN VIEW ---
   return (
     <div style={{ minHeight: '100vh', background: BG, fontFamily: FONT }}>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } } @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }`}</style>
+
       {/* Header */}
       <div style={{ background: `linear-gradient(135deg, ${INDIGO_DARK} 0%, #2D2A7A 100%)`, padding: '16px 20px', position: 'sticky', top: 0, zIndex: 10 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
@@ -239,20 +325,23 @@ function AdminInner() {
           <button onClick={() => router.push('/home')} style={{ background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', fontSize: 12, cursor: 'pointer', fontFamily: FONT, fontWeight: 700, padding: '6px 14px', borderRadius: 20 }}>← App</button>
         </div>
 
-        {/* Main tabs: Listings / Errors */}
-        <div style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
+        {/* Main tabs */}
+        <div style={{ display: 'flex', gap: 6, marginBottom: mainTab === 'listings' ? 14 : 0 }}>
           {MAIN_TABS.map(t => (
             <button key={t.id} onClick={() => setMainTab(t.id)}
-              style={{ flex: 1, padding: '9px 0', background: mainTab === t.id ? '#fff' : 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 800, color: mainTab === t.id ? INDIGO_DARK : 'rgba(255,255,255,0.8)', cursor: 'pointer', fontFamily: FONT, position: 'relative' }}>
+              style={{ flex: 1, padding: '9px 0', background: mainTab === t.id ? '#fff' : 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 10, fontSize: 11, fontWeight: 800, color: mainTab === t.id ? INDIGO_DARK : 'rgba(255,255,255,0.8)', cursor: 'pointer', fontFamily: FONT, position: 'relative' }}>
               {t.label}
               {t.id === 'errors' && errorCount > 0 && (
                 <span style={{ position: 'absolute', top: -6, right: -4, background: '#EF4444', color: '#fff', fontSize: 10, fontWeight: 900, borderRadius: 20, padding: '2px 6px', minWidth: 18, textAlign: 'center' }}>{errorCount}</span>
+              )}
+              {t.id === 'visitors' && visitorStats.live > 0 && (
+                <span style={{ position: 'absolute', top: -6, right: -4, background: MINT, color: '#065F46', fontSize: 10, fontWeight: 900, borderRadius: 20, padding: '2px 6px', minWidth: 18, textAlign: 'center', animation: 'pulse 2s infinite' }}>{visitorStats.live}</span>
               )}
             </button>
           ))}
         </div>
 
-        {/* Listing sub-filters — only shown on listings tab */}
+        {/* Listing sub-filters */}
         {mainTab === 'listings' && (
           <>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, marginBottom: 12 }}>
@@ -283,25 +372,141 @@ function AdminInner() {
               <div style={{ fontSize: 40, marginBottom: 12 }}>📭</div>
               <p style={{ fontSize: 14, color: '#9CA3AF', fontWeight: 600 }}>No {filter} listings</p>
             </div>
+          ) : listings.map(listing => {
+            const type = TYPE_LABELS[listing.type] || { label: listing.type, icon: '📋', color: INDIGO }
+            const d = listing.data || {}
+            const title = d.jobTitle || d.serviceName || 'Untitled'
+            const subtitle = d.location || ''
+            return (
+              <button key={listing.id} onClick={() => setSelected(listing)}
+                style={{ width: '100%', background: '#fff', border: `1.5px solid ${SOFT}`, borderRadius: 16, padding: '14px 16px', marginBottom: 10, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left', boxSizing: 'border-box', boxShadow: '0 2px 8px rgba(79,70,229,0.06)' }}>
+                <div style={{ width: 42, height: 42, borderRadius: 12, background: SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{type.icon}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: INDIGO_DARK, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</div>
+                  <div style={{ fontSize: 12, color: '#9CA3AF' }}>{type.label}{subtitle ? ` • ${subtitle}` : ''}</div>
+                  <div style={{ fontSize: 11, color: '#C4B5FD', marginTop: 2 }}>{formatDate(listing.created_at)}</div>
+                </div>
+                <div style={{ fontSize: 18, color: INDIGO, opacity: 0.4, flexShrink: 0 }}>›</div>
+              </button>
+            )
+          })}
+        </div>
+      )}
+
+      {/* --- VISITORS TAB --- */}
+      {mainTab === 'visitors' && (
+        <div style={{ maxWidth: 600, margin: '0 auto', padding: '16px 16px 80px' }}>
+          {visitorLoading && sessions.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+              <div style={{ width: 32, height: 32, border: `3px solid ${SOFT}`, borderTopColor: INDIGO, borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto' }} />
+            </div>
           ) : (
-            listings.map(listing => {
-              const type = TYPE_LABELS[listing.type] || { label: listing.type, icon: '📋', color: INDIGO }
-              const d = listing.data || {}
-              const title = d.jobTitle || d.serviceName || 'Untitled'
-              const subtitle = d.location || ''
-              return (
-                <button key={listing.id} onClick={() => setSelected(listing)}
-                  style={{ width: '100%', background: '#fff', border: `1.5px solid ${SOFT}`, borderRadius: 16, padding: '14px 16px', marginBottom: 10, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left', boxSizing: 'border-box', boxShadow: '0 2px 8px rgba(79,70,229,0.06)' }}>
-                  <div style={{ width: 42, height: 42, borderRadius: 12, background: SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{type.icon}</div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: INDIGO_DARK, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</div>
-                    <div style={{ fontSize: 12, color: '#9CA3AF' }}>{type.label}{subtitle ? ` • ${subtitle}` : ''}</div>
-                    <div style={{ fontSize: 11, color: '#C4B5FD', marginTop: 2 }}>{formatDate(listing.created_at)}</div>
+            <>
+              {/* Summary stats */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 16 }}>
+                {[
+                  { label: 'Total Visitors', value: visitorStats.total, color: INDIGO, bg: SOFT },
+                  { label: 'Live Now',        value: visitorStats.live, color: '#059669', bg: '#F0FDF4', pulse: true },
+                  { label: 'Returning',       value: visitorStats.returning, color: '#D97706', bg: '#FFFBEB' },
+                ].map(s => (
+                  <div key={s.label} style={{ background: s.bg, borderRadius: 14, padding: '14px 10px', textAlign: 'center' }}>
+                    <div style={{ fontSize: 28, fontWeight: 900, color: s.color, animation: s.pulse && visitorStats.live > 0 ? 'pulse 2s infinite' : 'none' }}>{s.value}</div>
+                    <div style={{ fontSize: 11, color: '#6B7280', fontWeight: 700, marginTop: 2 }}>{s.label}</div>
                   </div>
-                  <div style={{ fontSize: 18, color: INDIGO, opacity: 0.4, flexShrink: 0 }}>›</div>
+                ))}
+              </div>
+
+              {/* Refresh button */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+                <button onClick={fetchVisitors} style={{ background: SOFT, border: 'none', color: INDIGO, borderRadius: 10, padding: '7px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>
+                  🔄 Refresh
                 </button>
-              )
-            })
+              </div>
+
+              {sessions.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+                  <div style={{ fontSize: 40, marginBottom: 12 }}>👻</div>
+                  <p style={{ fontSize: 14, color: '#9CA3AF', fontWeight: 600 }}>No visitors yet</p>
+                </div>
+              ) : sessions.map(v => {
+                const isExpanded = expandedVisitor === v.identifier
+                const isLive = v.isLive
+                const isReturning = v.totalVisits > 1
+                const isUser = v.identifier_type === 'user'
+
+                return (
+                  <div key={v.identifier} style={{ background: '#fff', border: `1.5px solid ${isLive ? MINT : SOFT}`, borderRadius: 16, marginBottom: 10, overflow: 'hidden', boxShadow: '0 2px 8px rgba(79,70,229,0.05)', transition: 'border-color 0.2s' }}>
+                    <button onClick={() => setExpandedVisitor(isExpanded ? null : v.identifier)}
+                      style={{ width: '100%', background: 'none', border: 'none', padding: '14px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left', fontFamily: FONT, boxSizing: 'border-box' }}>
+                      {/* Avatar */}
+                      <div style={{ width: 42, height: 42, borderRadius: 12, background: isUser ? SOFT : '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0, position: 'relative' }}>
+                        {isUser ? '👤' : '🌐'}
+                        {isLive && (
+                          <div style={{ position: 'absolute', top: -3, right: -3, width: 12, height: 12, background: MINT, borderRadius: '50%', border: '2px solid #fff', animation: 'pulse 2s infinite' }} />
+                        )}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3, flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: 13, fontWeight: 800, color: INDIGO_DARK }}>
+                            {isUser ? 'Account user' : 'Anonymous'}
+                          </span>
+                          {isLive && <span style={{ fontSize: 10, background: '#D1FAE5', color: '#059669', borderRadius: 6, padding: '2px 7px', fontWeight: 800 }}>● LIVE</span>}
+                          {isReturning && <span style={{ fontSize: 10, background: '#FEF3C7', color: '#D97706', borderRadius: 6, padding: '2px 7px', fontWeight: 800 }}>↩ RETURNING</span>}
+                        </div>
+                        <div style={{ fontSize: 11, color: '#9CA3AF' }}>
+                          Last seen {timeAgo(v.lastSeen)}
+                          {v.currentPage && isLive && <span style={{ color: INDIGO, fontWeight: 700 }}> · {v.currentPage}</span>}
+                        </div>
+                      </div>
+                      <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                        <div style={{ fontSize: 13, fontWeight: 900, color: INDIGO }}>{v.totalVisits}×</div>
+                        <div style={{ fontSize: 10, color: '#9CA3AF', fontWeight: 600 }}>visits</div>
+                      </div>
+                      <div style={{ fontSize: 16, color: '#9CA3AF', flexShrink: 0, transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }}>›</div>
+                    </button>
+
+                    {isExpanded && (
+                      <div style={{ padding: '0 16px 16px', borderTop: `1px solid ${SOFT}` }}>
+                        {/* Stats grid */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, marginTop: 12 }}>
+                          {[
+                            { label: 'First Visit',    value: formatDate(v.firstSeen) },
+                            { label: 'Last Seen',      value: formatDate(v.lastSeen) },
+                            { label: 'Total Time',     value: formatDuration(v.totalTimeMs) },
+                            { label: 'Visit Count',    value: `${v.totalVisits} session${v.totalVisits !== 1 ? 's' : ''}` },
+                          ].map(s => (
+                            <div key={s.label} style={{ background: BG, borderRadius: 10, padding: '10px 12px' }}>
+                              <div style={{ fontSize: 10, fontWeight: 800, color: INDIGO, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 3 }}>{s.label}</div>
+                              <div style={{ fontSize: 12, color: INDIGO_DARK, fontWeight: 700 }}>{s.value}</div>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Session history */}
+                        <div style={{ marginTop: 12 }}>
+                          <div style={{ fontSize: 11, fontWeight: 800, color: INDIGO, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>Session History</div>
+                          {v.sessions.slice(0, 10).map((s, i) => (
+                            <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < v.sessions.length - 1 ? `1px solid ${SOFT}` : 'none' }}>
+                              <div style={{ width: 6, height: 6, borderRadius: '50%', background: new Date(s.last_seen_at).getTime() > Date.now() - LIVE_THRESHOLD ? MINT : '#D1D5DB', flexShrink: 0 }} />
+                              <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: 11, color: INDIGO_DARK, fontWeight: 600 }}>{formatDate(s.started_at)}</div>
+                                <div style={{ fontSize: 11, color: '#9CA3AF' }}>{formatDuration(Math.max(0, new Date(s.last_seen_at) - new Date(s.started_at)))} · {s.page_path || '/'}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Identifier */}
+                        <div style={{ marginTop: 12, background: '#1F2937', borderRadius: 10, padding: '10px 14px' }}>
+                          <div style={{ fontSize: 10, fontWeight: 800, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 3 }}>{isUser ? 'User ID' : 'IP Address'}</div>
+                          <div style={{ fontSize: 11, color: '#E5E7EB', fontFamily: 'monospace', wordBreak: 'break-all' }}>{v.identifier}</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </>
           )}
         </div>
       )}
@@ -312,7 +517,6 @@ function AdminInner() {
           {errorLoading ? (
             <div style={{ textAlign: 'center', padding: '60px 20px' }}>
               <div style={{ width: 32, height: 32, border: `3px solid ${SOFT}`, borderTopColor: INDIGO, borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto' }} />
-              <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             </div>
           ) : errors.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '60px 20px' }}>
@@ -321,26 +525,20 @@ function AdminInner() {
             </div>
           ) : (
             <>
-              {/* Clear all button */}
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
                 <button onClick={handleClearAllErrors}
                   style={{ background: '#FEF2F2', border: '1.5px solid #FECACA', color: '#EF4444', borderRadius: 10, padding: '7px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>
                   🗑️ Clear All
                 </button>
               </div>
-
               {errors.map(err => {
                 const meta = ERROR_TYPE_META[err.error_type] || { label: err.error_type, color: '#6B7280', bg: '#F9FAFB', icon: '❓' }
                 const isExpanded = expandedError === err.id
                 return (
                   <div key={err.id} style={{ background: '#fff', border: `1.5px solid ${isExpanded ? meta.color : SOFT}`, borderRadius: 16, marginBottom: 10, overflow: 'hidden', boxShadow: '0 2px 8px rgba(79,70,229,0.05)', transition: 'border-color 0.2s' }}>
-                    {/* Row */}
                     <button onClick={() => setExpandedError(isExpanded ? null : err.id)}
                       style={{ width: '100%', background: 'none', border: 'none', padding: '14px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left', fontFamily: FONT, boxSizing: 'border-box' }}>
-                      {/* Error type badge */}
-                      <div style={{ width: 42, height: 42, borderRadius: 12, background: meta.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>
-                        {meta.icon}
-                      </div>
+                      <div style={{ width: 42, height: 42, borderRadius: 12, background: meta.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{meta.icon}</div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
                           <span style={{ fontSize: 13, fontWeight: 800, color: meta.color }}>{meta.label}</span>
@@ -348,24 +546,17 @@ function AdminInner() {
                           <span style={{ fontSize: 11, background: SOFT, color: INDIGO, borderRadius: 6, padding: '2px 7px', fontWeight: 700 }}>{err.lang || '—'}</span>
                         </div>
                         <div style={{ fontSize: 11, color: '#9CA3AF' }}>{formatDate(err.created_at)}</div>
-                        {/* Preview of error detail */}
                         {!isExpanded && err.error_detail && (
-                          <div style={{ fontSize: 12, color: '#6B7280', marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {err.error_detail}
-                          </div>
+                          <div style={{ fontSize: 12, color: '#6B7280', marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{err.error_detail}</div>
                         )}
                       </div>
                       <div style={{ fontSize: 16, color: '#9CA3AF', flexShrink: 0, transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }}>›</div>
                     </button>
-
-                    {/* Expanded detail */}
                     {isExpanded && (
                       <div style={{ padding: '0 16px 16px', borderTop: `1px solid ${SOFT}` }}>
                         <div style={{ marginTop: 12 }}>
                           <div style={{ fontSize: 11, fontWeight: 800, color: INDIGO, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>Error Detail</div>
-                          <div style={{ background: '#1F2937', borderRadius: 10, padding: '12px 14px', fontSize: 12, color: '#E5E7EB', fontFamily: 'monospace', lineHeight: 1.6, wordBreak: 'break-all', whiteSpace: 'pre-wrap' }}>
-                            {err.error_detail || '(no detail)'}
-                          </div>
+                          <div style={{ background: '#1F2937', borderRadius: 10, padding: '12px 14px', fontSize: 12, color: '#E5E7EB', fontFamily: 'monospace', lineHeight: 1.6, wordBreak: 'break-all', whiteSpace: 'pre-wrap' }}>{err.error_detail || '(no detail)'}</div>
                         </div>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 12 }}>
                           <div style={{ background: BG, borderRadius: 10, padding: '10px 12px' }}>

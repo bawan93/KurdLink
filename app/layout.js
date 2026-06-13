@@ -1,6 +1,7 @@
 import './globals.css'
 import NavBar from '../components/NavBar'
 import BottomNav from '../components/BottomNav'
+import SessionTracker from '../components/SessionTracker'
 
 export const viewport = {
   width: 'device-width',
@@ -22,6 +23,7 @@ export default function RootLayout({ children }) {
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet" />
       </head>
       <body style={{ margin: 0, padding: 0, overflowX: 'hidden', paddingBottom: 80 }}>
+        <SessionTracker />
         <NavBar />
         {children}
         <BottomNav />
