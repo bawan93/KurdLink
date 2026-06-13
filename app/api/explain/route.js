@@ -14,6 +14,17 @@ const systemPrompts = {
   en: `You are a helpful assistant for people living in the UK. Explain the letter in simple plain English. Respond with ONLY a raw JSON object, no markdown, no backticks. Use this exact structure: {"letterType":"type of letter","summary":"plain explanation of what this letter means","deadlines":["any important dates or deadlines as array items"],"whatToDo":["step 1","step 2"],"warning":"any urgent warning or null if none"}`
 }
 
+// Anonymous: count ALL time (no 24h window) — limit is permanent until account created
+async function getAnonTotalCount(identifier) {
+  const { count } = await supabaseAdmin
+    .from('explainer_usage')
+    .select('*', { count: 'exact', head: true })
+    .eq('identifier', identifier)
+    .eq('identifier_type', 'ip')
+  return count || 0
+}
+
+// Logged-in: 24h rolling window for image limit
 async function getUsageCount(identifier, identifierType, inputType) {
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
   const { count } = await supabaseAdmin
@@ -22,18 +33,6 @@ async function getUsageCount(identifier, identifierType, inputType) {
     .eq('identifier', identifier)
     .eq('identifier_type', identifierType)
     .eq('input_type', inputType)
-    .gte('created_at', since)
-  return count || 0
-}
-
-// Combined count for anonymous users (image + text together)
-async function getAnonTotalCount(identifier) {
-  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-  const { count } = await supabaseAdmin
-    .from('explainer_usage')
-    .select('*', { count: 'exact', head: true })
-    .eq('identifier', identifier)
-    .eq('identifier_type', 'ip')
     .gte('created_at', since)
   return count || 0
 }
@@ -66,7 +65,7 @@ export async function POST(req) {
         }
       }
     } else {
-      // Anonymous: 3 total uses (images + text combined) per day
+      // Anonymous: 3 total uses ever (no reset — must create account)
       const total = await getAnonTotalCount(ip)
       if (total >= 3) {
         return NextResponse.json({ error: 'limit_reached', limitType: 'total_anon' }, { status: 429 })

@@ -36,7 +36,7 @@ const translations = {
     errorMsg: 'Something went wrong. Please try again.',
     imageReady: 'Tap Explain to continue',
     removeImage: '✕ Remove image',
-    limitTotal_anon: "You've used your 3 free explanations today. Create a free account to continue.",
+    limitTotal_anon: "You've used your 3 free explanations. Create a free account to continue.",
     limitImage_account: "You've used your 10 image explanations today. Come back tomorrow.",
     createAccount: 'Create Free Account',
     usesLeft: 'free uses left',
@@ -61,7 +61,7 @@ const translations = {
     errorMsg: 'هەڵەیەک ڕوویدا. دووبارە هەوڵ بدەوە.',
     imageReady: 'دەستی بکە بۆ ڕوونکردنەوە',
     removeImage: '✕ وێنەکە بسڕەوە',
-    limitTotal_anon: '٣ جارت بەخۆڕایی بەکاریهێناوە ئەمڕۆ. ئەکاونت دروست بکە بۆ بەردەوامبوون.',
+    limitTotal_anon: '٣ جارت بەخۆڕایی بەکاریهێناوە. ئەکاونت دروست بکە بۆ بەردەوامبوون.',
     limitImage_account: '١٠ جارت وێنە ڕوونکردوەتەوە ئەمڕۆ. سبەی دەگەڕێیتەوە.',
     createAccount: 'ئەکاونتی خۆڕای دروست بکە',
     usesLeft: 'جار ماوە',
@@ -86,7 +86,7 @@ const translations = {
     errorMsg: 'مشکلی پیش آمد. دوباره تلاش کنید.',
     imageReady: 'برای توضیح ادامه بده',
     removeImage: '✕ حذف تصویر',
-    limitTotal_anon: 'امروز ۳ توضیح رایگان استفاده کردی. حساب رایگان بساز برای ادامه.',
+    limitTotal_anon: 'سه توضیح رایگان استفاده کردی. حساب رایگان بساز برای ادامه.',
     limitImage_account: 'امروز ۱۰ توضیح تصویر استفاده کردی. فردا برگرد.',
     createAccount: 'ایجاد حساب رایگان',
     usesLeft: 'استفاده باقی مانده',
@@ -111,7 +111,7 @@ const translations = {
     errorMsg: 'حدث خطأ. حاول مرة أخرى.',
     imageReady: 'اضغط للشرح',
     removeImage: '✕ إزالة الصورة',
-    limitTotal_anon: 'استخدمت ٣ شروحات مجانية اليوم. أنشئ حساباً مجانياً للمتابعة.',
+    limitTotal_anon: 'استخدمت ٣ شروحات مجانية. أنشئ حساباً مجانياً للمتابعة.',
     limitImage_account: 'استخدمت ١٠ شروحات صور اليوم. ارجع غداً.',
     createAccount: 'إنشاء حساب مجاني',
     usesLeft: 'استخدامات متبقية',
@@ -119,18 +119,17 @@ const translations = {
   },
 }
 
-// Combined total usage for anonymous users (no input_type filter)
+// Anonymous: count ALL rows ever for this IP (no time window)
 async function fetchAnonTotalCount(ip) {
-  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
   const { count } = await supabase
     .from('explainer_usage')
     .select('*', { count: 'exact', head: true })
     .eq('identifier', ip)
     .eq('identifier_type', 'ip')
-    .gte('created_at', since)
   return count || 0
 }
 
+// Logged-in: 24h rolling window for image count
 async function fetchUsageCount(identifier, identifierType, inputType) {
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
   const { count } = await supabase
@@ -141,19 +140,6 @@ async function fetchUsageCount(identifier, identifierType, inputType) {
     .eq('input_type', inputType)
     .gte('created_at', since)
   return count || 0
-}
-
-async function fetchOldestAnonUsage(ip) {
-  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-  const { data } = await supabase
-    .from('explainer_usage')
-    .select('created_at')
-    .eq('identifier', ip)
-    .eq('identifier_type', 'ip')
-    .gte('created_at', since)
-    .order('created_at', { ascending: true })
-    .limit(1)
-  return data?.[0]?.created_at || null
 }
 
 async function fetchOldestUsage(identifier, identifierType, inputType) {
@@ -204,11 +190,10 @@ export default function DocumentExplainerPage() {
   const [userIp, setUserIp] = useState(null)
   const [dragOver, setDragOver] = useState(false)
 
-  // Anonymous: combined total uses (image + text)
+  // Anonymous: total permanent count
   const [anonTotalUsed, setAnonTotalUsed] = useState(0)
-  const [oldestAnonUsage, setOldestAnonUsage] = useState(null)
 
-  // Logged-in: image uses only
+  // Logged-in: image uses with 24h reset
   const [imageUsed, setImageUsed] = useState(0)
   const [oldestImageUsage, setOldestImageUsage] = useState(null)
 
@@ -217,15 +202,14 @@ export default function DocumentExplainerPage() {
   const t = translations[lang] || translations.en
   const canSubmit = tab === 'paste' ? text.trim().length > 0 : imageData !== null
 
-  // What to show in the hero pill
   const isAnon = !userId
   const anonUsesLeft = Math.max(0, 3 - anonTotalUsed)
   const imageLeft = Math.max(0, 10 - imageUsed)
 
-  const countdownSource = isAnon
-    ? (anonTotalUsed > 0 ? oldestAnonUsage : null)
-    : (imageUsed > 0 ? oldestImageUsage : null)
-  const countdown = useCountdown(countdownSource)
+  // Countdown only for logged-in users (image limit resets daily)
+  const countdown = useCountdown(!isAnon && imageUsed > 0 ? oldestImageUsage : null)
+
+  const textAlign = ['ku', 'fa', 'ar'].includes(lang) ? 'right' : 'left'
 
   useEffect(() => {
     const stored = localStorage.getItem('komek_lang')
@@ -244,10 +228,6 @@ export default function DocumentExplainerPage() {
           setUserIp(d.ip)
           const total = await fetchAnonTotalCount(d.ip)
           setAnonTotalUsed(total)
-          if (total > 0) {
-            const oldest = await fetchOldestAnonUsage(d.ip)
-            setOldestAnonUsage(oldest)
-          }
         } catch {
           // IP fetch failed, continue without
         }
@@ -269,10 +249,6 @@ export default function DocumentExplainerPage() {
       if (!userIp) return
       const total = await fetchAnonTotalCount(userIp)
       setAnonTotalUsed(total)
-      if (total > 0) {
-        const oldest = await fetchOldestAnonUsage(userIp)
-        setOldestAnonUsage(oldest)
-      }
     } else {
       const imgCount = await fetchUsageCount(userId, 'user', 'image')
       setImageUsed(imgCount)
@@ -354,12 +330,10 @@ export default function DocumentExplainerPage() {
   const LimitBanner = () => {
     if (!limitType) return null
     const isAnonLimit = limitType.includes('anon')
-    const msg = limitType === 'total_anon'
-      ? t.limitTotal_anon
-      : t.limitImage_account
+    const msg = limitType === 'total_anon' ? t.limitTotal_anon : t.limitImage_account
     return (
       <div style={{ background: '#FFF7ED', border: '1.5px solid #FDE68A', borderRadius: 14, padding: '16px', marginTop: 12 }}>
-        <p style={{ fontSize: 13, fontWeight: 700, color: '#92400E', margin: '0 0 10px' }}>{msg}</p>
+        <p style={{ fontSize: 13, fontWeight: 700, color: '#92400E', margin: '0 0 10px', textAlign }}>{msg}</p>
         {isAnonLimit && (
           <button onClick={() => router.push('/account')}
             style={{ background: INDIGO, color: '#fff', border: 'none', borderRadius: 10, padding: '10px 18px', fontFamily: 'Nunito, sans-serif', fontWeight: 800, fontSize: 13, cursor: 'pointer' }}>
@@ -370,11 +344,8 @@ export default function DocumentExplainerPage() {
     )
   }
 
-  // Pill colour: green → amber → red as uses deplete
   const anonPillColor = anonUsesLeft === 0 ? '#EF4444' : anonUsesLeft === 1 ? '#F59E0B' : MINT
   const imagePillColor = imageLeft === 0 ? '#EF4444' : imageLeft <= 2 ? '#F59E0B' : MINT
-
-  const textAlign = ['ku', 'fa', 'ar'].includes(lang) ? 'right' : 'left'
 
   return (
     <div style={{ fontFamily: 'Nunito, sans-serif', background: BG, minHeight: '100vh', paddingBottom: 80, direction: 'ltr' }}>
@@ -384,7 +355,7 @@ export default function DocumentExplainerPage() {
         <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 900, margin: '0 0 10px', lineHeight: 1.2, textAlign: 'center' }}>{t.heroTitle}</h1>
         <p style={{ color: INDIGO_LIGHT, fontSize: 14, fontWeight: 500, margin: '0 0 20px', maxWidth: 320, marginLeft: 'auto', marginRight: 'auto', textAlign: 'center' }}>{t.heroSub}</p>
 
-        {/* Usage pill — always visible so users know their allowance */}
+        {/* Usage pill */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
           {isAnon ? (
             <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -392,16 +363,18 @@ export default function DocumentExplainerPage() {
               <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', fontWeight: 600, lineHeight: 1 }}>{t.usesLeft}</span>
             </div>
           ) : tab === 'upload' ? (
-            <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 22, fontWeight: 900, color: imagePillColor, lineHeight: 1 }}>{imageLeft}</span>
-              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', fontWeight: 600, lineHeight: 1 }}>{t.usesLeft}</span>
-            </div>
-          ) : null}
-          {countdown ? (
-            <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 600, lineHeight: 1 }}>{t.resetsIn}</span>
-              <span style={{ fontSize: 13, fontWeight: 900, color: '#fff', lineHeight: 1 }}>{countdown}</span>
-            </div>
+            <>
+              <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 22, fontWeight: 900, color: imagePillColor, lineHeight: 1 }}>{imageLeft}</span>
+                <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', fontWeight: 600, lineHeight: 1 }}>{t.usesLeft}</span>
+              </div>
+              {countdown ? (
+                <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 600, lineHeight: 1 }}>{t.resetsIn}</span>
+                  <span style={{ fontSize: 13, fontWeight: 900, color: '#fff', lineHeight: 1 }}>{countdown}</span>
+                </div>
+              ) : null}
+            </>
           ) : null}
         </div>
       </div>
