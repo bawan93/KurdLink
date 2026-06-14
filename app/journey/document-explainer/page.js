@@ -25,8 +25,11 @@ const translations = {
     placeholder: 'Paste your letter here...',
     dragDrop: 'Drag & drop your letter image or',
     browse: 'browse',
-    camera: '📷 Take Photo',
-    btn: 'Explain This Letter',
+    camera: 'Take Photo Now',
+    dragTitle: 'Upload your letter',
+    dragSub: 'Any official letter, form or notice',
+    orText: 'or',
+    btn: '✨ Explain This Letter',
     explaining: 'Explaining...',
     letterType: 'Letter Type',
     summary: 'Summary',
@@ -34,8 +37,8 @@ const translations = {
     whatToDo: 'What To Do',
     warning: '⚠️ Warning',
     errorMsg: 'Something went wrong. Please try again.',
-    imageReady: 'Tap Explain to continue',
-    removeImage: '✕ Remove image',
+    imageReady: 'Ready — tap Explain below',
+    removeImage: 'Remove',
     limitTotal_anon: "You've used your 3 free explanations. Create a free account to continue.",
     limitImage_account: "You've used your 10 image explanations today. Come back tomorrow.",
     createAccount: 'Create Free Account',
@@ -46,12 +49,15 @@ const translations = {
     heroTitle: 'لە نامەکەت تێبگە',
     heroSub: 'بۆت ڕوون دەکرێتەوە AI نامەکەت وێنە بێ یان نوسین بە',
     tab_paste: 'نووسین پەیست بکە',
-    tab_upload: 'وێنە ئەپلۆد / وێنە گرتن',
+    tab_upload: 'وێنە / ئەپلۆد',
     placeholder: 'ئیمەیڵ، نامەی تەلەفۆنی یان هەر نووسینێک...',
     dragDrop: 'وێنە ئەپلۆد بکە',
-    browse: '',
-    camera: '📷 وێنە بگرە',
-    btn: 'نامەکە ڕوون بکەرەوە',
+    browse: 'لە گەلەریەوە هەڵبژێرە',
+    camera: 'ئێستا وێنە بگرە',
+    dragTitle: 'وێنەی نامەکەت بگرە یان ئەپلۆد بکە',
+    dragSub: 'هەر نامە، فۆرم یان ئاگاداریەک',
+    orText: 'یان',
+    btn: '✨ نامەکە ڕوون بکەرەوە',
     explaining: 'تکایە چاوەڕێ بکە...',
     letterType: 'جۆری نامە',
     summary: 'کورتە',
@@ -59,8 +65,8 @@ const translations = {
     whatToDo: 'چی بکەیت',
     warning: '⚠️ ئاگادارکردنەوە',
     errorMsg: 'هەڵەیەک ڕوویدا. دووبارە هەوڵ بدەوە.',
-    imageReady: 'دەستی بکە بۆ ڕوونکردنەوە',
-    removeImage: '✕ وێنەکە بسڕەوە',
+    imageReady: 'ئامادەیە — دەستی بکە بۆ ڕوونکردنەوە',
+    removeImage: 'بسڕەوە',
     limitTotal_anon: '٣ جارت بەخۆڕایی بەکاریهێناوە. ئەکاونت دروست بکە بۆ بەردەوامبوون.',
     limitImage_account: '١٠ جارت وێنە ڕوونکردوەتەوە ئەمڕۆ. سبەی دەگەڕێیتەوە.',
     createAccount: 'ئەکاونتی خۆڕای دروست بکە',
@@ -74,9 +80,12 @@ const translations = {
     tab_upload: 'آپلود / عکس',
     placeholder: 'نامه‌ات را اینجا بچسبان...',
     dragDrop: 'تصویر نامه را بکش یا',
-    browse: 'مرور',
-    camera: '📷 عکس بگیر',
-    btn: 'این نامه را توضیح بده',
+    browse: 'از گالری انتخاب کن',
+    camera: 'همین الان عکس بگیر',
+    dragTitle: 'از نامه‌ات عکس بگیر یا آپلود کن',
+    dragSub: 'هر نامه، فرم یا اطلاعیه رسمی',
+    orText: 'یا',
+    btn: '✨ این نامه را توضیح بده',
     explaining: 'در حال توضیح...',
     letterType: 'نوع نامه',
     summary: 'خلاصه',
@@ -84,8 +93,8 @@ const translations = {
     whatToDo: 'چه کاری انجام دهید',
     warning: '⚠️ هشدار',
     errorMsg: 'مشکلی پیش آمد. دوباره تلاش کنید.',
-    imageReady: 'برای توضیح ادامه بده',
-    removeImage: '✕ حذف تصویر',
+    imageReady: 'آماده است — برای توضیح ادامه بده',
+    removeImage: 'حذف',
     limitTotal_anon: 'سه توضیح رایگان استفاده کردی. حساب رایگان بساز برای ادامه.',
     limitImage_account: 'امروز ۱۰ توضیح تصویر استفاده کردی. فردا برگرد.',
     createAccount: 'ایجاد حساب رایگان',
@@ -99,9 +108,12 @@ const translations = {
     tab_upload: 'رفع / صورة',
     placeholder: 'الصق رسالتك هنا...',
     dragDrop: 'اسحب صورة الرسالة أو',
-    browse: 'تصفح',
-    camera: '📷 التقط صورة',
-    btn: 'اشرح هذه الرسالة',
+    browse: 'اختر من المعرض',
+    camera: 'التقط صورة الآن',
+    dragTitle: 'التقط صورة رسالتك أو ارفعها',
+    dragSub: 'أي رسالة أو نموذج أو إشعار رسمي',
+    orText: 'أو',
+    btn: '✨ اشرح هذه الرسالة',
     explaining: 'جارٍ الشرح...',
     letterType: 'نوع الرسالة',
     summary: 'ملخص',
@@ -109,8 +121,8 @@ const translations = {
     whatToDo: 'ماذا تفعل',
     warning: '⚠️ تحذير',
     errorMsg: 'حدث خطأ. حاول مرة أخرى.',
-    imageReady: 'اضغط للشرح',
-    removeImage: '✕ إزالة الصورة',
+    imageReady: 'جاهز — اضغط للشرح أدناه',
+    removeImage: 'إزالة',
     limitTotal_anon: 'استخدمت ٣ شروحات مجانية. أنشئ حساباً مجانياً للمتابعة.',
     limitImage_account: 'استخدمت ١٠ شروحات صور اليوم. ارجع غداً.',
     createAccount: 'إنشاء حساب مجاني',
@@ -119,7 +131,6 @@ const translations = {
   },
 }
 
-// Anonymous: count ALL rows ever for this IP (no time window)
 async function fetchAnonTotalCount(ip) {
   const { count } = await supabase
     .from('explainer_usage')
@@ -129,7 +140,6 @@ async function fetchAnonTotalCount(ip) {
   return count || 0
 }
 
-// Logged-in: 24h rolling window for image count
 async function fetchUsageCount(identifier, identifierType, inputType) {
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
   const { count } = await supabase
@@ -177,7 +187,8 @@ function useCountdown(resetAt) {
 export default function DocumentExplainerPage() {
   const router = useRouter()
   const [lang, setLang] = useState('en')
-  const [tab, setTab] = useState('paste')
+  // ← CHANGED: default tab is now 'upload'
+  const [tab, setTab] = useState('upload')
   const [text, setText] = useState('')
   const [imageData, setImageData] = useState(null)
   const [imageType, setImageType] = useState(null)
@@ -190,10 +201,7 @@ export default function DocumentExplainerPage() {
   const [userIp, setUserIp] = useState(null)
   const [dragOver, setDragOver] = useState(false)
 
-  // Anonymous: total permanent count
   const [anonTotalUsed, setAnonTotalUsed] = useState(0)
-
-  // Logged-in: image uses with 24h reset
   const [imageUsed, setImageUsed] = useState(0)
   const [oldestImageUsage, setOldestImageUsage] = useState(null)
 
@@ -206,7 +214,6 @@ export default function DocumentExplainerPage() {
   const anonUsesLeft = Math.max(0, 3 - anonTotalUsed)
   const imageLeft = Math.max(0, 10 - imageUsed)
 
-  // Countdown only for logged-in users (image limit resets daily)
   const countdown = useCountdown(!isAnon && imageUsed > 0 ? oldestImageUsage : null)
 
   const textAlign = ['ku', 'fa', 'ar'].includes(lang) ? 'right' : 'left'
@@ -349,13 +356,13 @@ export default function DocumentExplainerPage() {
 
   return (
     <div style={{ fontFamily: 'Nunito, sans-serif', background: BG, minHeight: '100vh', paddingBottom: 80, direction: 'ltr' }}>
-      {/* Hero */}
+
+      {/* ── Hero — UNCHANGED ── */}
       <div style={{ background: `linear-gradient(135deg, ${INDIGO_DARK} 0%, #2D2A7A 100%)`, padding: '40px 20px 32px', textAlign: 'center' }}>
         <div style={{ fontSize: 44, marginBottom: 12 }}>📄</div>
         <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 900, margin: '0 0 10px', lineHeight: 1.2, textAlign: 'center' }}>{t.heroTitle}</h1>
         <p style={{ color: INDIGO_LIGHT, fontSize: 14, fontWeight: 500, margin: '0 0 20px', maxWidth: 320, marginLeft: 'auto', marginRight: 'auto', textAlign: 'center' }}>{t.heroSub}</p>
 
-        {/* Usage pill */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
           {isAnon ? (
             <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -379,25 +386,47 @@ export default function DocumentExplainerPage() {
         </div>
       </div>
 
-      {/* Main card */}
+      {/* ── Main card ── */}
       <div style={{ padding: '0 16px', marginTop: -20 }}>
         <div style={{ background: '#fff', borderRadius: 20, boxShadow: '0 4px 24px rgba(79,70,229,0.10)', overflow: 'hidden' }}>
-          {/* Tabs */}
+
+          {/* ── CHANGED: Tabs — upload first, icons added ── */}
           <div style={{ display: 'flex', borderBottom: `1px solid ${SOFT}` }}>
-            {['paste', 'upload'].map(t2 => (
-              <button key={t2} onClick={() => setTab(t2)} style={{ flex: 1, padding: '14px 0', background: tab === t2 ? SOFT : 'none', border: 'none', fontFamily: 'Nunito, sans-serif', fontSize: 14, fontWeight: 700, color: tab === t2 ? INDIGO : '#9CA3AF', borderBottom: tab === t2 ? `2px solid ${INDIGO}` : '2px solid transparent', cursor: 'pointer', transition: 'all 0.2s' }}>
-                {t2 === 'paste' ? t.tab_paste : t.tab_upload}
+            {[
+              { key: 'upload', label: `📷 ${t.tab_upload}` },
+              { key: 'paste',  label: `✏️ ${t.tab_paste}` },
+            ].map(({ key, label }) => (
+              <button key={key} onClick={() => setTab(key)} style={{
+                flex: 1,
+                padding: '14px 0',
+                background: tab === key ? SOFT : 'none',
+                border: 'none',
+                fontFamily: 'Nunito, sans-serif',
+                fontSize: 13,
+                fontWeight: 700,
+                color: tab === key ? INDIGO : '#9CA3AF',
+                borderBottom: tab === key ? `2px solid ${INDIGO}` : '2px solid transparent',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}>
+                {label}
               </button>
             ))}
           </div>
 
           <div style={{ padding: 20 }}>
-            {tab === 'paste' ? (
+
+            {/* ── CHANGED: Paste tab — unchanged functionally ── */}
+            {tab === 'paste' && (
               <textarea value={text} onChange={e => setText(e.target.value)} placeholder={t.placeholder}
                 style={{ width: '100%', minHeight: 160, border: `1.5px solid ${SOFT}`, borderRadius: 12, padding: 14, fontFamily: 'Nunito, sans-serif', fontSize: 14, color: INDIGO_DARK, resize: 'vertical', outline: 'none', background: BG, boxSizing: 'border-box', direction: 'ltr', textAlign }} />
-            ) : (
+            )}
+
+            {/* ── CHANGED: Upload tab — camera-first layout ── */}
+            {tab === 'upload' && (
               <div>
                 {imageData ? (
+                  // Image selected — preview
                   <div style={{ borderRadius: 14, overflow: 'hidden', border: `2px solid ${MINT}`, background: '#F0FDF4' }}>
                     <img
                       src={`data:image/jpeg;base64,${imageData}`}
@@ -411,29 +440,77 @@ export default function DocumentExplainerPage() {
                       </div>
                       <button
                         onClick={() => { setImageData(null); setImageType(null); setImageName(null) }}
-                        style={{ background: 'none', border: 'none', color: '#9CA3AF', fontSize: 12, cursor: 'pointer', fontFamily: 'Nunito, sans-serif', flexShrink: 0 }}>
+                        style={{ background: '#FEF2F2', border: 'none', color: '#EF4444', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Nunito, sans-serif', padding: '6px 10px', borderRadius: 8, flexShrink: 0 }}>
                         {t.removeImage}
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <div
-                    onDragOver={e => { e.preventDefault(); setDragOver(true) }}
-                    onDragLeave={() => setDragOver(false)}
-                    onDrop={e => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]) }}
-                    style={{ border: `2px dashed ${dragOver ? INDIGO : SOFT}`, borderRadius: 14, padding: '32px 20px', textAlign: 'center', background: dragOver ? SOFT : BG, transition: 'all 0.2s', cursor: 'pointer' }}
-                    onClick={() => fileRef.current?.click()}
-                  >
-                    <div style={{ fontSize: 32, marginBottom: 8 }}>📎</div>
-                    <p style={{ color: '#6B7280', fontSize: 13, margin: '0 0 12px' }}>
-                      {t.dragDrop} <span style={{ color: INDIGO, fontWeight: 700 }}>{t.browse}</span>
-                    </p>
-                    <button onClick={e => { e.stopPropagation(); cameraRef.current?.click() }}
-                      style={{ background: SOFT, color: INDIGO, border: 'none', borderRadius: 10, padding: '10px 20px', fontFamily: 'Nunito, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+                  // No image yet — camera CTA + dropzone
+                  <div>
+                    {/* Primary: Camera button */}
+                    <button
+                      onClick={() => cameraRef.current?.click()}
+                      style={{
+                        width: '100%',
+                        padding: '17px',
+                        background: `linear-gradient(135deg, ${INDIGO} 0%, #6366F1 100%)`,
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: 14,
+                        fontFamily: 'Nunito, sans-serif',
+                        fontSize: 15,
+                        fontWeight: 800,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 10,
+                        marginBottom: 14,
+                        boxShadow: '0 4px 18px rgba(79,70,229,0.30)',
+                      }}>
+                      <span style={{ fontSize: 20 }}>📷</span>
                       {t.camera}
                     </button>
+
+                    {/* Or divider */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+                      <div style={{ flex: 1, height: 1, background: SOFT }} />
+                      <span style={{ fontSize: 12, color: '#9CA3AF', fontWeight: 600 }}>{t.orText}</span>
+                      <div style={{ flex: 1, height: 1, background: SOFT }} />
+                    </div>
+
+                    {/* Secondary: Drop zone */}
+                    <div
+                      onDragOver={e => { e.preventDefault(); setDragOver(true) }}
+                      onDragLeave={() => setDragOver(false)}
+                      onDrop={e => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]) }}
+                      onClick={() => fileRef.current?.click()}
+                      style={{
+                        border: `2px dashed ${dragOver ? INDIGO : '#D1D5DB'}`,
+                        borderRadius: 14,
+                        padding: '22px 16px',
+                        textAlign: 'center',
+                        background: dragOver ? SOFT : '#FAFAFA',
+                        transition: 'all 0.2s',
+                        cursor: 'pointer',
+                      }}>
+                      <div style={{ fontSize: 26, marginBottom: 8 }}>🖼️</div>
+                      <p style={{ color: INDIGO_DARK, fontSize: 13, fontWeight: 700, margin: '0 0 4px', textAlign }}>{t.dragTitle}</p>
+                      <p style={{ color: '#9CA3AF', fontSize: 12, margin: '0 0 12px', textAlign }}>{t.dragSub}</p>
+                      <span style={{
+                        display: 'inline-block',
+                        background: SOFT,
+                        color: INDIGO,
+                        borderRadius: 10,
+                        padding: '7px 16px',
+                        fontSize: 13,
+                        fontWeight: 700,
+                      }}>{t.browse}</span>
+                    </div>
                   </div>
                 )}
+
                 <input ref={fileRef} type="file" accept="image/*,.txt" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
                 <input ref={cameraRef} type="file" accept="image/*" capture="environment" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
               </div>
@@ -442,9 +519,28 @@ export default function DocumentExplainerPage() {
             {error && <p style={{ color: '#EF4444', fontSize: 13, fontWeight: 600, marginTop: 10, textAlign }}>{error}</p>}
             <LimitBanner />
 
+            {/* ── CHANGED: Explain button — gradient when active, shadow ── */}
             {!limitType && (
               <button onClick={handleExplain} disabled={loading || !canSubmit}
-                style={{ width: '100%', marginTop: 16, padding: '15px', background: !canSubmit ? '#E5E7EB' : INDIGO, color: !canSubmit ? '#9CA3AF' : '#fff', border: 'none', borderRadius: 14, fontFamily: 'Nunito, sans-serif', fontSize: 16, fontWeight: 800, cursor: !canSubmit ? 'not-allowed' : 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+                style={{
+                  width: '100%',
+                  marginTop: 16,
+                  padding: '15px',
+                  background: !canSubmit ? '#E5E7EB' : `linear-gradient(135deg, ${INDIGO} 0%, #6366F1 100%)`,
+                  color: !canSubmit ? '#9CA3AF' : '#fff',
+                  border: 'none',
+                  borderRadius: 14,
+                  fontFamily: 'Nunito, sans-serif',
+                  fontSize: 16,
+                  fontWeight: 800,
+                  cursor: !canSubmit ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 10,
+                  boxShadow: canSubmit ? '0 4px 18px rgba(79,70,229,0.28)' : 'none',
+                }}>
                 {loading ? (
                   <>
                     <span style={{ display: 'inline-block', width: 18, height: 18, border: '2.5px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
@@ -457,7 +553,7 @@ export default function DocumentExplainerPage() {
           </div>
         </div>
 
-        {/* Results */}
+        {/* ── Results — UNCHANGED ── */}
         {result && (
           <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
             {result.letterType && (
