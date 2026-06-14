@@ -3,18 +3,21 @@ import { useState, useEffect, useRef, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
 
-const FONT = "'Nunito', sans-serif"
-const INDIGO = '#4F46E5'
+const FONT        = "'Nunito', sans-serif"
+const INDIGO      = '#4F46E5'
 const INDIGO_DARK = '#1C1A4F'
 const INDIGO_LIGHT = '#818CF8'
-const SOFT = '#EDE9FE'
-const BG = '#F5F4FF'
-const MINT = '#34D399'
+const SOFT        = '#EDE9FE'
+const BG          = '#F5F4FF'
+const MINT        = '#34D399'
 const ADMIN_EMAIL = 'bawanhozhin@outlook.com'
 const LIVE_THRESHOLD = 2 * 60 * 1000 // 2 minutes
 
 function getSupabase() {
-  return createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  )
 }
 
 const TYPE_LABELS = {
@@ -30,21 +33,24 @@ const LISTING_FILTERS = [
 ]
 
 const ERROR_TYPE_META = {
-  rate_limited:     { label: 'Rate Limited',  color: '#F59E0B', bg: '#FFFBEB', icon: '🚦' },
-  api_error:        { label: 'API Error',     color: '#EF4444', bg: '#FEF2F2', icon: '🔴' },
-  parse_error:      { label: 'Parse Error',   color: '#8B5CF6', bg: '#F5F3FF', icon: '⚠️' },
-  no_content:       { label: 'No Content',    color: '#6B7280', bg: '#F9FAFB', icon: '📭' },
-  unexpected_error: { label: 'Unexpected',    color: '#DC2626', bg: '#FEF2F2', icon: '💥' },
+  rate_limited:     { label: 'Rate Limited', color: '#F59E0B', bg: '#FFFBEB', icon: '🚦' },
+  api_error:        { label: 'API Error',    color: '#EF4444', bg: '#FEF2F2', icon: '🔴' },
+  parse_error:      { label: 'Parse Error',  color: '#8B5CF6', bg: '#F5F3FF', icon: '⚠️' },
+  no_content:       { label: 'No Content',   color: '#6B7280', bg: '#F9FAFB', icon: '📭' },
+  unexpected_error: { label: 'Unexpected',   color: '#DC2626', bg: '#FEF2F2', icon: '💥' },
 }
 
 const MAIN_TABS = [
-  { id: 'listings',  label: '📋 Listings'  },
-  { id: 'visitors',  label: '👥 Visitors'  },
-  { id: 'errors',    label: '⚠️ Errors'    },
+  { id: 'listings', label: '📋 Listings' },
+  { id: 'visitors', label: '👥 Visitors' },
+  { id: 'errors',   label: '⚠️ Errors'   },
 ]
 
 function formatDate(d) {
-  return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+  return new Date(d).toLocaleDateString('en-GB', {
+    day: 'numeric', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  })
 }
 
 function formatDuration(ms) {
@@ -72,31 +78,31 @@ function AdminInner() {
   const [mainTab, setMainTab]       = useState('listings')
 
   // Listings
-  const [listings, setListings]         = useState([])
-  const [selected, setSelected]         = useState(null)
-  const [filter, setFilter]             = useState('pending')
-  const [rejectReason, setRejectReason] = useState('')
-  const [showReject, setShowReject]     = useState(false)
+  const [listings, setListings]           = useState([])
+  const [selected, setSelected]           = useState(null)
+  const [filter, setFilter]               = useState('pending')
+  const [rejectReason, setRejectReason]   = useState('')
+  const [showReject, setShowReject]       = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
-  const [counts, setCounts]             = useState({})
+  const [counts, setCounts]               = useState({})
 
   // Errors
-  const [errors, setErrors]           = useState([])
+  const [errors, setErrors]             = useState([])
   const [errorLoading, setErrorLoading] = useState(false)
   const [expandedError, setExpandedError] = useState(null)
-  const [errorCount, setErrorCount]   = useState(0)
+  const [errorCount, setErrorCount]     = useState(0)
 
   // Visitors
-  const [sessions, setSessions]         = useState([])
+  const [sessions, setSessions]           = useState([])
   const [visitorLoading, setVisitorLoading] = useState(false)
   const [expandedVisitor, setExpandedVisitor] = useState(null)
-  const [visitorStats, setVisitorStats] = useState({ total: 0, live: 0, returning: 0 })
+  const [visitorStats, setVisitorStats]   = useState({ total: 0, live: 0, returning: 0 })
   const liveTimer = useRef(null)
 
   useEffect(() => { checkAuth() }, [])
   useEffect(() => { if (authorized) fetchListings() }, [authorized, filter])
   useEffect(() => {
-    if (authorized && mainTab === 'errors') fetchErrors()
+    if (authorized && mainTab === 'errors')   fetchErrors()
     if (authorized && mainTab === 'visitors') fetchVisitors()
   }, [authorized, mainTab])
 
@@ -118,28 +124,46 @@ function AdminInner() {
 
   const fetchListings = async () => {
     const supabase = getSupabase()
-    const { data } = await supabase.from('listings').select('*').eq('status', filter).order('created_at', { ascending: false })
+    const { data } = await supabase
+      .from('listings')
+      .select('*')
+      .eq('status', filter)
+      .order('created_at', { ascending: false })
     setListings(data || [])
+
     const newCounts = {}
     for (const f of LISTING_FILTERS) {
-      const { count } = await supabase.from('listings').select('*', { count: 'exact', head: true }).eq('status', f.id)
+      const { count } = await supabase
+        .from('listings')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', f.id)
       newCounts[f.id] = count || 0
     }
     setCounts(newCounts)
-    const { count: ec } = await supabase.from('explainer_errors').select('*', { count: 'exact', head: true })
+
+    const { count: ec } = await supabase
+      .from('explainer_errors')
+      .select('*', { count: 'exact', head: true })
     setErrorCount(ec || 0)
   }
 
   const fetchErrors = async () => {
     setErrorLoading(true)
     const supabase = getSupabase()
-    const { data } = await supabase.from('explainer_errors').select('*').order('created_at', { ascending: false }).limit(200)
+    const { data } = await supabase
+      .from('explainer_errors')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(200)
     setErrors(data || [])
     setErrorCount(data?.length || 0)
     setErrorLoading(false)
   }
 
-  // Visitors: group sessions by identifier to build per-visitor picture
+  // ─── VISITORS: fixed returning count ────────────────────────────────────────
+  // Bug was: v.totalVisits = s.visit_count (last-write-wins in loop order)
+  // Fix:     v.totalVisits = Math.max(v.totalVisits, s.visit_count) (always keep highest)
+  // This correctly reflects the cumulative visit_count written at session-create time.
   const fetchVisitors = async () => {
     setVisitorLoading(true)
     const supabase = getSupabase()
@@ -153,46 +177,58 @@ function AdminInner() {
     const now = Date.now()
     const liveThreshold = new Date(now - LIVE_THRESHOLD).toISOString()
 
-    // Group by identifier
+    // Group all rows by identifier
     const visitorMap = {}
     for (const s of rawSessions) {
       const key = s.identifier
       if (!visitorMap[key]) {
         visitorMap[key] = {
-          identifier: s.identifier,
+          identifier:      s.identifier,
           identifier_type: s.identifier_type,
-          sessions: [],
-          firstSeen: s.started_at,
-          lastSeen: s.last_seen_at,
-          isLive: false,
-          currentPage: null,
-          totalVisits: 0,
-          totalTimeMs: 0,
+          sessions:        [],
+          firstSeen:       s.started_at,
+          lastSeen:        s.last_seen_at,
+          isLive:          false,
+          currentPage:     null,
+          totalVisits:     0,   // will be set to the MAX visit_count seen across all rows
+          totalTimeMs:     0,
         }
       }
       const v = visitorMap[key]
       v.sessions.push(s)
-      // Accumulate time: last_seen - started per session
-      const sessionMs = new Date(s.last_seen_at).getTime() - new Date(s.started_at).getTime()
+
+      // Accumulate time per session row
+      const sessionMs =
+        new Date(s.last_seen_at).getTime() - new Date(s.started_at).getTime()
       v.totalTimeMs += Math.max(0, sessionMs)
-      v.totalVisits = s.visit_count // visit_count on latest row is cumulative
+
+      // THE FIX: always keep the highest visit_count seen for this identifier
+      // Each new session row is inserted with visit_count = (previous count + 1),
+      // so the row with the highest value is the most accurate total.
+      v.totalVisits = Math.max(v.totalVisits, s.visit_count || 0)
+
+      // Track most-recent page and live status from latest row
       if (s.last_seen_at > v.lastSeen) {
-        v.lastSeen = s.last_seen_at
+        v.lastSeen    = s.last_seen_at
         v.currentPage = s.page_path
       }
       if (s.last_seen_at >= liveThreshold) v.isLive = true
-      if (s.started_at < v.firstSeen) v.firstSeen = s.started_at
+      if (s.started_at < v.firstSeen)      v.firstSeen = s.started_at
     }
 
-    const visitors = Object.values(visitorMap).sort((a, b) => new Date(b.lastSeen) - new Date(a.lastSeen))
+    const visitors = Object.values(visitorMap).sort(
+      (a, b) => new Date(b.lastSeen) - new Date(a.lastSeen)
+    )
 
-    const liveCount = visitors.filter(v => v.isLive).length
+    // Returning = has more than 1 session (visit_count > 1)
+    const liveCount      = visitors.filter(v => v.isLive).length
     const returningCount = visitors.filter(v => v.totalVisits > 1).length
 
     setSessions(visitors)
     setVisitorStats({ total: visitors.length, live: liveCount, returning: returningCount })
     setVisitorLoading(false)
   }
+  // ────────────────────────────────────────────────────────────────────────────
 
   const handleDeleteError = async (id) => {
     await getSupabase().from('explainer_errors').delete().eq('id', id)
@@ -203,7 +239,10 @@ function AdminInner() {
 
   const handleClearAllErrors = async () => {
     if (!confirm('Clear all explainer errors? This cannot be undone.')) return
-    await getSupabase().from('explainer_errors').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+    await getSupabase()
+      .from('explainer_errors')
+      .delete()
+      .neq('id', '00000000-0000-0000-0000-000000000000')
     setErrors([])
     setErrorCount(0)
     setExpandedError(null)
@@ -220,7 +259,10 @@ function AdminInner() {
   const handleReject = async (id) => {
     if (!rejectReason.trim()) return
     setActionLoading(true)
-    await getSupabase().from('listings').update({ status: 'rejected', reject_reason: rejectReason }).eq('id', id)
+    await getSupabase()
+      .from('listings')
+      .update({ status: 'rejected', reject_reason: rejectReason })
+      .eq('id', id)
     setSelected(null); setShowReject(false); setRejectReason('')
     await fetchListings()
     setActionLoading(false)
@@ -235,6 +277,7 @@ function AdminInner() {
     setActionLoading(false)
   }
 
+  // ─── LOADING ────────────────────────────────────────────────────────────────
   if (loading) return (
     <div style={{ minHeight: '100vh', background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: FONT }}>
       <div style={{ width: 36, height: 36, border: `3px solid ${SOFT}`, borderTopColor: INDIGO, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
@@ -244,19 +287,22 @@ function AdminInner() {
 
   if (!authorized) return null
 
-  // --- LISTING DETAIL ---
+  // ─── LISTING DETAIL ─────────────────────────────────────────────────────────
   if (selected) {
-    const d = selected.data || {}
+    const d    = selected.data || {}
     const type = TYPE_LABELS[selected.type] || { label: selected.type, icon: '📋', color: INDIGO }
     const fields = Object.entries(d).filter(([k]) => k !== 'imageUrls')
     return (
       <div style={{ minHeight: '100vh', background: BG, fontFamily: FONT }}>
         <div style={{ background: `linear-gradient(135deg, ${INDIGO_DARK} 0%, #2D2A7A 100%)`, padding: '16px 20px', position: 'sticky', top: 0, zIndex: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <button onClick={() => { setSelected(null); setShowReject(false); setRejectReason('') }} style={{ background: 'none', border: 'none', color: '#fff', fontSize: 15, cursor: 'pointer', fontFamily: FONT, fontWeight: 700 }}>← Back</button>
+          <button onClick={() => { setSelected(null); setShowReject(false); setRejectReason('') }}
+            style={{ background: 'none', border: 'none', color: '#fff', fontSize: 15, cursor: 'pointer', fontFamily: FONT, fontWeight: 700 }}>← Back</button>
           <div style={{ fontSize: 16, fontWeight: 800, color: '#fff' }}>Review Listing</div>
           <div style={{ width: 60 }} />
         </div>
+
         <div style={{ maxWidth: 600, margin: '0 auto', padding: '20px 16px 80px' }}>
+          {/* Type + status header */}
           <div style={{ background: '#fff', borderRadius: 16, padding: '16px', marginBottom: 14, boxShadow: '0 2px 12px rgba(79,70,229,0.07)', display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 44, height: 44, borderRadius: 12, background: SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>{type.icon}</div>
             <div style={{ flex: 1 }}>
@@ -267,14 +313,20 @@ function AdminInner() {
               {selected.status}
             </div>
           </div>
+
+          {/* Fields */}
           <div style={{ background: '#fff', borderRadius: 16, padding: '16px', marginBottom: 14, boxShadow: '0 2px 12px rgba(79,70,229,0.07)' }}>
             {fields.map(([key, val]) => (
               <div key={key} style={{ marginBottom: 12, paddingBottom: 12, borderBottom: `1px solid ${SOFT}` }}>
-                <div style={{ fontSize: 11, fontWeight: 800, color: INDIGO, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 3 }}>{key.replace(/([A-Z])/g, ' $1').trim()}</div>
+                <div style={{ fontSize: 11, fontWeight: 800, color: INDIGO, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 3 }}>
+                  {key.replace(/([A-Z])/g, ' $1').trim()}
+                </div>
                 <div style={{ fontSize: 14, color: INDIGO_DARK, fontWeight: 500, lineHeight: 1.5 }}>{String(val)}</div>
               </div>
             ))}
           </div>
+
+          {/* Actions */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {selected.status === 'pending' && !showReject && (
               <>
@@ -291,7 +343,8 @@ function AdminInner() {
             {selected.status === 'pending' && showReject && (
               <div style={{ background: '#fff', borderRadius: 16, padding: 16, border: '1.5px solid #FECACA' }}>
                 <p style={{ fontSize: 13, fontWeight: 800, color: '#EF4444', margin: '0 0 10px' }}>Reason for rejection:</p>
-                <textarea value={rejectReason} onChange={e => setRejectReason(e.target.value)} placeholder="e.g. Inappropriate content, missing details…" rows={3}
+                <textarea value={rejectReason} onChange={e => setRejectReason(e.target.value)}
+                  placeholder="e.g. Inappropriate content, missing details…" rows={3}
                   style={{ width: '100%', padding: '12px', border: `1.5px solid ${SOFT}`, borderRadius: 12, fontSize: 14, fontFamily: FONT, outline: 'none', resize: 'vertical', boxSizing: 'border-box', background: BG }} />
                 <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
                   <button onClick={() => { setShowReject(false); setRejectReason('') }}
@@ -313,16 +366,22 @@ function AdminInner() {
     )
   }
 
-  // --- MAIN VIEW ---
+  // ─── MAIN VIEW ───────────────────────────────────────────────────────────────
   return (
     <div style={{ minHeight: '100vh', background: BG, fontFamily: FONT }}>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } } @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }`}</style>
+      <style>{`
+        @keyframes spin  { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+      `}</style>
 
-      {/* Header */}
+      {/* ── Header ── */}
       <div style={{ background: `linear-gradient(135deg, ${INDIGO_DARK} 0%, #2D2A7A 100%)`, padding: '16px 20px', position: 'sticky', top: 0, zIndex: 10 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
           <div style={{ fontSize: 18, fontWeight: 900, color: '#fff' }}>Komek Admin</div>
-          <button onClick={() => router.push('/home')} style={{ background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', fontSize: 12, cursor: 'pointer', fontFamily: FONT, fontWeight: 700, padding: '6px 14px', borderRadius: 20 }}>← App</button>
+          <button onClick={() => router.push('/home')}
+            style={{ background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', fontSize: 12, cursor: 'pointer', fontFamily: FONT, fontWeight: 700, padding: '6px 14px', borderRadius: 20 }}>
+            ← App
+          </button>
         </div>
 
         {/* Main tabs */}
@@ -364,7 +423,7 @@ function AdminInner() {
         )}
       </div>
 
-      {/* --- LISTINGS TAB --- */}
+      {/* ── LISTINGS TAB ── */}
       {mainTab === 'listings' && (
         <div style={{ maxWidth: 600, margin: '0 auto', padding: '16px 16px 80px' }}>
           {listings.length === 0 ? (
@@ -373,17 +432,17 @@ function AdminInner() {
               <p style={{ fontSize: 14, color: '#9CA3AF', fontWeight: 600 }}>No {filter} listings</p>
             </div>
           ) : listings.map(listing => {
-            const type = TYPE_LABELS[listing.type] || { label: listing.type, icon: '📋', color: INDIGO }
-            const d = listing.data || {}
+            const type  = TYPE_LABELS[listing.type] || { label: listing.type, icon: '📋', color: INDIGO }
+            const d     = listing.data || {}
             const title = d.jobTitle || d.serviceName || 'Untitled'
-            const subtitle = d.location || ''
+            const sub   = d.location || ''
             return (
               <button key={listing.id} onClick={() => setSelected(listing)}
                 style={{ width: '100%', background: '#fff', border: `1.5px solid ${SOFT}`, borderRadius: 16, padding: '14px 16px', marginBottom: 10, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left', boxSizing: 'border-box', boxShadow: '0 2px 8px rgba(79,70,229,0.06)' }}>
                 <div style={{ width: 42, height: 42, borderRadius: 12, background: SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{type.icon}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 14, fontWeight: 800, color: INDIGO_DARK, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</div>
-                  <div style={{ fontSize: 12, color: '#9CA3AF' }}>{type.label}{subtitle ? ` • ${subtitle}` : ''}</div>
+                  <div style={{ fontSize: 12, color: '#9CA3AF' }}>{type.label}{sub ? ` • ${sub}` : ''}</div>
                   <div style={{ fontSize: 11, color: '#C4B5FD', marginTop: 2 }}>{formatDate(listing.created_at)}</div>
                 </div>
                 <div style={{ fontSize: 18, color: INDIGO, opacity: 0.4, flexShrink: 0 }}>›</div>
@@ -393,7 +452,7 @@ function AdminInner() {
         </div>
       )}
 
-      {/* --- VISITORS TAB --- */}
+      {/* ── VISITORS TAB ── */}
       {mainTab === 'visitors' && (
         <div style={{ maxWidth: 600, margin: '0 auto', padding: '16px 16px 80px' }}>
           {visitorLoading && sessions.length === 0 ? (
@@ -405,20 +464,23 @@ function AdminInner() {
               {/* Summary stats */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 16 }}>
                 {[
-                  { label: 'Total Visitors', value: visitorStats.total, color: INDIGO, bg: SOFT },
-                  { label: 'Live Now',        value: visitorStats.live, color: '#059669', bg: '#F0FDF4', pulse: true },
-                  { label: 'Returning',       value: visitorStats.returning, color: '#D97706', bg: '#FFFBEB' },
+                  { label: 'Total Visitors', value: visitorStats.total,     color: INDIGO,    bg: SOFT,      pulse: false },
+                  { label: 'Live Now',        value: visitorStats.live,      color: '#059669', bg: '#F0FDF4', pulse: true  },
+                  { label: 'Returning',       value: visitorStats.returning, color: '#D97706', bg: '#FFFBEB', pulse: false },
                 ].map(s => (
                   <div key={s.label} style={{ background: s.bg, borderRadius: 14, padding: '14px 10px', textAlign: 'center' }}>
-                    <div style={{ fontSize: 28, fontWeight: 900, color: s.color, animation: s.pulse && visitorStats.live > 0 ? 'pulse 2s infinite' : 'none' }}>{s.value}</div>
+                    <div style={{ fontSize: 28, fontWeight: 900, color: s.color, animation: s.pulse && visitorStats.live > 0 ? 'pulse 2s infinite' : 'none' }}>
+                      {s.value}
+                    </div>
                     <div style={{ fontSize: 11, color: '#6B7280', fontWeight: 700, marginTop: 2 }}>{s.label}</div>
                   </div>
                 ))}
               </div>
 
-              {/* Refresh button */}
+              {/* Refresh */}
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
-                <button onClick={fetchVisitors} style={{ background: SOFT, border: 'none', color: INDIGO, borderRadius: 10, padding: '7px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>
+                <button onClick={fetchVisitors}
+                  style={{ background: SOFT, border: 'none', color: INDIGO, borderRadius: 10, padding: '7px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>
                   🔄 Refresh
                 </button>
               </div>
@@ -429,15 +491,18 @@ function AdminInner() {
                   <p style={{ fontSize: 14, color: '#9CA3AF', fontWeight: 600 }}>No visitors yet</p>
                 </div>
               ) : sessions.map(v => {
-                const isExpanded = expandedVisitor === v.identifier
-                const isLive = v.isLive
+                const isExpanded  = expandedVisitor === v.identifier
+                const isLive      = v.isLive
                 const isReturning = v.totalVisits > 1
-                const isUser = v.identifier_type === 'user'
+                const isUser      = v.identifier_type === 'user'
 
                 return (
-                  <div key={v.identifier} style={{ background: '#fff', border: `1.5px solid ${isLive ? MINT : SOFT}`, borderRadius: 16, marginBottom: 10, overflow: 'hidden', boxShadow: '0 2px 8px rgba(79,70,229,0.05)', transition: 'border-color 0.2s' }}>
+                  <div key={v.identifier}
+                    style={{ background: '#fff', border: `1.5px solid ${isLive ? MINT : SOFT}`, borderRadius: 16, marginBottom: 10, overflow: 'hidden', boxShadow: '0 2px 8px rgba(79,70,229,0.05)', transition: 'border-color 0.2s' }}>
+
                     <button onClick={() => setExpandedVisitor(isExpanded ? null : v.identifier)}
                       style={{ width: '100%', background: 'none', border: 'none', padding: '14px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left', fontFamily: FONT, boxSizing: 'border-box' }}>
+
                       {/* Avatar */}
                       <div style={{ width: 42, height: 42, borderRadius: 12, background: isUser ? SOFT : '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0, position: 'relative' }}>
                         {isUser ? '👤' : '🌐'}
@@ -445,19 +510,27 @@ function AdminInner() {
                           <div style={{ position: 'absolute', top: -3, right: -3, width: 12, height: 12, background: MINT, borderRadius: '50%', border: '2px solid #fff', animation: 'pulse 2s infinite' }} />
                         )}
                       </div>
+
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3, flexWrap: 'wrap' }}>
                           <span style={{ fontSize: 13, fontWeight: 800, color: INDIGO_DARK }}>
                             {isUser ? 'Account user' : 'Anonymous'}
                           </span>
-                          {isLive && <span style={{ fontSize: 10, background: '#D1FAE5', color: '#059669', borderRadius: 6, padding: '2px 7px', fontWeight: 800 }}>● LIVE</span>}
-                          {isReturning && <span style={{ fontSize: 10, background: '#FEF3C7', color: '#D97706', borderRadius: 6, padding: '2px 7px', fontWeight: 800 }}>↩ RETURNING</span>}
+                          {isLive && (
+                            <span style={{ fontSize: 10, background: '#D1FAE5', color: '#059669', borderRadius: 6, padding: '2px 7px', fontWeight: 800 }}>● LIVE</span>
+                          )}
+                          {isReturning && (
+                            <span style={{ fontSize: 10, background: '#FEF3C7', color: '#D97706', borderRadius: 6, padding: '2px 7px', fontWeight: 800 }}>↩ RETURNING</span>
+                          )}
                         </div>
                         <div style={{ fontSize: 11, color: '#9CA3AF' }}>
                           Last seen {timeAgo(v.lastSeen)}
-                          {v.currentPage && isLive && <span style={{ color: INDIGO, fontWeight: 700 }}> · {v.currentPage}</span>}
+                          {v.currentPage && isLive && (
+                            <span style={{ color: INDIGO, fontWeight: 700 }}> · {v.currentPage}</span>
+                          )}
                         </div>
                       </div>
+
                       <div style={{ textAlign: 'right', flexShrink: 0 }}>
                         <div style={{ fontSize: 13, fontWeight: 900, color: INDIGO }}>{v.totalVisits}×</div>
                         <div style={{ fontSize: 10, color: '#9CA3AF', fontWeight: 600 }}>visits</div>
@@ -465,15 +538,15 @@ function AdminInner() {
                       <div style={{ fontSize: 16, color: '#9CA3AF', flexShrink: 0, transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }}>›</div>
                     </button>
 
+                    {/* Expanded detail */}
                     {isExpanded && (
                       <div style={{ padding: '0 16px 16px', borderTop: `1px solid ${SOFT}` }}>
-                        {/* Stats grid */}
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, marginTop: 12 }}>
                           {[
-                            { label: 'First Visit',    value: formatDate(v.firstSeen) },
-                            { label: 'Last Seen',      value: formatDate(v.lastSeen) },
-                            { label: 'Total Time',     value: formatDuration(v.totalTimeMs) },
-                            { label: 'Visit Count',    value: `${v.totalVisits} session${v.totalVisits !== 1 ? 's' : ''}` },
+                            { label: 'First Visit',  value: formatDate(v.firstSeen) },
+                            { label: 'Last Seen',    value: formatDate(v.lastSeen) },
+                            { label: 'Total Time',   value: formatDuration(v.totalTimeMs) },
+                            { label: 'Total Visits', value: `${v.totalVisits} session${v.totalVisits !== 1 ? 's' : ''}` },
                           ].map(s => (
                             <div key={s.label} style={{ background: BG, borderRadius: 10, padding: '10px 12px' }}>
                               <div style={{ fontSize: 10, fontWeight: 800, color: INDIGO, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 3 }}>{s.label}</div>
@@ -486,19 +559,24 @@ function AdminInner() {
                         <div style={{ marginTop: 12 }}>
                           <div style={{ fontSize: 11, fontWeight: 800, color: INDIGO, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>Session History</div>
                           {v.sessions.slice(0, 10).map((s, i) => (
-                            <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < v.sessions.length - 1 ? `1px solid ${SOFT}` : 'none' }}>
+                            <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < Math.min(v.sessions.length, 10) - 1 ? `1px solid ${SOFT}` : 'none' }}>
                               <div style={{ width: 6, height: 6, borderRadius: '50%', background: new Date(s.last_seen_at).getTime() > Date.now() - LIVE_THRESHOLD ? MINT : '#D1D5DB', flexShrink: 0 }} />
                               <div style={{ flex: 1 }}>
                                 <div style={{ fontSize: 11, color: INDIGO_DARK, fontWeight: 600 }}>{formatDate(s.started_at)}</div>
-                                <div style={{ fontSize: 11, color: '#9CA3AF' }}>{formatDuration(Math.max(0, new Date(s.last_seen_at) - new Date(s.started_at)))} · {s.page_path || '/'}</div>
+                                <div style={{ fontSize: 11, color: '#9CA3AF' }}>
+                                  {formatDuration(Math.max(0, new Date(s.last_seen_at) - new Date(s.started_at)))} · {s.page_path || '/'}
+                                </div>
                               </div>
+                              <div style={{ fontSize: 10, color: INDIGO, fontWeight: 700 }}>#{s.visit_count}</div>
                             </div>
                           ))}
                         </div>
 
                         {/* Identifier */}
                         <div style={{ marginTop: 12, background: '#1F2937', borderRadius: 10, padding: '10px 14px' }}>
-                          <div style={{ fontSize: 10, fontWeight: 800, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 3 }}>{isUser ? 'User ID' : 'IP Address'}</div>
+                          <div style={{ fontSize: 10, fontWeight: 800, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 3 }}>
+                            {isUser ? 'User ID' : 'IP Address'}
+                          </div>
                           <div style={{ fontSize: 11, color: '#E5E7EB', fontFamily: 'monospace', wordBreak: 'break-all' }}>{v.identifier}</div>
                         </div>
                       </div>
@@ -511,7 +589,7 @@ function AdminInner() {
         </div>
       )}
 
-      {/* --- ERRORS TAB --- */}
+      {/* ── ERRORS TAB ── */}
       {mainTab === 'errors' && (
         <div style={{ maxWidth: 600, margin: '0 auto', padding: '16px 16px 80px' }}>
           {errorLoading ? (
@@ -532,10 +610,12 @@ function AdminInner() {
                 </button>
               </div>
               {errors.map(err => {
-                const meta = ERROR_TYPE_META[err.error_type] || { label: err.error_type, color: '#6B7280', bg: '#F9FAFB', icon: '❓' }
+                const meta       = ERROR_TYPE_META[err.error_type] || { label: err.error_type, color: '#6B7280', bg: '#F9FAFB', icon: '❓' }
                 const isExpanded = expandedError === err.id
                 return (
-                  <div key={err.id} style={{ background: '#fff', border: `1.5px solid ${isExpanded ? meta.color : SOFT}`, borderRadius: 16, marginBottom: 10, overflow: 'hidden', boxShadow: '0 2px 8px rgba(79,70,229,0.05)', transition: 'border-color 0.2s' }}>
+                  <div key={err.id}
+                    style={{ background: '#fff', border: `1.5px solid ${isExpanded ? meta.color : SOFT}`, borderRadius: 16, marginBottom: 10, overflow: 'hidden', boxShadow: '0 2px 8px rgba(79,70,229,0.05)', transition: 'border-color 0.2s' }}>
+
                     <button onClick={() => setExpandedError(isExpanded ? null : err.id)}
                       style={{ width: '100%', background: 'none', border: 'none', padding: '14px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left', fontFamily: FONT, boxSizing: 'border-box' }}>
                       <div style={{ width: 42, height: 42, borderRadius: 12, background: meta.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{meta.icon}</div>
@@ -552,11 +632,14 @@ function AdminInner() {
                       </div>
                       <div style={{ fontSize: 16, color: '#9CA3AF', flexShrink: 0, transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }}>›</div>
                     </button>
+
                     {isExpanded && (
                       <div style={{ padding: '0 16px 16px', borderTop: `1px solid ${SOFT}` }}>
                         <div style={{ marginTop: 12 }}>
                           <div style={{ fontSize: 11, fontWeight: 800, color: INDIGO, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>Error Detail</div>
-                          <div style={{ background: '#1F2937', borderRadius: 10, padding: '12px 14px', fontSize: 12, color: '#E5E7EB', fontFamily: 'monospace', lineHeight: 1.6, wordBreak: 'break-all', whiteSpace: 'pre-wrap' }}>{err.error_detail || '(no detail)'}</div>
+                          <div style={{ background: '#1F2937', borderRadius: 10, padding: '12px 14px', fontSize: 12, color: '#E5E7EB', fontFamily: 'monospace', lineHeight: 1.6, wordBreak: 'break-all', whiteSpace: 'pre-wrap' }}>
+                            {err.error_detail || '(no detail)'}
+                          </div>
                         </div>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 12 }}>
                           <div style={{ background: BG, borderRadius: 10, padding: '10px 12px' }}>
