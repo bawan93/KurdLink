@@ -46,6 +46,13 @@ const MAIN_TABS = [
   { id: 'errors',   label: '⚠️ Errors'   },
 ]
 
+const PERIOD_TABS = [
+  { id: 'day',   label: 'Today' },
+  { id: 'week',  label: 'Week'  },
+  { id: 'month', label: 'Month' },
+  { id: 'year',  label: 'Year'  },
+]
+
 function formatDate(d) {
   return new Date(d).toLocaleDateString('en-GB', {
     day: 'numeric', month: 'short', year: 'numeric',
@@ -71,6 +78,47 @@ function timeAgo(dateStr) {
   return `${Math.floor(h / 24)}d ago`
 }
 
+// Returns the start of the period as an ISO string
+function periodStart(period) {
+  const now = new Date()
+  if (period === 'day') {
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString()
+  }
+  if (period === 'week') {
+    const d = new Date(now)
+    d.setDate(d.getDate() - 6)
+    d.setHours(0, 0, 0, 0)
+    return d.toISOString()
+  }
+  if (period === 'month') {
+    return new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+  }
+  if (period === 'year') {
+    return new Date(now.getFullYear(), 0, 1).toISOString()
+  }
+  return new Date(0).toISOString()
+}
+
+// New    = firstSeen falls WITHIN the period
+// Returning = had at least one session WITHIN the period AND firstSeen is BEFORE the period
+function computePeriodStats(visitors, period) {
+  const start = periodStart(period)
+  let newCount = 0
+  let returningCount = 0
+
+  for (const v of visitors) {
+    const activeInPeriod = v.sessions.some(s => s.started_at >= start)
+    if (!activeInPeriod) continue
+    if (v.firstSeen >= start) {
+      newCount++
+    } else {
+      returningCount++
+    }
+  }
+
+  return { new: newCount, returning: returningCount, total: newCount + returningCount }
+}
+
 function AdminInner() {
   const router = useRouter()
   const [loading, setLoading]       = useState(true)
@@ -87,17 +135,20 @@ function AdminInner() {
   const [counts, setCounts]               = useState({})
 
   // Errors
-  const [errors, setErrors]             = useState([])
-  const [errorLoading, setErrorLoading] = useState(false)
+  const [errors, setErrors]               = useState([])
+  const [errorLoading, setErrorLoading]   = useState(false)
   const [expandedError, setExpandedError] = useState(null)
-  const [errorCount, setErrorCount]     = useState(0)
+  const [errorCount, setErrorCount]       = useState(0)
 
   // Visitors
-  const [sessions, setSessions]           = useState([])
-  const [visitorLoading, setVisitorLoading] = useState(false)
+  const [sessions, setSessions]               = useState([])
+  const [visitorLoading, setVisitorLoading]   = useState(false)
   const [expandedVisitor, setExpandedVisitor] = useState(null)
-  const [visitorStats, setVisitorStats]   = useState({ total: 0, live: 0, returning: 0 })
-  const liveTimer = useRef(null)
+  const [visitorStats, setVisitorStats]       = useState({ total: 0, live: 0, returning: 0 })
+  const [periodTab, setPeriodTab]             = useState('day')
+  const [periodStats, setPeriodStats]         = useState({ new: 0, returning: 0, total: 0 })
+  const liveTimer   = useRef(null)
+  const allVisitors = useRef([]) // store visitors for period switching without re-fetching
 
   useEffect(() => { checkAuth() }, [])
   useEffect(() => { if (authorized) fetchListings() }, [authorized, filter])
@@ -106,13 +157,19 @@ function AdminInner() {
     if (authorized && mainTab === 'visitors') fetchVisitors()
   }, [authorized, mainTab])
 
-  // Auto-refresh live count every 30s when on visitors tab
   useEffect(() => {
     if (mainTab === 'visitors' && authorized) {
       liveTimer.current = setInterval(fetchVisitors, 30000)
     }
     return () => { if (liveTimer.current) clearInterval(liveTimer.current) }
   }, [mainTab, authorized])
+
+  // Switching period tabs recomputes from cached data — no extra fetch
+  useEffect(() => {
+    if (allVisitors.current.length > 0) {
+      setPeriodStats(computePeriodStats(allVisitors.current, periodTab))
+    }
+  }, [periodTab])
 
   const checkAuth = async () => {
     const supabase = getSupabase()
@@ -160,10 +217,6 @@ function AdminInner() {
     setErrorLoading(false)
   }
 
-  // ─── VISITORS: fixed returning count ────────────────────────────────────────
-  // Bug was: v.totalVisits = s.visit_count (last-write-wins in loop order)
-  // Fix:     v.totalVisits = Math.max(v.totalVisits, s.visit_count) (always keep highest)
-  // This correctly reflects the cumulative visit_count written at session-create time.
   const fetchVisitors = async () => {
     setVisitorLoading(true)
     const supabase = getSupabase()
@@ -177,7 +230,6 @@ function AdminInner() {
     const now = Date.now()
     const liveThreshold = new Date(now - LIVE_THRESHOLD).toISOString()
 
-    // Group all rows by identifier
     const visitorMap = {}
     for (const s of rawSessions) {
       const key = s.identifier
@@ -190,45 +242,38 @@ function AdminInner() {
           lastSeen:        s.last_seen_at,
           isLive:          false,
           currentPage:     null,
-          totalVisits:     0,   // will be set to the MAX visit_count seen across all rows
+          totalVisits:     0,
           totalTimeMs:     0,
         }
       }
       const v = visitorMap[key]
       v.sessions.push(s)
 
-      // Accumulate time per session row
-      const sessionMs =
-        new Date(s.last_seen_at).getTime() - new Date(s.started_at).getTime()
+      const sessionMs = new Date(s.last_seen_at).getTime() - new Date(s.started_at).getTime()
       v.totalTimeMs += Math.max(0, sessionMs)
-
-      // THE FIX: always keep the highest visit_count seen for this identifier
-      // Each new session row is inserted with visit_count = (previous count + 1),
-      // so the row with the highest value is the most accurate total.
       v.totalVisits = Math.max(v.totalVisits, s.visit_count || 0)
 
-      // Track most-recent page and live status from latest row
       if (s.last_seen_at > v.lastSeen) {
         v.lastSeen    = s.last_seen_at
         v.currentPage = s.page_path
       }
       if (s.last_seen_at >= liveThreshold) v.isLive = true
-      if (s.started_at < v.firstSeen)      v.firstSeen = s.started_at
+      if (s.started_at < v.firstSeen) v.firstSeen = s.started_at
     }
 
     const visitors = Object.values(visitorMap).sort(
       (a, b) => new Date(b.lastSeen) - new Date(a.lastSeen)
     )
 
-    // Returning = has more than 1 session (visit_count > 1)
     const liveCount      = visitors.filter(v => v.isLive).length
     const returningCount = visitors.filter(v => v.totalVisits > 1).length
 
+    allVisitors.current = visitors
     setSessions(visitors)
     setVisitorStats({ total: visitors.length, live: liveCount, returning: returningCount })
+    setPeriodStats(computePeriodStats(visitors, periodTab))
     setVisitorLoading(false)
   }
-  // ────────────────────────────────────────────────────────────────────────────
 
   const handleDeleteError = async (id) => {
     await getSupabase().from('explainer_errors').delete().eq('id', id)
@@ -302,7 +347,6 @@ function AdminInner() {
         </div>
 
         <div style={{ maxWidth: 600, margin: '0 auto', padding: '20px 16px 80px' }}>
-          {/* Type + status header */}
           <div style={{ background: '#fff', borderRadius: 16, padding: '16px', marginBottom: 14, boxShadow: '0 2px 12px rgba(79,70,229,0.07)', display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 44, height: 44, borderRadius: 12, background: SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>{type.icon}</div>
             <div style={{ flex: 1 }}>
@@ -314,7 +358,6 @@ function AdminInner() {
             </div>
           </div>
 
-          {/* Fields */}
           <div style={{ background: '#fff', borderRadius: 16, padding: '16px', marginBottom: 14, boxShadow: '0 2px 12px rgba(79,70,229,0.07)' }}>
             {fields.map(([key, val]) => (
               <div key={key} style={{ marginBottom: 12, paddingBottom: 12, borderBottom: `1px solid ${SOFT}` }}>
@@ -326,7 +369,6 @@ function AdminInner() {
             ))}
           </div>
 
-          {/* Actions */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {selected.status === 'pending' && !showReject && (
               <>
@@ -384,7 +426,6 @@ function AdminInner() {
           </button>
         </div>
 
-        {/* Main tabs */}
         <div style={{ display: 'flex', gap: 6, marginBottom: mainTab === 'listings' ? 14 : 0 }}>
           {MAIN_TABS.map(t => (
             <button key={t.id} onClick={() => setMainTab(t.id)}
@@ -400,7 +441,6 @@ function AdminInner() {
           ))}
         </div>
 
-        {/* Listing sub-filters */}
         {mainTab === 'listings' && (
           <>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, marginBottom: 12 }}>
@@ -461,7 +501,7 @@ function AdminInner() {
             </div>
           ) : (
             <>
-              {/* Summary stats */}
+              {/* All-time summary */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 16 }}>
                 {[
                   { label: 'Total Visitors', value: visitorStats.total,     color: INDIGO,    bg: SOFT,      pulse: false },
@@ -477,6 +517,61 @@ function AdminInner() {
                 ))}
               </div>
 
+              {/* ── Period breakdown card ── */}
+              <div style={{ background: '#fff', borderRadius: 16, padding: '16px', marginBottom: 16, boxShadow: '0 2px 8px rgba(79,70,229,0.06)', border: `1.5px solid ${SOFT}` }}>
+                <div style={{ fontSize: 12, fontWeight: 800, color: INDIGO, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10 }}>
+                  New vs Returning
+                </div>
+
+                {/* Period pills */}
+                <div style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
+                  {PERIOD_TABS.map(p => (
+                    <button key={p.id} onClick={() => setPeriodTab(p.id)}
+                      style={{ flex: 1, padding: '7px 0', background: periodTab === p.id ? INDIGO : SOFT, border: 'none', borderRadius: 10, fontSize: 11, fontWeight: 800, color: periodTab === p.id ? '#fff' : INDIGO, cursor: 'pointer', fontFamily: FONT, transition: 'background 0.15s' }}>
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Stats for selected period */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+                  {[
+                    { label: 'New',       value: periodStats.new,      color: '#059669', bg: '#F0FDF4' },
+                    { label: 'Returning', value: periodStats.returning, color: '#D97706', bg: '#FFFBEB' },
+                    { label: 'Total',     value: periodStats.total,     color: INDIGO,    bg: SOFT      },
+                  ].map(s => (
+                    <div key={s.label} style={{ background: s.bg, borderRadius: 12, padding: '12px 8px', textAlign: 'center' }}>
+                      <div style={{ fontSize: 24, fontWeight: 900, color: s.color }}>{s.value}</div>
+                      <div style={{ fontSize: 11, color: '#6B7280', fontWeight: 700, marginTop: 2 }}>{s.label}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Progress bar */}
+                {periodStats.total > 0 && (
+                  <div style={{ marginTop: 14 }}>
+                    <div style={{ display: 'flex', borderRadius: 8, overflow: 'hidden', height: 8, background: '#F3F4F6' }}>
+                      <div style={{ width: `${(periodStats.new / periodStats.total) * 100}%`, background: '#059669', transition: 'width 0.3s' }} />
+                      <div style={{ width: `${(periodStats.returning / periodStats.total) * 100}%`, background: '#D97706', transition: 'width 0.3s' }} />
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
+                      <span style={{ fontSize: 10, color: '#059669', fontWeight: 700 }}>
+                        {Math.round((periodStats.new / periodStats.total) * 100)}% New
+                      </span>
+                      <span style={{ fontSize: 10, color: '#D97706', fontWeight: 700 }}>
+                        {Math.round((periodStats.returning / periodStats.total) * 100)}% Returning
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {periodStats.total === 0 && (
+                  <div style={{ textAlign: 'center', padding: '10px 0 2px', fontSize: 13, color: '#9CA3AF', fontWeight: 600 }}>
+                    No visitors in this period
+                  </div>
+                )}
+              </div>
+
               {/* Refresh */}
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
                 <button onClick={fetchVisitors}
@@ -485,6 +580,7 @@ function AdminInner() {
                 </button>
               </div>
 
+              {/* Visitor list */}
               {sessions.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '40px 20px' }}>
                   <div style={{ fontSize: 40, marginBottom: 12 }}>👻</div>
@@ -503,7 +599,6 @@ function AdminInner() {
                     <button onClick={() => setExpandedVisitor(isExpanded ? null : v.identifier)}
                       style={{ width: '100%', background: 'none', border: 'none', padding: '14px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left', fontFamily: FONT, boxSizing: 'border-box' }}>
 
-                      {/* Avatar */}
                       <div style={{ width: 42, height: 42, borderRadius: 12, background: isUser ? SOFT : '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0, position: 'relative' }}>
                         {isUser ? '👤' : '🌐'}
                         {isLive && (
@@ -538,7 +633,6 @@ function AdminInner() {
                       <div style={{ fontSize: 16, color: '#9CA3AF', flexShrink: 0, transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }}>›</div>
                     </button>
 
-                    {/* Expanded detail */}
                     {isExpanded && (
                       <div style={{ padding: '0 16px 16px', borderTop: `1px solid ${SOFT}` }}>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, marginTop: 12 }}>
@@ -555,7 +649,6 @@ function AdminInner() {
                           ))}
                         </div>
 
-                        {/* Session history */}
                         <div style={{ marginTop: 12 }}>
                           <div style={{ fontSize: 11, fontWeight: 800, color: INDIGO, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>Session History</div>
                           {v.sessions.slice(0, 10).map((s, i) => (
@@ -572,7 +665,6 @@ function AdminInner() {
                           ))}
                         </div>
 
-                        {/* Identifier */}
                         <div style={{ marginTop: 12, background: '#1F2937', borderRadius: 10, padding: '10px 14px' }}>
                           <div style={{ fontSize: 10, fontWeight: 800, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 3 }}>
                             {isUser ? 'User ID' : 'IP Address'}
