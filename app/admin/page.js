@@ -2,16 +2,20 @@
 import { useState, useEffect, useRef, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid,
+  Tooltip, Legend, ResponsiveContainer
+} from 'recharts'
 
 const FONT        = "'Nunito', sans-serif"
 const INDIGO      = '#4F46E5'
 const INDIGO_DARK = '#1C1A4F'
-const INDIGO_LIGHT = '#818CF8'
 const SOFT        = '#EDE9FE'
 const BG          = '#F5F4FF'
 const MINT        = '#34D399'
+const AMBER       = '#D97706'
 const ADMIN_EMAIL = 'bawanhozhin@outlook.com'
-const LIVE_THRESHOLD = 2 * 60 * 1000 // 2 minutes
+const LIVE_THRESHOLD = 2 * 60 * 1000
 
 function getSupabase() {
   return createBrowserClient(
@@ -78,7 +82,6 @@ function timeAgo(dateStr) {
   return `${Math.floor(h / 24)}d ago`
 }
 
-// Returns the start of the period as an ISO string
 function periodStart(period) {
   const now = new Date()
   if (period === 'day') {
@@ -99,24 +102,114 @@ function periodStart(period) {
   return new Date(0).toISOString()
 }
 
-// New    = firstSeen falls WITHIN the period
-// Returning = had at least one session WITHIN the period AND firstSeen is BEFORE the period
 function computePeriodStats(visitors, period) {
   const start = periodStart(period)
   let newCount = 0
   let returningCount = 0
-
   for (const v of visitors) {
     const activeInPeriod = v.sessions.some(s => s.started_at >= start)
     if (!activeInPeriod) continue
-    if (v.firstSeen >= start) {
-      newCount++
-    } else {
-      returningCount++
+    if (v.firstSeen >= start) newCount++
+    else returningCount++
+  }
+  return { new: newCount, returning: returningCount, total: newCount + returningCount }
+}
+
+// ─── Chart data builder ──────────────────────────────────────────────────────
+// Builds an array of { label, new, returning } data points
+// granularity adapts to the selected period
+function buildChartData(visitors, period) {
+  const now = new Date()
+  const buckets = []
+
+  if (period === 'day') {
+    // Last 24 hours, one bucket per hour
+    for (let i = 23; i >= 0; i--) {
+      const start = new Date(now)
+      start.setMinutes(0, 0, 0)
+      start.setHours(start.getHours() - i)
+      const end = new Date(start)
+      end.setHours(end.getHours() + 1)
+      buckets.push({
+        label: start.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
+        startIso: start.toISOString(),
+        endIso:   end.toISOString(),
+      })
+    }
+  } else if (period === 'week') {
+    // Last 7 days, one bucket per day
+    for (let i = 6; i >= 0; i--) {
+      const start = new Date(now)
+      start.setDate(start.getDate() - i)
+      start.setHours(0, 0, 0, 0)
+      const end = new Date(start)
+      end.setDate(end.getDate() + 1)
+      buckets.push({
+        label: start.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric' }),
+        startIso: start.toISOString(),
+        endIso:   end.toISOString(),
+      })
+    }
+  } else if (period === 'month') {
+    // Last 30 days, one bucket per day
+    for (let i = 29; i >= 0; i--) {
+      const start = new Date(now)
+      start.setDate(start.getDate() - i)
+      start.setHours(0, 0, 0, 0)
+      const end = new Date(start)
+      end.setDate(end.getDate() + 1)
+      buckets.push({
+        label: start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
+        startIso: start.toISOString(),
+        endIso:   end.toISOString(),
+      })
+    }
+  } else if (period === 'year') {
+    // Last 12 months, one bucket per month
+    for (let i = 11; i >= 0; i--) {
+      const start = new Date(now.getFullYear(), now.getMonth() - i, 1)
+      const end   = new Date(now.getFullYear(), now.getMonth() - i + 1, 1)
+      buckets.push({
+        label: start.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' }),
+        startIso: start.toISOString(),
+        endIso:   end.toISOString(),
+      })
     }
   }
 
-  return { new: newCount, returning: returningCount, total: newCount + returningCount }
+  // For each bucket, count new and returning visitors
+  // New      = firstSeen is within [bucketStart, bucketEnd)
+  // Returning = had a session within [bucketStart, bucketEnd) AND firstSeen is before bucketStart
+  return buckets.map(b => {
+    let newCount = 0
+    let returningCount = 0
+    for (const v of visitors) {
+      const activeInBucket = v.sessions.some(
+        s => s.started_at >= b.startIso && s.started_at < b.endIso
+      )
+      if (!activeInBucket) continue
+      if (v.firstSeen >= b.startIso && v.firstSeen < b.endIso) newCount++
+      else returningCount++
+    }
+    return { label: b.label, New: newCount, Returning: returningCount }
+  })
+}
+
+// Custom tooltip for the chart
+function ChartTooltip({ active, payload, label }) {
+  if (!active || !payload || !payload.length) return null
+  return (
+    <div style={{ background: '#fff', border: `1.5px solid ${SOFT}`, borderRadius: 12, padding: '10px 14px', fontFamily: FONT, boxShadow: '0 4px 16px rgba(79,70,229,0.12)' }}>
+      <div style={{ fontSize: 11, fontWeight: 800, color: '#9CA3AF', marginBottom: 6 }}>{label}</div>
+      {payload.map(p => (
+        <div key={p.name} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: p.color }} />
+          <span style={{ fontSize: 12, fontWeight: 700, color: INDIGO_DARK }}>{p.name}:</span>
+          <span style={{ fontSize: 12, fontWeight: 900, color: p.color }}>{p.value}</span>
+        </div>
+      ))}
+    </div>
+  )
 }
 
 function AdminInner() {
@@ -147,8 +240,9 @@ function AdminInner() {
   const [visitorStats, setVisitorStats]       = useState({ total: 0, live: 0, returning: 0 })
   const [periodTab, setPeriodTab]             = useState('day')
   const [periodStats, setPeriodStats]         = useState({ new: 0, returning: 0, total: 0 })
+  const [chartData, setChartData]             = useState([])
   const liveTimer   = useRef(null)
-  const allVisitors = useRef([]) // store visitors for period switching without re-fetching
+  const allVisitors = useRef([])
 
   useEffect(() => { checkAuth() }, [])
   useEffect(() => { if (authorized) fetchListings() }, [authorized, filter])
@@ -164,10 +258,11 @@ function AdminInner() {
     return () => { if (liveTimer.current) clearInterval(liveTimer.current) }
   }, [mainTab, authorized])
 
-  // Switching period tabs recomputes from cached data — no extra fetch
+  // Recompute period stats AND chart when period tab switches — no extra fetch
   useEffect(() => {
     if (allVisitors.current.length > 0) {
       setPeriodStats(computePeriodStats(allVisitors.current, periodTab))
+      setChartData(buildChartData(allVisitors.current, periodTab))
     }
   }, [periodTab])
 
@@ -272,6 +367,7 @@ function AdminInner() {
     setSessions(visitors)
     setVisitorStats({ total: visitors.length, live: liveCount, returning: returningCount })
     setPeriodStats(computePeriodStats(visitors, periodTab))
+    setChartData(buildChartData(visitors, periodTab))
     setVisitorLoading(false)
   }
 
@@ -345,7 +441,6 @@ function AdminInner() {
           <div style={{ fontSize: 16, fontWeight: 800, color: '#fff' }}>Review Listing</div>
           <div style={{ width: 60 }} />
         </div>
-
         <div style={{ maxWidth: 600, margin: '0 auto', padding: '20px 16px 80px' }}>
           <div style={{ background: '#fff', borderRadius: 16, padding: '16px', marginBottom: 14, boxShadow: '0 2px 12px rgba(79,70,229,0.07)', display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 44, height: 44, borderRadius: 12, background: SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>{type.icon}</div>
@@ -357,7 +452,6 @@ function AdminInner() {
               {selected.status}
             </div>
           </div>
-
           <div style={{ background: '#fff', borderRadius: 16, padding: '16px', marginBottom: 14, boxShadow: '0 2px 12px rgba(79,70,229,0.07)' }}>
             {fields.map(([key, val]) => (
               <div key={key} style={{ marginBottom: 12, paddingBottom: 12, borderBottom: `1px solid ${SOFT}` }}>
@@ -368,7 +462,6 @@ function AdminInner() {
               </div>
             ))}
           </div>
-
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {selected.status === 'pending' && !showReject && (
               <>
@@ -425,7 +518,6 @@ function AdminInner() {
             ← App
           </button>
         </div>
-
         <div style={{ display: 'flex', gap: 6, marginBottom: mainTab === 'listings' ? 14 : 0 }}>
           {MAIN_TABS.map(t => (
             <button key={t.id} onClick={() => setMainTab(t.id)}
@@ -440,7 +532,6 @@ function AdminInner() {
             </button>
           ))}
         </div>
-
         {mainTab === 'listings' && (
           <>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, marginBottom: 12 }}>
@@ -506,7 +597,7 @@ function AdminInner() {
                 {[
                   { label: 'Total Visitors', value: visitorStats.total,     color: INDIGO,    bg: SOFT,      pulse: false },
                   { label: 'Live Now',        value: visitorStats.live,      color: '#059669', bg: '#F0FDF4', pulse: true  },
-                  { label: 'Returning',       value: visitorStats.returning, color: '#D97706', bg: '#FFFBEB', pulse: false },
+                  { label: 'Returning',       value: visitorStats.returning, color: AMBER,     bg: '#FFFBEB', pulse: false },
                 ].map(s => (
                   <div key={s.label} style={{ background: s.bg, borderRadius: 14, padding: '14px 10px', textAlign: 'center' }}>
                     <div style={{ fontSize: 28, fontWeight: 900, color: s.color, animation: s.pulse && visitorStats.live > 0 ? 'pulse 2s infinite' : 'none' }}>
@@ -517,7 +608,7 @@ function AdminInner() {
                 ))}
               </div>
 
-              {/* ── Period breakdown card ── */}
+              {/* ── Period stats + chart card ── */}
               <div style={{ background: '#fff', borderRadius: 16, padding: '16px', marginBottom: 16, boxShadow: '0 2px 8px rgba(79,70,229,0.06)', border: `1.5px solid ${SOFT}` }}>
                 <div style={{ fontSize: 12, fontWeight: 800, color: INDIGO, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10 }}>
                   New vs Returning
@@ -533,11 +624,11 @@ function AdminInner() {
                   ))}
                 </div>
 
-                {/* Stats for selected period */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+                {/* Period stat boxes */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 20 }}>
                   {[
                     { label: 'New',       value: periodStats.new,      color: '#059669', bg: '#F0FDF4' },
-                    { label: 'Returning', value: periodStats.returning, color: '#D97706', bg: '#FFFBEB' },
+                    { label: 'Returning', value: periodStats.returning, color: AMBER,     bg: '#FFFBEB' },
                     { label: 'Total',     value: periodStats.total,     color: INDIGO,    bg: SOFT      },
                   ].map(s => (
                     <div key={s.label} style={{ background: s.bg, borderRadius: 12, padding: '12px 8px', textAlign: 'center' }}>
@@ -549,24 +640,75 @@ function AdminInner() {
 
                 {/* Progress bar */}
                 {periodStats.total > 0 && (
-                  <div style={{ marginTop: 14 }}>
+                  <div style={{ marginBottom: 20 }}>
                     <div style={{ display: 'flex', borderRadius: 8, overflow: 'hidden', height: 8, background: '#F3F4F6' }}>
                       <div style={{ width: `${(periodStats.new / periodStats.total) * 100}%`, background: '#059669', transition: 'width 0.3s' }} />
-                      <div style={{ width: `${(periodStats.returning / periodStats.total) * 100}%`, background: '#D97706', transition: 'width 0.3s' }} />
+                      <div style={{ width: `${(periodStats.returning / periodStats.total) * 100}%`, background: AMBER, transition: 'width 0.3s' }} />
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
                       <span style={{ fontSize: 10, color: '#059669', fontWeight: 700 }}>
                         {Math.round((periodStats.new / periodStats.total) * 100)}% New
                       </span>
-                      <span style={{ fontSize: 10, color: '#D97706', fontWeight: 700 }}>
+                      <span style={{ fontSize: 10, color: AMBER, fontWeight: 700 }}>
                         {Math.round((periodStats.returning / periodStats.total) * 100)}% Returning
                       </span>
                     </div>
                   </div>
                 )}
 
+                {/* ── Line chart ── */}
+                <div style={{ fontSize: 11, fontWeight: 800, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10 }}>
+                  Trend
+                </div>
+                {chartData.length > 0 && chartData.some(d => d.New > 0 || d.Returning > 0) ? (
+                  <ResponsiveContainer width="100%" height={200}>
+                    <LineChart data={chartData} margin={{ top: 4, right: 4, left: -24, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke={SOFT} vertical={false} />
+                      <XAxis
+                        dataKey="label"
+                        tick={{ fontSize: 9, fontFamily: FONT, fill: '#9CA3AF', fontWeight: 700 }}
+                        tickLine={false}
+                        axisLine={false}
+                        interval="preserveStartEnd"
+                      />
+                      <YAxis
+                        allowDecimals={false}
+                        tick={{ fontSize: 9, fontFamily: FONT, fill: '#9CA3AF', fontWeight: 700 }}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <Tooltip content={<ChartTooltip />} />
+                      <Legend
+                        wrapperStyle={{ fontSize: 11, fontFamily: FONT, fontWeight: 700, paddingTop: 8 }}
+                        iconType="circle"
+                        iconSize={8}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="New"
+                        stroke="#059669"
+                        strokeWidth={2.5}
+                        dot={{ r: 3, fill: '#059669', strokeWidth: 0 }}
+                        activeDot={{ r: 5, fill: '#059669', strokeWidth: 0 }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="Returning"
+                        stroke={AMBER}
+                        strokeWidth={2.5}
+                        dot={{ r: 3, fill: AMBER, strokeWidth: 0 }}
+                        activeDot={{ r: 5, fill: AMBER, strokeWidth: 0 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div style={{ textAlign: 'center', padding: '24px 0', fontSize: 13, color: '#9CA3AF', fontWeight: 600 }}>
+                    No data to chart for this period
+                  </div>
+                )}
+
                 {periodStats.total === 0 && (
-                  <div style={{ textAlign: 'center', padding: '10px 0 2px', fontSize: 13, color: '#9CA3AF', fontWeight: 600 }}>
+                  <div style={{ textAlign: 'center', paddingTop: 8, fontSize: 13, color: '#9CA3AF', fontWeight: 600 }}>
                     No visitors in this period
                   </div>
                 )}
@@ -580,7 +722,7 @@ function AdminInner() {
                 </button>
               </div>
 
-              {/* Visitor list */}
+              {/* ── Visitor list ── */}
               {sessions.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '40px 20px' }}>
                   <div style={{ fontSize: 40, marginBottom: 12 }}>👻</div>
@@ -591,21 +733,18 @@ function AdminInner() {
                 const isLive      = v.isLive
                 const isReturning = v.totalVisits > 1
                 const isUser      = v.identifier_type === 'user'
-
                 return (
                   <div key={v.identifier}
                     style={{ background: '#fff', border: `1.5px solid ${isLive ? MINT : SOFT}`, borderRadius: 16, marginBottom: 10, overflow: 'hidden', boxShadow: '0 2px 8px rgba(79,70,229,0.05)', transition: 'border-color 0.2s' }}>
 
                     <button onClick={() => setExpandedVisitor(isExpanded ? null : v.identifier)}
                       style={{ width: '100%', background: 'none', border: 'none', padding: '14px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left', fontFamily: FONT, boxSizing: 'border-box' }}>
-
                       <div style={{ width: 42, height: 42, borderRadius: 12, background: isUser ? SOFT : '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0, position: 'relative' }}>
                         {isUser ? '👤' : '🌐'}
                         {isLive && (
                           <div style={{ position: 'absolute', top: -3, right: -3, width: 12, height: 12, background: MINT, borderRadius: '50%', border: '2px solid #fff', animation: 'pulse 2s infinite' }} />
                         )}
                       </div>
-
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3, flexWrap: 'wrap' }}>
                           <span style={{ fontSize: 13, fontWeight: 800, color: INDIGO_DARK }}>
@@ -615,7 +754,7 @@ function AdminInner() {
                             <span style={{ fontSize: 10, background: '#D1FAE5', color: '#059669', borderRadius: 6, padding: '2px 7px', fontWeight: 800 }}>● LIVE</span>
                           )}
                           {isReturning && (
-                            <span style={{ fontSize: 10, background: '#FEF3C7', color: '#D97706', borderRadius: 6, padding: '2px 7px', fontWeight: 800 }}>↩ RETURNING</span>
+                            <span style={{ fontSize: 10, background: '#FEF3C7', color: AMBER, borderRadius: 6, padding: '2px 7px', fontWeight: 800 }}>↩ RETURNING</span>
                           )}
                         </div>
                         <div style={{ fontSize: 11, color: '#9CA3AF' }}>
@@ -625,7 +764,6 @@ function AdminInner() {
                           )}
                         </div>
                       </div>
-
                       <div style={{ textAlign: 'right', flexShrink: 0 }}>
                         <div style={{ fontSize: 13, fontWeight: 900, color: INDIGO }}>{v.totalVisits}×</div>
                         <div style={{ fontSize: 10, color: '#9CA3AF', fontWeight: 600 }}>visits</div>
@@ -648,7 +786,6 @@ function AdminInner() {
                             </div>
                           ))}
                         </div>
-
                         <div style={{ marginTop: 12 }}>
                           <div style={{ fontSize: 11, fontWeight: 800, color: INDIGO, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>Session History</div>
                           {v.sessions.slice(0, 10).map((s, i) => (
@@ -664,7 +801,6 @@ function AdminInner() {
                             </div>
                           ))}
                         </div>
-
                         <div style={{ marginTop: 12, background: '#1F2937', borderRadius: 10, padding: '10px 14px' }}>
                           <div style={{ fontSize: 10, fontWeight: 800, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 3 }}>
                             {isUser ? 'User ID' : 'IP Address'}
@@ -707,7 +843,6 @@ function AdminInner() {
                 return (
                   <div key={err.id}
                     style={{ background: '#fff', border: `1.5px solid ${isExpanded ? meta.color : SOFT}`, borderRadius: 16, marginBottom: 10, overflow: 'hidden', boxShadow: '0 2px 8px rgba(79,70,229,0.05)', transition: 'border-color 0.2s' }}>
-
                     <button onClick={() => setExpandedError(isExpanded ? null : err.id)}
                       style={{ width: '100%', background: 'none', border: 'none', padding: '14px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left', fontFamily: FONT, boxSizing: 'border-box' }}>
                       <div style={{ width: 42, height: 42, borderRadius: 12, background: meta.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{meta.icon}</div>
@@ -724,7 +859,6 @@ function AdminInner() {
                       </div>
                       <div style={{ fontSize: 16, color: '#9CA3AF', flexShrink: 0, transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }}>›</div>
                     </button>
-
                     {isExpanded && (
                       <div style={{ padding: '0 16px 16px', borderTop: `1px solid ${SOFT}` }}>
                         <div style={{ marginTop: 12 }}>
