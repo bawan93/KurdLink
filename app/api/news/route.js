@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
 const SIX_HOURS_MS = 6 * 60 * 60 * 1000
@@ -10,7 +10,6 @@ async function fetchFreshNews() {
       'Content-Type': 'application/json',
       'x-api-key': process.env.ANTHROPIC_API_KEY,
       'anthropic-version': '2023-06-01',
-      'anthropic-beta': 'interleaved-thinking-2025-05-14',
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
@@ -54,7 +53,6 @@ Return ONLY a valid JSON array with no markdown, no explanation, no backticks. E
 
   const data = await response.json()
 
-  // Extract text from response — find the last text block which contains the JSON
   let jsonText = ''
   for (const block of data.content) {
     if (block.type === 'text' && block.text) {
@@ -62,7 +60,6 @@ Return ONLY a valid JSON array with no markdown, no explanation, no backticks. E
     }
   }
 
-  // Clean and parse
   const clean = jsonText.replace(/```json|```/g, '').trim()
   const articles = JSON.parse(clean)
 
@@ -74,7 +71,7 @@ Return ONLY a valid JSON array with no markdown, no explanation, no backticks. E
 export async function GET() {
   try {
     const cookieStore = cookies()
-    const supabase = createClient(
+    const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY,
       {
@@ -94,15 +91,13 @@ export async function GET() {
     if (!cacheError && cache) {
       const age = Date.now() - new Date(cache.fetched_at).getTime()
       if (age < SIX_HOURS_MS && Array.isArray(cache.articles) && cache.articles.length > 0) {
-        // Cache is fresh — return immediately
         return Response.json({ articles: cache.articles, cached: true })
       }
     }
 
-    // Cache is stale — fetch fresh from Claude
+    // Cache stale — fetch fresh
     const articles = await fetchFreshNews()
 
-    // Update cache
     await supabase
       .from('news_cache')
       .update({ articles, fetched_at: new Date().toISOString() })
