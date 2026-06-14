@@ -27,8 +27,7 @@ async function fetchFreshNews() {
 
 Rules:
 - Only include articles published in the last 7 days
-- Sort by date, newest first
-- Each article must have a real URL
+- Each article must have a real URL and a real publication date in YYYY-MM-DD format
 - Categorise each as either "immigration" or "kurdish"
 
 Return ONLY a valid JSON array with no markdown, no explanation, no backticks. Exactly this format:
@@ -38,7 +37,7 @@ Return ONLY a valid JSON array with no markdown, no explanation, no backticks. E
     "summary": "One sentence summary of the article in plain English",
     "source": "Source name e.g. BBC News",
     "url": "https://...",
-    "date": "2025-01-15",
+    "date": "2025-06-14",
     "category": "immigration"
   }
 ]`,
@@ -64,6 +63,13 @@ Return ONLY a valid JSON array with no markdown, no explanation, no backticks. E
   const articles = JSON.parse(clean)
 
   if (!Array.isArray(articles)) throw new Error('Response was not an array')
+
+  // Always sort by date descending — newest first — regardless of Claude's order
+  articles.sort((a, b) => {
+    const dateA = new Date(a.date || '1970-01-01')
+    const dateB = new Date(b.date || '1970-01-01')
+    return dateB - dateA
+  })
 
   return articles
 }
