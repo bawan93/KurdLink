@@ -14,7 +14,7 @@ const TABS = [
     icon: '🧭',
     label: { en: 'Guide', ku: 'ڕێنمایی', fa: 'راهنما', ar: 'الدليل' },
     route: '/reber/coming-to-uk',
-    match: (p) => p?.startsWith('/reber') && p !== '/reber/ask',
+    match: (p) => p?.startsWith('/reber') && p !== '/reber/ask' && p !== '/reber/news',
   },
   {
     id: 'letters',
@@ -36,6 +36,13 @@ const TABS = [
     label: { en: 'Search', ku: 'گەڕان', fa: 'جستجو', ar: 'بحث' },
     route: '/find',
     match: (p) => p?.startsWith('/find'),
+  },
+  {
+    id: 'news',
+    icon: '📰',
+    label: { en: 'News', ku: 'هەواڵ', fa: 'اخبار', ar: 'الأخبار' },
+    route: '/reber/news',
+    match: (p) => p === '/reber/news',
   },
 ]
 
@@ -74,6 +81,10 @@ export default function NavBar() {
   useEffect(() => {
     const saved = localStorage.getItem('komek_lang')
     if (saved) setLang(saved)
+
+    const handler = (e) => setLang(e.detail)
+    window.addEventListener('langchange', handler)
+    return () => window.removeEventListener('langchange', handler)
   }, [])
 
   if (pathname === '/') return null
@@ -98,7 +109,7 @@ export default function NavBar() {
       </div>
 
       {/* Tab row */}
-      <div style={{ display: 'flex', padding: '0 8px', direction: 'ltr' }}>
+      <div style={{ display: 'flex', padding: '0 4px', direction: 'ltr', overflowX: 'auto' }}>
         {TABS.map(tab => {
           const active = tab.match(pathname)
           const label = tab.label[lang] || tab.label.en
@@ -107,20 +118,26 @@ export default function NavBar() {
               key={tab.id}
               onClick={() => router.push(tab.route)}
               style={{
-                flex: 1, padding: '9px 4px',
+                flex: 1, padding: '9px 2px',
                 background: active ? SOFT : 'transparent',
                 border: 'none',
                 color: active ? INDIGO : '#9CA3AF',
                 fontWeight: active ? 800 : 600,
-                fontSize: 12, cursor: 'pointer', fontFamily: FONT,
+                fontSize: 11, cursor: 'pointer', fontFamily: FONT,
                 borderBottom: active ? `2px solid ${INDIGO}` : '2px solid transparent',
                 borderRadius: '8px 8px 0 0', transition: 'all 0.2s',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-                whiteSpace: 'nowrap',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3,
+                whiteSpace: 'nowrap', minWidth: 0,
               }}
             >
-              <span style={{ fontSize: 14, display: 'inline-block', transform: tab.id === 'ask' && (lang === 'ku' || lang === 'fa' || lang === 'ar') ? 'scaleX(-1)' : 'none' }}>{tab.icon}</span>
-              <span>{label}</span>
+              <span style={{
+                fontSize: 13,
+                display: 'inline-block',
+                transform: tab.id === 'ask' && (lang === 'ku' || lang === 'fa' || lang === 'ar') ? 'scaleX(-1)' : 'none'
+              }}>
+                {tab.icon}
+              </span>
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 52 }}>{label}</span>
             </button>
           )
         })}
