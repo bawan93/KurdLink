@@ -10,11 +10,8 @@ const FONT = "'Nunito', 'Plus Jakarta Sans', sans-serif"
 
 const T = {
   en: {
-    heroTitle: 'Community News',
-    heroSub: 'Latest news for immigrants and Kurdish communities in the UK',
-    all: 'All',
-    immigration: 'Immigration',
-    kurdish: 'Kurdish News',
+    heroTitle: 'News for Kurds in the UK',
+    heroSub: 'Latest UK news relevant to Kurdish and Middle Eastern communities',
     readMore: 'Read more',
     loading: 'Loading news...',
     error: 'Could not load news. Please try again.',
@@ -22,11 +19,8 @@ const T = {
     retry: 'Try again',
   },
   ku: {
-    heroTitle: 'هەواڵەکانی کۆمەڵگە',
-    heroSub: 'دوایین هەواڵ بۆ کۆمەڵگەی کوردی و کۆچبەران لە UK',
-    all: 'هەمووی',
-    immigration: 'کۆچبەری',
-    kurdish: 'هەواڵی کوردی',
+    heroTitle: 'هەواڵ بۆ کوردەکانی UK',
+    heroSub: 'دوایین هەواڵی UK کە پەیوەندیی بە کۆمەڵگەی کوردی هەیە',
     readMore: 'زیاتر بخوێنەوە',
     loading: 'هەواڵەکان بارکردن...',
     error: 'هەواڵ نەتوانرا بارکرێت. تکایە دووبارە هەوڵ بدەرەوە.',
@@ -34,11 +28,8 @@ const T = {
     retry: 'دووبارە هەوڵ بدەرەوە',
   },
   fa: {
-    heroTitle: 'اخبار جامعه',
-    heroSub: 'آخرین اخبار برای مهاجران و جوامع کردی در بریتانیا',
-    all: 'همه',
-    immigration: 'مهاجرت',
-    kurdish: 'اخبار کردی',
+    heroTitle: 'اخبار کردها در بریتانیا',
+    heroSub: 'آخرین اخبار بریتانیا مرتبط با جوامع کردی و خاورمیانه‌ای',
     readMore: 'بیشتر بخوان',
     loading: 'در حال بارگذاری...',
     error: 'خبرها بارگذاری نشد. دوباره تلاش کن.',
@@ -46,11 +37,8 @@ const T = {
     retry: 'دوباره تلاش کن',
   },
   ar: {
-    heroTitle: 'أخبار المجتمع',
-    heroSub: 'آخر الأخبار للمهاجرين والمجتمعات الكردية في المملكة المتحدة',
-    all: 'الكل',
-    immigration: 'الهجرة',
-    kurdish: 'الأخبار الكردية',
+    heroTitle: 'أخبار الأكراد في المملكة المتحدة',
+    heroSub: 'آخر أخبار المملكة المتحدة ذات الصلة بالمجتمعات الكردية والشرق أوسطية',
     readMore: 'اقرأ المزيد',
     loading: 'جارٍ تحميل الأخبار...',
     error: 'تعذّر تحميل الأخبار. حاول مرة أخرى.',
@@ -73,10 +61,10 @@ function timeAgo(dateStr) {
   }
 }
 
-function NewsCard({ article, t, lang }) {
+function NewsCard({ article, lang }) {
   const isRtl = lang === 'ku' || lang === 'fa' || lang === 'ar'
   const align = isRtl ? 'right' : 'left'
-  const isImmigration = article.category === 'immigration'
+  const t = T[lang] || T.en
 
   return (
     <div style={{
@@ -89,30 +77,22 @@ function NewsCard({ article, t, lang }) {
       flexDirection: 'column',
       gap: 10,
     }}>
+      {/* Date */}
       <div style={{
         display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        gap: 8,
-        flexDirection: isRtl ? 'row-reverse' : 'row',
+        justifyContent: isRtl ? 'flex-start' : 'flex-end',
       }}>
         <span style={{
-          display: 'inline-block',
-          padding: '3px 10px',
-          borderRadius: 20,
           fontSize: 11,
-          fontWeight: 700,
+          color: '#9CA3AF',
           fontFamily: FONT,
-          background: isImmigration ? '#DBEAFE' : SOFT,
-          color: isImmigration ? '#1D4ED8' : INDIGO,
+          fontWeight: 600,
         }}>
-          {isImmigration ? t.immigration : t.kurdish}
-        </span>
-        <span style={{ fontSize: 11, color: '#9CA3AF', fontFamily: FONT, whiteSpace: 'nowrap' }}>
           {timeAgo(article.date)}
         </span>
       </div>
 
+      {/* Title */}
       <h3 style={{
         margin: 0,
         fontSize: 15,
@@ -125,6 +105,7 @@ function NewsCard({ article, t, lang }) {
         {article.title}
       </h3>
 
+      {/* Summary */}
       <p style={{
         margin: 0,
         fontSize: 13,
@@ -136,6 +117,7 @@ function NewsCard({ article, t, lang }) {
         {article.summary}
       </p>
 
+      {/* Source + Read more */}
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -143,7 +125,12 @@ function NewsCard({ article, t, lang }) {
         flexDirection: isRtl ? 'row-reverse' : 'row',
         marginTop: 4,
       }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: '#9CA3AF', fontFamily: FONT }}>
+        <span style={{
+          fontSize: 12,
+          fontWeight: 700,
+          color: '#9CA3AF',
+          fontFamily: FONT,
+        }}>
           {article.source}
         </span>
         <a
@@ -177,7 +164,6 @@ export default function NewsPage() {
   const [articles, setArticles] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
-  const [activeTab, setActiveTab] = useState('all')
 
   useEffect(() => {
     const saved = localStorage.getItem('komek_lang')
@@ -211,16 +197,6 @@ export default function NewsPage() {
   const isRtl = lang === 'ku' || lang === 'fa' || lang === 'ar'
   const align = isRtl ? 'right' : 'left'
 
-  const filtered = activeTab === 'all'
-    ? articles
-    : articles.filter(a => a.category === activeTab)
-
-  const tabs = [
-    { id: 'all', label: t.all },
-    { id: 'immigration', label: t.immigration },
-    { id: 'kurdish', label: t.kurdish },
-  ]
-
   return (
     <div style={{ minHeight: '100vh', background: BG, fontFamily: FONT, paddingBottom: 80 }}>
 
@@ -253,7 +229,6 @@ export default function NewsPage() {
             fontSize: 12,
             fontWeight: 700,
             marginBottom: 14,
-            textAlign: align,
           }}>
             {lang === 'ku' ? 'هەواڵ' : lang === 'fa' ? 'اخبار' : lang === 'ar' ? 'الأخبار' : 'News'}
           </div>
@@ -279,38 +254,8 @@ export default function NewsPage() {
         </div>
       </div>
 
-      {/* Filter tabs */}
-      <div style={{ maxWidth: 480, margin: '0 auto', padding: '20px 16px 0' }}>
-        <div style={{
-          display: 'flex',
-          gap: 8,
-          flexDirection: isRtl ? 'row-reverse' : 'row',
-        }}>
-          {tabs.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              style={{
-                padding: '8px 16px',
-                borderRadius: 20,
-                border: activeTab === tab.id ? `1.5px solid ${INDIGO}` : '1.5px solid #E5E7EB',
-                background: activeTab === tab.id ? SOFT : '#fff',
-                color: activeTab === tab.id ? INDIGO : '#6B7280',
-                fontWeight: 700,
-                fontSize: 13,
-                cursor: 'pointer',
-                fontFamily: FONT,
-                transition: 'all 0.15s',
-              }}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Content */}
-      <div style={{ maxWidth: 480, margin: '0 auto', padding: '16px 16px 0' }}>
+      <div style={{ maxWidth: 480, margin: '0 auto', padding: '20px 16px 0' }}>
 
         {loading && (
           <div style={{ textAlign: 'center', padding: '60px 20px' }}>
@@ -353,7 +298,7 @@ export default function NewsPage() {
           </div>
         )}
 
-        {!loading && !error && filtered.length === 0 && (
+        {!loading && !error && articles.length === 0 && (
           <div style={{ textAlign: 'center', padding: '60px 20px' }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>📰</div>
             <p style={{ color: '#9CA3AF', fontFamily: FONT, fontSize: 14, margin: 0 }}>
@@ -362,10 +307,10 @@ export default function NewsPage() {
           </div>
         )}
 
-        {!loading && !error && filtered.length > 0 && (
+        {!loading && !error && articles.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            {filtered.map((article, i) => (
-              <NewsCard key={i} article={article} t={t} lang={lang} />
+            {articles.map((article, i) => (
+              <NewsCard key={i} article={article} lang={lang} />
             ))}
           </div>
         )}

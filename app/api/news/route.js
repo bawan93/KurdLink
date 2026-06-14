@@ -18,27 +18,35 @@ async function fetchFreshNews() {
       messages: [
         {
           role: 'user',
-          content: `Search the web for the 10 most recent news articles published within the last 7 days about these topics:
-- UK immigration news and policy
-- Asylum seekers in the UK
-- Refugees in the UK
-- Kurdish community news in the UK or Europe
-- Kurdish political news (Iraq, Iran, Syria)
+          content: `Search the web for the 10 most recent news articles published within the last 7 days that are relevant to Kurdish, Iraqi, Iranian, and Syrian people living in the UK.
+
+This includes:
+- UK immigration and asylum policy that affects these communities
+- Home Office decisions on refugee resettlement or deportation
+- Kurdish community news and events in the UK
+- Integration, housing, employment support for refugees in the UK
+- Discrimination, hate crime, or community safety affecting these groups in the UK
+- UK government schemes or charities supporting Kurdish, Iraqi, Iranian or Syrian people
+- Any UK news story where the Kurdish or wider Middle Eastern community in Britain is directly affected
+
+Do NOT include:
+- News from Iraq, Iran, Syria or the Kurdistan region unless it directly affects people living in the UK
+- General world news with no UK relevance
+- Sports or entertainment news
 
 Rules:
 - Only include articles published in the last 7 days
 - Each article must have a real URL and a real publication date in YYYY-MM-DD format
-- Categorise each as either "immigration" or "kurdish"
+- Sort by date, newest first
 
 Return ONLY a valid JSON array with no markdown, no explanation, no backticks. Exactly this format:
 [
   {
     "title": "Article title here",
-    "summary": "One sentence summary of the article in plain English",
+    "summary": "One sentence summary of why this matters to Kurdish and Middle Eastern communities in the UK",
     "source": "Source name e.g. BBC News",
     "url": "https://...",
-    "date": "2025-06-14",
-    "category": "immigration"
+    "date": "2026-06-14"
   }
 ]`,
         },
@@ -64,7 +72,7 @@ Return ONLY a valid JSON array with no markdown, no explanation, no backticks. E
 
   if (!Array.isArray(articles)) throw new Error('Response was not an array')
 
-  // Always sort by date descending — newest first — regardless of Claude's order
+  // Sort newest first on our side — never trust Claude's order
   articles.sort((a, b) => {
     const dateA = new Date(a.date || '1970-01-01')
     const dateB = new Date(b.date || '1970-01-01')
