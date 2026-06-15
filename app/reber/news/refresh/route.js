@@ -68,7 +68,11 @@ Return ONLY a valid JSON array, no markdown, no backticks:
     }
 
     const clean = jsonText.replace(/```json|```/g, '').trim()
-    const articles = JSON.parse(clean)
+
+// Extract just the JSON array even if there's text before or after it
+const match = clean.match(/\[[\s\S]*\]/)
+if (!match) throw new Error('No JSON array found in response')
+const articles = JSON.parse(match[0])
     if (!Array.isArray(articles)) throw new Error('Not an array')
 
     articles.sort((a, b) => new Date(b.date) - new Date(a.date))
