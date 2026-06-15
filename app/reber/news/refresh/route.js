@@ -87,4 +87,4 @@ Return ONLY a valid JSON array, no markdown, no backticks:
     console.error('News refresh failed:', err)
     return Response.json({ error: err.message }, { status: 500 })
   }
-}
+} 
