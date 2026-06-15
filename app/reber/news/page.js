@@ -13,14 +13,19 @@ export async function GET() {
       .eq('id', 1)
       .single()
 
-    if (error || !data || !data.articles?.length) {
-      return Response.json({ articles: [] })
+    if (error) {
+      console.error('Supabase error:', JSON.stringify(error))
+      return Response.json({ articles: [], debug: error.message })
+    }
+
+    if (!data || !data.articles?.length) {
+      return Response.json({ articles: [], debug: 'no data or empty articles' })
     }
 
     return Response.json({ articles: data.articles, fetched_at: data.fetched_at })
 
   } catch (err) {
-    console.error('News fetch error:', err)
-    return Response.json({ error: 'Failed to load news' }, { status: 500 })
+    console.error('News fetch error:', err.message)
+    return Response.json({ error: err.message }, { status: 500 })
   }
 }
