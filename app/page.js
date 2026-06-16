@@ -1,266 +1,405 @@
 'use client'
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { createClient } from '../lib/supabase'
 
-const INDIGO = "#4F46E5"
-const INDIGO_DARK = "#1C1A4F"
-const INDIGO_LIGHT = "#818CF8"
-const MINT = "#34D399"
-const KURD_RED = "#E30A17"
-const KURD_GREEN = "#009C3B"
-const KURD_YELLOW = "#F7C200"
+const INDIGO = '#4F46E5'
+const INDIGO_DARK = '#1C1A4F'
+const INDIGO_LIGHT = '#818CF8'
+const MINT = '#34D399'
+const SOFT = '#EDE9FE'
+const BG = '#F5F4FF'
+const FONT = "'Nunito', sans-serif"
 
-const taglines = [
-  { text: "Your rights · Your language · Your community", dir: "ltr" },
-  { text: "مافەکانت · زمانەکەت · کۆمەڵگاکەت", dir: "rtl" },
-  { text: "حقوقت · زبانت · جامعه‌ات", dir: "rtl" },
-  { text: "حقوقك · لغتك · مجتمعك", dir: "rtl" },
-]
+const supabase = createClient()
 
-const LANGS = [
-  { id: "en", flag: "🇬🇧", name: "EN" },
-  { id: "ku", flag: null, name: "کوردی" },
-  { id: "fa", flag: "🇮🇷", name: "فارسی" },
-  { id: "ar", flag: "🇮🇶", name: "عربي" },
-]
+const TX = {
+  en: {
+    heroEyebrow: 'Welcome to Komek',
+    heroTitle: 'Your guide to life in the UK',
+    stats: [
+      { label: 'Letters explained', color: MINT },
+      { label: 'Jobs & services', color: '#818CF8' },
+      { label: 'Questions answered', color: '#F59E0B' },
+    ],
+    quickTitle: 'Quick actions',
+    quick: [
+      { icon: '📄', title: 'Explain a letter', sub: 'Upload or type', route: '/journey/document-explainer' },
+      { icon: '🔍', title: 'Find work', sub: 'Jobs near you', route: '/find' },
+      { icon: '❓', title: 'Ask community', sub: 'Get answers', route: '/reber/ask' },
+      { icon: '➕', title: 'Post a listing', sub: 'Job or service', route: '/post' },
+    ],
+    guidesTitle: 'ڕێنوێنی',
+    guides: [
+      { badge: 'ASYLUM', badgeStyle: 'asylum', title: 'New to the UK', sub: 'First steps guide', route: '/reber/new-to-uk' },
+      { badge: 'LEAVE TO REMAIN', badgeStyle: 'leave', title: 'Leave to Remain', sub: '42-day window', route: '/reber/leave-to-remain' },
+      { badge: 'CITIZENSHIP', badgeStyle: 'citizen', title: 'Citizenship', sub: '£1,709 fee', route: '/reber/citizenship' },
+    ],
+    listingsTitle: 'Latest listings',
+    seeAll: 'See all →',
+    noListings: 'No listings yet',
+    job: 'JOB',
+    service: 'SERVICE',
+    ago: 'ago',
+  },
+  ku: {
+    heroEyebrow: 'بەخێربێیت بۆ کۆمەک',
+    heroTitle: 'ڕێنوێنەکەت بۆ ژیان لە UK',
+    stats: [
+      { label: 'نامەی ڕوونکراوە', color: MINT },
+      { label: 'کار و خزمەتگوزاریەکان', color: '#818CF8' },
+      { label: 'پرسیارە وەڵامدراوەکان', color: '#F59E0B' },
+    ],
+    quickTitle: 'کارە خێراکان',
+    quick: [
+      { icon: '📄', title: 'نامە ڕوون بکەرەوە', sub: 'وێنە ئەپلۆد یان نووسین', route: '/journey/document-explainer' },
+      { icon: '🔍', title: 'کار بدۆزەرەوە', sub: 'کارەکان لە نزیکەکەت', route: '/find' },
+      { icon: '❓', title: 'پرسیار بکە', sub: 'وەڵام وەربگرە', route: '/reber/ask' },
+      { icon: '➕', title: 'بڵاوکردنەوە', sub: 'کار یان خزمەتگوزاری', route: '/post' },
+    ],
+    guidesTitle: 'ڕێنوێنی',
+    guides: [
+      { badge: 'ASYLUM', badgeStyle: 'asylum', title: 'تازە گەیشتووە بە UK', sub: 'ڕێنوێنەی یەکەم هەنگاوەکان', route: '/reber/new-to-uk' },
+      { badge: 'LEAVE TO REMAIN', badgeStyle: 'leave', title: 'Leave to Remain', sub: 'پەنجەرەی ٤٢ ڕۆژ', route: '/reber/leave-to-remain' },
+      { badge: 'CITIZENSHIP', badgeStyle: 'citizen', title: 'هاووڵاتیبوون', sub: 'تێچووی £١٬٧٠٩', route: '/reber/citizenship' },
+    ],
+    listingsTitle: 'کارە نوێکان',
+    seeAll: '← هەموو ببینە',
+    noListings: 'هێشتا هیچ لیستێک نییە',
+    job: 'کار',
+    service: 'خزمەتگوزاری',
+    ago: 'لەمەوبەر',
+  },
+  fa: {
+    heroEyebrow: 'به کومک خوش آمدی',
+    heroTitle: 'راهنمای زندگی در بریتانیا',
+    stats: [
+      { label: 'نامه توضیح داده شده', color: MINT },
+      { label: 'شغل و خدمات', color: '#818CF8' },
+      { label: 'سوال پاسخ داده شده', color: '#F59E0B' },
+    ],
+    quickTitle: 'اقدامات سریع',
+    quick: [
+      { icon: '📄', title: 'توضیح نامه', sub: 'آپلود یا تایپ', route: '/journey/document-explainer' },
+      { icon: '🔍', title: 'پیدا کردن کار', sub: 'مشاغل نزدیک شما', route: '/find' },
+      { icon: '❓', title: 'از جامعه بپرس', sub: 'پاسخ بگیر', route: '/reber/ask' },
+      { icon: '➕', title: 'ارسال آگهی', sub: 'شغل یا خدمت', route: '/post' },
+    ],
+    guidesTitle: 'ڕێنوێنی',
+    guides: [
+      { badge: 'ASYLUM', badgeStyle: 'asylum', title: 'تازه رسیدی', sub: 'راهنمای اول', route: '/reber/new-to-uk' },
+      { badge: 'LEAVE TO REMAIN', badgeStyle: 'leave', title: 'اجازه اقامت', sub: 'پنجره ۴۲ روزه', route: '/reber/leave-to-remain' },
+      { badge: 'CITIZENSHIP', badgeStyle: 'citizen', title: 'شهروندی', sub: 'هزینه £۱٬۷۰۹', route: '/reber/citizenship' },
+    ],
+    listingsTitle: 'آخرین آگهی‌ها',
+    seeAll: '← همه را ببین',
+    noListings: 'هنوز آگهی‌ای نیست',
+    job: 'شغل',
+    service: 'خدمت',
+    ago: 'پیش',
+  },
+  ar: {
+    heroEyebrow: 'مرحباً بك في كومك',
+    heroTitle: 'دليلك للحياة في المملكة المتحدة',
+    stats: [
+      { label: 'رسالة تم شرحها', color: MINT },
+      { label: 'الوظائف والخدمات', color: '#818CF8' },
+      { label: 'الأسئلة التي تمت إجابتها', color: '#F59E0B' },
+    ],
+    quickTitle: 'إجراءات سريعة',
+    quick: [
+      { icon: '📄', title: 'شرح رسالة', sub: 'رفع أو كتابة', route: '/journey/document-explainer' },
+      { icon: '🔍', title: 'البحث عن عمل', sub: 'وظائف قريبة', route: '/find' },
+      { icon: '❓', title: 'اسأل المجتمع', sub: 'احصل على إجابات', route: '/reber/ask' },
+      { icon: '➕', title: 'نشر إعلان', sub: 'وظيفة أو خدمة', route: '/post' },
+    ],
+    guidesTitle: 'ڕێنوێنی',
+    guides: [
+      { badge: 'ASYLUM', badgeStyle: 'asylum', title: 'وصلت للتو', sub: 'دليل الخطوات الأولى', route: '/reber/new-to-uk' },
+      { badge: 'LEAVE TO REMAIN', badgeStyle: 'leave', title: 'الإذن بالبقاء', sub: 'نافذة ٤٢ يوماً', route: '/reber/leave-to-remain' },
+      { badge: 'CITIZENSHIP', badgeStyle: 'citizen', title: 'الجنسية', sub: 'رسوم £١٬٧٠٩', route: '/reber/citizenship' },
+    ],
+    listingsTitle: 'أحدث الإعلانات',
+    seeAll: '← عرض الكل',
+    noListings: 'لا توجد إعلانات بعد',
+    job: 'وظيفة',
+    service: 'خدمة',
+    ago: 'مضت',
+  },
+}
 
-const startLabel = { en: "Get Started", ku: "دەست پێ بکە", fa: "شروع کن", ar: "ابدأ الآن" }
+const BADGE_STYLES = {
+  asylum:  { background: '#FEF3C7', color: '#D97706' },
+  leave:   { background: '#EDE9FE', color: '#4F46E5' },
+  citizen: { background: '#D1FAE5', color: '#059669' },
+}
 
-function KurdFlag({ size = 18 }) {
-  const w = size * 1.5
+const QUICK_COLORS = ['#EDE9FE', '#D1FAE5', '#FEF3C7', '#FCE7F3']
+
+function timeAgo(dateStr) {
+  const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000)
+  if (diff < 3600) return `${Math.floor(diff / 60)}m`
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h`
+  return `${Math.floor(diff / 86400)}d`
+}
+
+function Counter({ target, color }) {
+  const [count, setCount] = useState(0)
+  useEffect(() => {
+    if (!target) { setCount(0); return }
+    setCount(0)
+    let start = 0
+    const duration = 1500
+    const step = target / (duration / 16)
+    const timer = setInterval(() => {
+      start += step
+      if (start >= target) { setCount(target); clearInterval(timer) }
+      else setCount(Math.floor(start))
+    }, 16)
+    return () => clearInterval(timer)
+  }, [target])
   return (
-    <svg width={w} height={size} viewBox="0 0 90 60" style={{ borderRadius: 2, display: "block", pointerEvents: "none" }}>
-      <rect width="90" height="20" fill="#E30A17" />
-      <rect y="20" width="90" height="20" fill="#FFFFFF" />
-      <rect y="40" width="90" height="20" fill="#009C3B" />
-      <circle cx="45" cy="30" r="9" fill="#F7C200" />
-      {Array.from({ length: 21 }).map((_, i) => {
-        const a = (i * 360 / 21) * Math.PI / 180
-        return <line key={i} x1={45+Math.cos(a)*9} y1={30+Math.sin(a)*9} x2={45+Math.cos(a)*14} y2={30+Math.sin(a)*14} stroke="#F7C200" strokeWidth="1.5" />
-      })}
-      <circle cx="45" cy="30" r="5" fill="#E30A17" />
-    </svg>
+    <span style={{ fontSize: 22, fontWeight: 900, color, lineHeight: 1 }}>
+      {count.toLocaleString()}
+    </span>
   )
 }
 
-function SproutLogo({ size = 38 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 100 100" style={{ pointerEvents: "none" }}>
-      <defs>
-        <linearGradient id="sbg" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor={INDIGO} /><stop offset="100%" stopColor={INDIGO_LIGHT} />
-        </linearGradient>
-        <linearGradient id="sl" x1="0%" y1="100%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#059669" /><stop offset="100%" stopColor="#6EE7B7" />
-        </linearGradient>
-      </defs>
-      <circle cx="50" cy="50" r="46" fill="url(#sbg)" />
-      <path d="M 50 76 L 50 45" stroke="white" strokeWidth="5" strokeLinecap="round" fill="none" />
-      <path d="M 50 60 Q 26 55 22 34 Q 44 28 52 56 Z" fill="url(#sl)" />
-      <path d="M 50 50 Q 72 44 76 23 Q 56 17 48 46 Z" fill="url(#sl)" opacity="0.85" />
-      <ellipse cx="50" cy="40" rx="6" ry="9" fill={MINT} />
-      <ellipse cx="50" cy="37" rx="3" ry="4" fill="white" opacity="0.8" />
-    </svg>
-  )
-}
-
-export default function SplashPage() {
+export default function HomePage() {
   const router = useRouter()
-  const [tagIdx, setTagIdx] = useState(0)
-  const [tagVisible, setTagVisible] = useState(true)
-  const [lang, setLang] = useState("en")
-  const [langOpen, setLangOpen] = useState(false)
+  const [lang, setLang] = useState('en')
+  const [stats, setStats] = useState({ explained: 0, listings: 0, answered: 0 })
+  const [listings, setListings] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [statsLoading, setStatsLoading] = useState(true)
 
   useEffect(() => {
-    const saved = localStorage.getItem("komek_lang")
-    if (saved) setLang(saved)
-
-    const interval = setInterval(() => {
-      setTagVisible(false)
-      setTimeout(() => { setTagIdx(i => (i + 1) % taglines.length); setTagVisible(true) }, 400)
-    }, 3000)
-
-    return () => clearInterval(interval)
+    const saved = localStorage.getItem('komek_lang')
+    if (saved && TX[saved]) setLang(saved)
+    const handler = (e) => { if (TX[e.detail]) setLang(e.detail) }
+    window.addEventListener('langchange', handler)
+    fetchAll()
+    return () => window.removeEventListener('langchange', handler)
   }, [])
 
-  function selectLang(l) {
-    setLang(l)
-    setLangOpen(false)
-    localStorage.setItem("komek_lang", l)
-    window.dispatchEvent(new CustomEvent("langchange", { detail: l }))
+  async function fetchAll() {
+    setLoading(true)
+    setStatsLoading(true)
+
+    const [
+      { count: explained },
+      { count: listingCount },
+      { count: answered },
+      { data: latestListings },
+    ] = await Promise.all([
+      supabase.from('explainer_usage').select('*', { count: 'exact', head: true }),
+      supabase.from('listings').select('*', { count: 'exact', head: true }).in('type', ['hire_staff', 'list_service']).in('status', ['approved', 'filled']),
+      supabase.from('questions').select('*', { count: 'exact', head: true }).eq('status', 'answered'),
+      supabase.from('listings').select('id, type, data, status, created_at').in('type', ['hire_staff', 'list_service']).in('status', ['approved', 'filled']).neq('paused', true).order('created_at', { ascending: false }).limit(3),
+    ])
+
+    setStats({ explained: explained || 0, listings: listingCount || 0, answered: answered || 0 })
+    setListings(latestListings || [])
+    setStatsLoading(false)
+    setLoading(false)
   }
 
-  const currentTag = taglines[tagIdx]
-  const currentLang = LANGS.find(l => l.id === lang) || LANGS[0]
+  const t = TX[lang] || TX.en
+  const isRtl = ['ku', 'fa', 'ar'].includes(lang)
+  const ta = isRtl ? 'right' : 'left'
+  const LISTING_ICONS = { hire_staff: '💼', list_service: '🛠️' }
+  const statValues = [stats.explained, stats.listings, stats.answered]
 
   return (
-    <div style={{
-      height: "100vh",
-      maxHeight: "100vh",
-      background: "#050412",
-      fontFamily: "Nunito, sans-serif",
-      display: "flex",
-      flexDirection: "column",
-      overflow: "hidden",
-      position: "relative",
-    }}>
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 0.6; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.03); }
-        }
-        html, body { margin: 0; padding: 0; overflow: hidden; background: #050412; }
-      `}</style>
+    <div style={{ fontFamily: FONT, background: BG, minHeight: '100vh', paddingBottom: 90, direction: 'ltr' }}>
 
-      {/* ALL decorative layers — pointerEvents none */}
-      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 70% 55% at 50% 52%, rgba(79,70,229,0.22) 0%, rgba(28,26,79,0.35) 45%, transparent 75%)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", top: -80, left: -60, width: 260, height: 260, borderRadius: "50%", background: "radial-gradient(circle, rgba(227,10,23,0.12) 0%, transparent 70%)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", bottom: -60, right: -40, width: 220, height: 220, borderRadius: "50%", background: "radial-gradient(circle, rgba(0,156,59,0.1) 0%, transparent 70%)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3, background: `linear-gradient(to bottom, ${KURD_RED}, transparent, ${KURD_GREEN})`, opacity: 0.5, pointerEvents: "none" }} />
-      <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 3, background: `linear-gradient(to bottom, ${KURD_GREEN}, transparent, ${KURD_RED})`, opacity: 0.5, pointerEvents: "none" }} />
-
-      {/* Stars — pointerEvents none */}
-      <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 0 }} viewBox="0 0 390 844">
-        {[[30,60],[80,30],[140,80],[200,20],[260,55],[320,35],[360,75],[15,140],[100,160],[170,110],[240,150],[300,120],[350,160],[50,220],[150,240],[280,200],[340,230]].map(([x,y],i)=>(
-          <circle key={i} cx={x} cy={y} r={i%4===0?1.4:0.8} fill="white" opacity={0.08+((i*11)%9)*0.04} />
-        ))}
-      </svg>
-
-      {/* Nav — high z-index, interactive */}
-      <div style={{ padding: "52px 24px 0", display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative", zIndex: 50, flexShrink: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <SproutLogo size={38} />
-          <span style={{ fontSize: 22, fontWeight: 900, color: "white", letterSpacing: -0.5 }}>Komek</span>
-        </div>
-
-        {/* Language toggle — inline, no external click handler */}
-        <div style={{ position: "relative", zIndex: 200 }}>
-          <button
-            onClick={() => setLangOpen(o => !o)}
-            style={{
-              display: "flex", alignItems: "center", gap: 5, padding: "7px 13px",
-              background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)",
-              borderRadius: 20, color: "white", fontWeight: 800, fontSize: 12,
-              cursor: "pointer", fontFamily: "Nunito, sans-serif",
-            }}>
-            {currentLang.id === "ku" ? <KurdFlag size={12} /> : <span style={{ fontSize: 14 }}>{currentLang.flag}</span>}
-            <span>{currentLang.name}</span>
-            <span style={{ fontSize: 8, opacity: 0.4 }}>{langOpen ? "▲" : "▼"}</span>
-          </button>
-
-          {langOpen && (
-            <div style={{
-              position: "absolute", top: "calc(100% + 8px)", right: 0,
-              background: "#0d0b24", borderRadius: 16,
-              boxShadow: "0 16px 48px rgba(0,0,0,0.8)",
-              zIndex: 300, minWidth: 150,
-              border: "1px solid rgba(255,255,255,0.15)",
-              overflow: "hidden",
-            }}>
-              {LANGS.map(l => (
-                <button
-                  key={l.id}
-                  onClick={() => selectLang(l.id)}
-                  style={{
-                    width: "100%", display: "flex", alignItems: "center", gap: 10,
-                    padding: "12px 16px",
-                    background: lang === l.id ? "rgba(79,70,229,0.4)" : "transparent",
-                    border: "none", borderBottom: "1px solid rgba(255,255,255,0.07)",
-                    cursor: "pointer", fontFamily: "Nunito, sans-serif", color: "white",
-                    fontSize: 13, fontWeight: 700,
-                    textAlign: "left",
-                  }}>
-                  {l.id === "ku" ? <KurdFlag size={15} /> : <span style={{ fontSize: 18 }}>{l.flag}</span>}
-                  <span>{l.name}</span>
-                  {lang === l.id && <span style={{ color: MINT, marginLeft: "auto" }}>✓</span>}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Centre content */}
+      {/* HERO */}
       <div style={{
-        flex: 1, display: "flex", flexDirection: "column",
-        alignItems: "center", justifyContent: "center",
-        position: "relative", zIndex: 10, padding: "0 24px",
+        background: `linear-gradient(135deg, ${INDIGO_DARK} 0%, #2D2A7A 65%, ${INDIGO} 100%)`,
+        padding: '36px 20px 28px',
+        textAlign: 'center',
+        position: 'relative',
+        overflow: 'hidden',
       }}>
-        {/* Sun */}
-        <div style={{ animation: "pulse 1s ease-in-out infinite", marginBottom: 36, pointerEvents: "none" }}>
-          <svg width="180" height="180" viewBox="0 0 180 180" style={{ pointerEvents: "none" }}>
-            <defs>
-              <radialGradient id="sg2" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor={KURD_YELLOW} />
-                <stop offset="100%" stopColor="#F59E0B" />
-              </radialGradient>
-              <filter id="sunblur"><feGaussianBlur stdDeviation="6" /></filter>
-            </defs>
-            <circle cx="90" cy="90" r="70" fill={KURD_YELLOW} opacity="0.12" filter="url(#sunblur)" />
-            {Array.from({ length: 21 }).map((_, i) => {
-              const a = (i * 360 / 21) * Math.PI / 180
-              return <line key={i}
-                x1={90 + Math.cos(a) * 38} y1={90 + Math.sin(a) * 38}
-                x2={90 + Math.cos(a) * 62} y2={90 + Math.sin(a) * 62}
-                stroke={KURD_YELLOW} strokeWidth="3.5" strokeLinecap="round" opacity="0.95" />
-            })}
-            <circle cx="90" cy="90" r="38" fill="url(#sg2)" />
-            <circle cx="90" cy="90" r="17" fill={KURD_RED} />
-            <ellipse cx="78" cy="78" rx="12" ry="8" fill="white" opacity="0.14" />
-          </svg>
-        </div>
+        <div style={{ position: 'absolute', top: -50, right: -50, width: 160, height: 160, borderRadius: '50%', background: 'rgba(52,211,153,0.07)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: -30, left: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(129,140,248,0.08)', pointerEvents: 'none' }} />
 
-        {/* Tagline */}
+        <p style={{ fontSize: 11, fontWeight: 800, color: INDIGO_LIGHT, letterSpacing: 1, textTransform: 'uppercase', margin: '0 0 10px' }}>
+          {t.heroEyebrow}
+        </p>
+        <h1 style={{ fontSize: 26, fontWeight: 900, color: '#fff', margin: '0 0 24px', lineHeight: 1.25 }}>
+          {t.heroTitle}
+        </h1>
+
+        {/* STATS ROW */}
         <div style={{
-          textAlign: "center",
-          opacity: tagVisible ? 1 : 0,
-          transition: "opacity 0.4s ease",
-          minHeight: 80,
-          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-          pointerEvents: "none",
+          display: 'flex', alignItems: 'center',
+          background: 'rgba(255,255,255,0.07)',
+          border: '1px solid rgba(255,255,255,0.12)',
+          borderRadius: 16, padding: '14px 8px',
         }}>
-          <p style={{
-            fontSize: 26, fontWeight: 900, color: "white",
-            lineHeight: 1.25, textAlign: "center",
-            direction: currentTag.dir,
-            letterSpacing: currentTag.dir === "ltr" ? -0.5 : 0,
-            textShadow: "0 2px 24px rgba(79,70,229,0.4)",
-            margin: 0,
-          }}>
-            {currentTag.text}
-          </p>
-        </div>
-
-        {/* Dots */}
-        <div style={{ display: "flex", gap: 6, marginTop: 20, pointerEvents: "none" }}>
-          {taglines.map((_, i) => (
-            <div key={i} style={{
-              width: i === tagIdx ? 20 : 6, height: 6, borderRadius: 3,
-              background: i === tagIdx ? KURD_YELLOW : "rgba(255,255,255,0.15)",
-              transition: "all 0.4s ease",
-            }} />
+          {t.stats.map((s, i) => (
+            <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, position: 'relative' }}>
+              {i > 0 && (
+                <div style={{ position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)', width: 1, height: 32, background: 'rgba(255,255,255,0.12)' }} />
+              )}
+              {statsLoading ? (
+                <span style={{ fontSize: 22, fontWeight: 900, color: s.color }}>—</span>
+              ) : (
+                <Counter target={statValues[i]} color={s.color} />
+              )}
+              <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', fontWeight: 700, lineHeight: 1.3, textAlign: 'center', padding: '0 4px' }}>
+                {s.label}
+              </span>
+            </div>
           ))}
         </div>
-
-        {/* CTA */}
-        <button
-          onClick={() => router.push("/home")}
-          style={{
-            marginTop: 36,
-            background: `linear-gradient(135deg, ${MINT} 0%, #059669 100%)`,
-            borderRadius: 28, padding: "16px 48px",
-            fontSize: 16, fontWeight: 900, color: "white",
-            border: "none", cursor: "pointer",
-            boxShadow: "0 8px 32px rgba(52,211,153,0.35)",
-            letterSpacing: 0.3, fontFamily: "Nunito, sans-serif",
-            position: "relative", zIndex: 20,
-          }}>{startLabel[lang]}</button>
-
-        <p style={{ marginTop: 14, fontSize: 10, color: "rgba(255,255,255,0.3)", fontWeight: 600, textAlign: "center", pointerEvents: "none" }}>
-          English · کوردی · فارسی · عربي
-        </p>
       </div>
 
+      <div style={{ maxWidth: 520, margin: '0 auto', padding: '0 16px' }}>
+
+        {/* QUICK ACTIONS */}
+        <div style={{ padding: '22px 0 0' }}>
+          <p style={{ fontSize: 11, fontWeight: 800, color: INDIGO_LIGHT, letterSpacing: 1, textTransform: 'uppercase', margin: '0 0 12px', textAlign: ta }}>
+            {t.quickTitle}
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            {t.quick.map((q, i) => (
+              <div
+                key={i}
+                onClick={() => router.push(q.route)}
+                style={{
+                  background: '#fff', borderRadius: 18, padding: '16px 14px',
+                  border: `1px solid ${SOFT}`,
+                  boxShadow: '0 2px 10px rgba(79,70,229,0.07)',
+                  cursor: 'pointer', textAlign: ta,
+                }}
+              >
+                <div style={{
+                  width: 38, height: 38, borderRadius: 12,
+                  background: QUICK_COLORS[i],
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 19, marginBottom: 10,
+                  marginLeft: isRtl ? 'auto' : 0,
+                  marginRight: isRtl ? 0 : 'auto',
+                }}>
+                  {q.icon}
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: INDIGO_DARK, marginBottom: 2 }}>{q.title}</div>
+                <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 600 }}>{q.sub}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* GUIDE CARDS */}
+        <div style={{ padding: '22px 0 0' }}>
+          <p style={{ fontSize: 11, fontWeight: 800, color: INDIGO_LIGHT, letterSpacing: 1, textTransform: 'uppercase', margin: '0 0 12px', textAlign: ta }}>
+            {t.guidesTitle}
+          </p>
+          <div style={{
+            display: 'flex', gap: 10,
+            overflowX: 'auto', paddingBottom: 6,
+            scrollbarWidth: 'none',
+            flexDirection: isRtl ? 'row-reverse' : 'row',
+            marginLeft: -16, marginRight: -16,
+            paddingLeft: 16, paddingRight: 16,
+          }}>
+            {t.guides.map((g, i) => (
+              <div
+                key={i}
+                onClick={() => router.push(g.route)}
+                style={{
+                  minWidth: 148, background: '#fff',
+                  borderRadius: 18, border: `1px solid ${SOFT}`,
+                  boxShadow: '0 2px 10px rgba(79,70,229,0.07)',
+                  overflow: 'hidden', flexShrink: 0, cursor: 'pointer',
+                }}
+              >
+                <div style={{ padding: '14px 14px 10px', textAlign: ta }}>
+                  <span style={{
+                    display: 'inline-block', fontSize: 9, fontWeight: 800,
+                    padding: '3px 8px', borderRadius: 20, marginBottom: 8,
+                    direction: 'ltr', ...BADGE_STYLES[g.badgeStyle],
+                  }}>
+                    {g.badge}
+                  </span>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: INDIGO_DARK, lineHeight: 1.3 }}>{g.title}</div>
+                </div>
+                <div style={{ padding: '8px 14px 12px', borderTop: `1px solid ${BG}`, textAlign: ta }}>
+                  <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 600 }}>{g.sub}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* LATEST LISTINGS */}
+        <div style={{ padding: '22px 0 0' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isRtl ? 'row-reverse' : 'row', marginBottom: 12 }}>
+            <p style={{ fontSize: 11, fontWeight: 800, color: INDIGO_LIGHT, letterSpacing: 1, textTransform: 'uppercase', margin: 0 }}>
+              {t.listingsTitle}
+            </p>
+            <span onClick={() => router.push('/find')} style={{ fontSize: 12, fontWeight: 700, color: INDIGO, cursor: 'pointer' }}>
+              {t.seeAll}
+            </span>
+          </div>
+
+          {loading ? (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '20px 0' }}>
+              <div style={{ width: 24, height: 24, border: `2px solid ${SOFT}`, borderTopColor: INDIGO, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+            </div>
+          ) : listings.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '20px 0', fontSize: 13, color: '#94A3B8', fontWeight: 600 }}>
+              {t.noListings}
+            </div>
+          ) : listings.map((l, i) => {
+            const d = l.data || {}
+            const title = l.type === 'hire_staff' ? d.jobTitle : d.serviceName
+            const location = d.location || ''
+            const isJob = l.type === 'hire_staff'
+            return (
+              <div
+                key={l.id}
+                onClick={() => router.push('/find')}
+                style={{
+                  background: '#fff', borderRadius: 18,
+                  border: `1px solid ${SOFT}`,
+                  boxShadow: '0 2px 10px rgba(79,70,229,0.07)',
+                  padding: '14px 16px', marginBottom: 10,
+                  display: 'flex', gap: 12, alignItems: 'flex-start',
+                  flexDirection: isRtl ? 'row-reverse' : 'row',
+                  cursor: 'pointer',
+                }}
+              >
+                <div style={{ width: 42, height: 42, borderRadius: 12, background: SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>
+                  {LISTING_ICONS[l.type]}
+                </div>
+                <div style={{ flex: 1, textAlign: ta }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: INDIGO_DARK, marginBottom: 3 }}>{title}</div>
+                  <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 600 }}>
+                    {location}{location ? ' · ' : ''}{timeAgo(l.created_at)} {t.ago}
+                  </div>
+                  <span style={{
+                    display: 'inline-block', fontSize: 10, fontWeight: 700,
+                    padding: '2px 8px', borderRadius: 20, marginTop: 6,
+                    background: isJob ? SOFT : '#D1FAE5',
+                    color: isJob ? INDIGO : '#059669',
+                  }}>
+                    {isJob ? t.job : t.service}
+                  </span>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+      </div>
+
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        div::-webkit-scrollbar { display: none; }
+      `}</style>
     </div>
   )
 }
