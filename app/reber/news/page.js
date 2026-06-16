@@ -101,8 +101,7 @@ function NewsCard({ article, lang }) {
             padding: '7px 14px', background: SOFT, color: INDIGO,
             borderRadius: 20, fontSize: 12, fontWeight: 800, fontFamily: FONT,
             textDecoration: 'none', border: '1.5px solid #C4B5FD',
-          }}
-        >
+          }}>
           {t.readMore} &#8594;
         </a>
       </div>
