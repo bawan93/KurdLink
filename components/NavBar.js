@@ -10,30 +10,30 @@ const FONT = "'Nunito', 'Plus Jakarta Sans', sans-serif"
 
 const TABS = [
   {
-    id: 'guide',
-    icon: '🧭',
-    label: { en: 'Guide', ku: 'ڕێنمایی', fa: 'راهنما', ar: 'الدليل' },
-    route: '/reber/coming-to-uk',
-    match: (p) => p?.startsWith('/reber') && p !== '/reber/ask',
+    id: 'home',
+    icon: '🏠',
+    label: { en: 'Home', ku: 'سەرەکی', fa: 'خانه', ar: 'الرئيسية' },
+    route: '/home',
+    match: (p) => p === '/home',
   },
   {
     id: 'letters',
     icon: '📄',
-    label: { en: 'Letters', ku: 'ڕوونکردنەوەی نامە', fa: 'نامه‌ها', ar: 'الرسائل' },
+    label: { en: 'Letters', ku: 'شیکاری نامە', fa: 'نامه‌ها', ar: 'الرسائل' },
     route: '/journey/document-explainer',
     match: (p) => p?.startsWith('/journey'),
   },
   {
     id: 'ask',
     icon: '❓',
-    label: { en: 'Ask', ku: 'پرسیار بکە', fa: 'سوال', ar: 'اسأل' },
+    label: { en: 'Ask', ku: 'پرسیار', fa: 'سوال', ar: 'اسأل' },
     route: '/reber/ask',
     match: (p) => p === '/reber/ask',
   },
   {
     id: 'find',
     icon: '🔍',
-    label: { en: 'Search', ku: 'گەڕان', fa: 'جستجو', ar: 'بحث' },
+    label: { en: 'Find', ku: 'بدۆزەرەوە', fa: 'جستجو', ar: 'ابحث' },
     route: '/find',
     match: (p) => p?.startsWith('/find'),
   },
@@ -74,7 +74,6 @@ export default function NavBar() {
   useEffect(() => {
     const saved = localStorage.getItem('komek_lang')
     if (saved) setLang(saved)
-
     const handler = (e) => setLang(e.detail)
     window.addEventListener('langchange', handler)
     return () => window.removeEventListener('langchange', handler)
@@ -123,11 +122,7 @@ export default function NavBar() {
                 whiteSpace: 'nowrap', minWidth: 0,
               }}
             >
-              <span style={{
-                fontSize: 13,
-                display: 'inline-block',
-                transform: tab.id === 'ask' && (lang === 'ku' || lang === 'fa' || lang === 'ar') ? 'scaleX(-1)' : 'none'
-              }}>
+              <span style={{ fontSize: 13, display: 'inline-block' }}>
                 {tab.icon}
               </span>
               <span>{label}</span>
@@ -160,7 +155,7 @@ function LangSelector({ lang, onChange }) {
     <div ref={ref} style={{ position: 'relative', userSelect: 'none' }}>
       <button onClick={() => setOpen(o => !o)} style={{
         display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px',
-        background: SOFT, border: `1.5px solid #C4B5FD`,
+        background: SOFT, border: '1.5px solid #C4B5FD',
         borderRadius: 20, color: INDIGO, fontWeight: 800, fontSize: 12,
         cursor: 'pointer', fontFamily: FONT,
       }}>
