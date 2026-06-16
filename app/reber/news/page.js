@@ -103,7 +103,7 @@ function NewsCard({ article, lang }) {
             textDecoration: 'none', border: '1.5px solid #C4B5FD',
           }}
         >
-          {t.readMore} →
+          {t.readMore} &#8594;
         </a>
       </div>
     </div>
