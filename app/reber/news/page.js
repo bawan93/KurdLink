@@ -1,3 +1,4 @@
+'use client'
 <div style={{ maxWidth: 480, margin: '0 auto', padding: '20px 16px 0' }}>
     {loading && (
       <div style={{ textAlign: 'center', padding: '60px 20px' }}>
