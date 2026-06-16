@@ -56,4 +56,4 @@ export async function GET() {
     console.error('News refresh failed:', err)
     return Response.json({ error: err.message }, { status: 500 })
   }
-}
+} 
