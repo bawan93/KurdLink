@@ -1,6 +1,6 @@
 'use client'
 import { useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '../lib/supabase'
 
 const INDIGO = '#4F46E5'
@@ -19,7 +19,7 @@ const TX = {
     heroTitle: 'Your guide to life in the UK',
     stats: [
       { label: 'Letters explained', color: MINT },
-      { label: 'Jobs & services', color: '#818CF8' },
+      { label: 'Jobs & services', color: INDIGO_LIGHT },
       { label: 'Questions answered', color: '#F59E0B' },
     ],
     quickTitle: 'Quick actions',
@@ -47,7 +47,7 @@ const TX = {
     heroTitle: 'ڕێنوێنەکەت بۆ ژیان لە UK',
     stats: [
       { label: 'نامەی ڕوونکراوە', color: MINT },
-      { label: 'کار و خزمەتگوزاریەکان', color: '#818CF8' },
+      { label: 'کار و خزمەتگوزاریەکان', color: INDIGO_LIGHT },
       { label: 'پرسیارە وەڵامدراوەکان', color: '#F59E0B' },
     ],
     quickTitle: 'کارە خێراکان',
@@ -75,7 +75,7 @@ const TX = {
     heroTitle: 'راهنمای زندگی در بریتانیا',
     stats: [
       { label: 'نامه توضیح داده شده', color: MINT },
-      { label: 'شغل و خدمات', color: '#818CF8' },
+      { label: 'شغل و خدمات', color: INDIGO_LIGHT },
       { label: 'سوال پاسخ داده شده', color: '#F59E0B' },
     ],
     quickTitle: 'اقدامات سریع',
@@ -103,7 +103,7 @@ const TX = {
     heroTitle: 'دليلك للحياة في المملكة المتحدة',
     stats: [
       { label: 'رسالة تم شرحها', color: MINT },
-      { label: 'الوظائف والخدمات', color: '#818CF8' },
+      { label: 'الوظائف والخدمات', color: INDIGO_LIGHT },
       { label: 'الأسئلة التي تمت إجابتها', color: '#F59E0B' },
     ],
     quickTitle: 'إجراءات سريعة',
@@ -135,6 +135,7 @@ const BADGE_STYLES = {
 }
 
 const QUICK_COLORS = ['#EDE9FE', '#D1FAE5', '#FEF3C7', '#FCE7F3']
+const LISTING_ICONS = { hire_staff: '💼', list_service: '🛠️' }
 
 function timeAgo(dateStr) {
   const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000)
@@ -143,24 +144,34 @@ function timeAgo(dateStr) {
   return `${Math.floor(diff / 86400)}d`
 }
 
-function Counter({ target, color }) {
-  const [count, setCount] = useState(0)
+function AnimatedCounter({ value, color }) {
+  const [display, setDisplay] = useState(0)
+  const prevValue = useRef(0)
+
   useEffect(() => {
-    if (!target) { setCount(0); return }
-    setCount(0)
-    let start = 0
+    const target = value
+    const start = prevValue.current
+    prevValue.current = target
+    if (target === 0) { setDisplay(0); return }
+    let current = start
     const duration = 1500
-    const step = target / (duration / 16)
+    const steps = duration / 16
+    const increment = (target - start) / steps
     const timer = setInterval(() => {
-      start += step
-      if (start >= target) { setCount(target); clearInterval(timer) }
-      else setCount(Math.floor(start))
+      current += increment
+      if (current >= target) {
+        setDisplay(target)
+        clearInterval(timer)
+      } else {
+        setDisplay(Math.floor(current))
+      }
     }, 16)
     return () => clearInterval(timer)
-  }, [target])
+  }, [value])
+
   return (
-    <span style={{ fontSize: 22, fontWeight: 900, color, lineHeight: 1 }}>
-      {count.toLocaleString()}
+    <span style={{ fontSize: 24, fontWeight: 900, color, lineHeight: 1 }}>
+      {display.toLocaleString()}
     </span>
   )
 }
@@ -168,10 +179,9 @@ function Counter({ target, color }) {
 export default function HomePage() {
   const router = useRouter()
   const [lang, setLang] = useState('en')
-  const [stats, setStats] = useState({ explained: 0, listings: 0, answered: 0 })
+  const [statValues, setStatValues] = useState([0, 0, 0])
   const [listings, setListings] = useState([])
   const [loading, setLoading] = useState(true)
-  const [statsLoading, setStatsLoading] = useState(true)
 
   useEffect(() => {
     const saved = localStorage.getItem('komek_lang')
@@ -184,8 +194,6 @@ export default function HomePage() {
 
   async function fetchAll() {
     setLoading(true)
-    setStatsLoading(true)
-
     const [
       { count: explained },
       { count: listingCount },
@@ -197,18 +205,14 @@ export default function HomePage() {
       supabase.from('questions').select('*', { count: 'exact', head: true }).eq('status', 'answered'),
       supabase.from('listings').select('id, type, data, status, created_at').in('type', ['hire_staff', 'list_service']).in('status', ['approved', 'filled']).neq('paused', true).order('created_at', { ascending: false }).limit(3),
     ])
-
-    setStats({ explained: explained || 0, listings: listingCount || 0, answered: answered || 0 })
+    setStatValues([explained || 0, listingCount || 0, answered || 0])
     setListings(latestListings || [])
-    setStatsLoading(false)
     setLoading(false)
   }
 
   const t = TX[lang] || TX.en
   const isRtl = ['ku', 'fa', 'ar'].includes(lang)
   const ta = isRtl ? 'right' : 'left'
-  const LISTING_ICONS = { hire_staff: '💼', list_service: '🛠️' }
-  const statValues = [stats.explained, stats.listings, stats.answered]
 
   return (
     <div style={{ fontFamily: FONT, background: BG, minHeight: '100vh', paddingBottom: 90, direction: 'ltr' }}>
@@ -216,39 +220,34 @@ export default function HomePage() {
       {/* HERO */}
       <div style={{
         background: `linear-gradient(135deg, ${INDIGO_DARK} 0%, #2D2A7A 65%, ${INDIGO} 100%)`,
-        padding: '36px 20px 28px',
-        textAlign: 'center',
-        position: 'relative',
-        overflow: 'hidden',
+        padding: '32px 20px 24px', textAlign: 'center',
+        position: 'relative', overflow: 'hidden',
       }}>
         <div style={{ position: 'absolute', top: -50, right: -50, width: 160, height: 160, borderRadius: '50%', background: 'rgba(52,211,153,0.07)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', bottom: -30, left: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(129,140,248,0.08)', pointerEvents: 'none' }} />
 
-        <p style={{ fontSize: 11, fontWeight: 800, color: INDIGO_LIGHT, letterSpacing: 1, textTransform: 'uppercase', margin: '0 0 10px' }}>
+        <p style={{ fontSize: 11, fontWeight: 800, color: INDIGO_LIGHT, letterSpacing: 1, textTransform: 'uppercase', margin: '0 0 10px', position: 'relative' }}>
           {t.heroEyebrow}
         </p>
-        <h1 style={{ fontSize: 26, fontWeight: 900, color: '#fff', margin: '0 0 24px', lineHeight: 1.25 }}>
+        <h1 style={{ fontSize: 26, fontWeight: 900, color: '#fff', margin: '0 0 24px', lineHeight: 1.25, position: 'relative' }}>
           {t.heroTitle}
         </h1>
 
-        {/* STATS ROW */}
+        {/* STATS */}
         <div style={{
-          display: 'flex', alignItems: 'center',
+          display: 'flex', alignItems: 'stretch',
           background: 'rgba(255,255,255,0.07)',
           border: '1px solid rgba(255,255,255,0.12)',
-          borderRadius: 16, padding: '14px 8px',
+          borderRadius: 16, overflow: 'hidden', position: 'relative',
         }}>
           {t.stats.map((s, i) => (
-            <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, position: 'relative' }}>
-              {i > 0 && (
-                <div style={{ position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)', width: 1, height: 32, background: 'rgba(255,255,255,0.12)' }} />
-              )}
-              {statsLoading ? (
-                <span style={{ fontSize: 22, fontWeight: 900, color: s.color }}>—</span>
-              ) : (
-                <Counter target={statValues[i]} color={s.color} />
-              )}
-              <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', fontWeight: 700, lineHeight: 1.3, textAlign: 'center', padding: '0 4px' }}>
+            <div key={i} style={{
+              flex: 1, padding: '14px 8px',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+              borderLeft: i > 0 ? '1px solid rgba(255,255,255,0.1)' : 'none',
+            }}>
+              <AnimatedCounter value={statValues[i]} color={s.color} />
+              <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', fontWeight: 700, textAlign: 'center', lineHeight: 1.3, padding: '0 4px' }}>
                 {s.label}
               </span>
             </div>
@@ -259,29 +258,22 @@ export default function HomePage() {
       <div style={{ maxWidth: 520, margin: '0 auto', padding: '0 16px' }}>
 
         {/* QUICK ACTIONS */}
-        <div style={{ padding: '22px 0 0' }}>
+        <div style={{ padding: '20px 0 0' }}>
           <p style={{ fontSize: 11, fontWeight: 800, color: INDIGO_LIGHT, letterSpacing: 1, textTransform: 'uppercase', margin: '0 0 12px', textAlign: ta }}>
             {t.quickTitle}
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             {t.quick.map((q, i) => (
-              <div
-                key={i}
-                onClick={() => router.push(q.route)}
-                style={{
-                  background: '#fff', borderRadius: 18, padding: '16px 14px',
-                  border: `1px solid ${SOFT}`,
-                  boxShadow: '0 2px 10px rgba(79,70,229,0.07)',
-                  cursor: 'pointer', textAlign: ta,
-                }}
-              >
+              <div key={i} onClick={() => router.push(q.route)} style={{
+                background: '#fff', borderRadius: 18, padding: '16px 14px',
+                border: `1px solid ${SOFT}`, boxShadow: '0 2px 10px rgba(79,70,229,0.07)',
+                cursor: 'pointer', textAlign: ta,
+              }}>
                 <div style={{
-                  width: 38, height: 38, borderRadius: 12,
-                  background: QUICK_COLORS[i],
+                  width: 38, height: 38, borderRadius: 12, background: QUICK_COLORS[i],
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 19, marginBottom: 10,
-                  marginLeft: isRtl ? 'auto' : 0,
-                  marginRight: isRtl ? 0 : 'auto',
+                  marginLeft: isRtl ? 'auto' : 0, marginRight: isRtl ? 0 : 'auto',
                 }}>
                   {q.icon}
                 </div>
@@ -293,29 +285,22 @@ export default function HomePage() {
         </div>
 
         {/* GUIDE CARDS */}
-        <div style={{ padding: '22px 0 0' }}>
+        <div style={{ padding: '20px 0 0' }}>
           <p style={{ fontSize: 11, fontWeight: 800, color: INDIGO_LIGHT, letterSpacing: 1, textTransform: 'uppercase', margin: '0 0 12px', textAlign: ta }}>
             {t.guidesTitle}
           </p>
           <div style={{
-            display: 'flex', gap: 10,
-            overflowX: 'auto', paddingBottom: 6,
+            display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 6,
             scrollbarWidth: 'none',
             flexDirection: isRtl ? 'row-reverse' : 'row',
-            marginLeft: -16, marginRight: -16,
-            paddingLeft: 16, paddingRight: 16,
+            marginLeft: -16, marginRight: -16, paddingLeft: 16, paddingRight: 16,
           }}>
             {t.guides.map((g, i) => (
-              <div
-                key={i}
-                onClick={() => router.push(g.route)}
-                style={{
-                  minWidth: 148, background: '#fff',
-                  borderRadius: 18, border: `1px solid ${SOFT}`,
-                  boxShadow: '0 2px 10px rgba(79,70,229,0.07)',
-                  overflow: 'hidden', flexShrink: 0, cursor: 'pointer',
-                }}
-              >
+              <div key={i} onClick={() => router.push(g.route)} style={{
+                minWidth: 148, background: '#fff', borderRadius: 18,
+                border: `1px solid ${SOFT}`, boxShadow: '0 2px 10px rgba(79,70,229,0.07)',
+                overflow: 'hidden', flexShrink: 0, cursor: 'pointer',
+              }}>
                 <div style={{ padding: '14px 14px 10px', textAlign: ta }}>
                   <span style={{
                     display: 'inline-block', fontSize: 9, fontWeight: 800,
@@ -335,7 +320,7 @@ export default function HomePage() {
         </div>
 
         {/* LATEST LISTINGS */}
-        <div style={{ padding: '22px 0 0' }}>
+        <div style={{ padding: '20px 0 0' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isRtl ? 'row-reverse' : 'row', marginBottom: 12 }}>
             <p style={{ fontSize: 11, fontWeight: 800, color: INDIGO_LIGHT, letterSpacing: 1, textTransform: 'uppercase', margin: 0 }}>
               {t.listingsTitle}
@@ -359,19 +344,13 @@ export default function HomePage() {
             const location = d.location || ''
             const isJob = l.type === 'hire_staff'
             return (
-              <div
-                key={l.id}
-                onClick={() => router.push('/find')}
-                style={{
-                  background: '#fff', borderRadius: 18,
-                  border: `1px solid ${SOFT}`,
-                  boxShadow: '0 2px 10px rgba(79,70,229,0.07)',
-                  padding: '14px 16px', marginBottom: 10,
-                  display: 'flex', gap: 12, alignItems: 'flex-start',
-                  flexDirection: isRtl ? 'row-reverse' : 'row',
-                  cursor: 'pointer',
-                }}
-              >
+              <div key={l.id} onClick={() => router.push('/find')} style={{
+                background: '#fff', borderRadius: 18, border: `1px solid ${SOFT}`,
+                boxShadow: '0 2px 10px rgba(79,70,229,0.07)',
+                padding: '14px 16px', marginBottom: 10,
+                display: 'flex', gap: 12, alignItems: 'flex-start',
+                flexDirection: isRtl ? 'row-reverse' : 'row', cursor: 'pointer',
+              }}>
                 <div style={{ width: 42, height: 42, borderRadius: 12, background: SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>
                   {LISTING_ICONS[l.type]}
                 </div>
