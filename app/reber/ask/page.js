@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createBrowserClient } from '@supabase/ssr'
+import { createClient } from '@/app/lib/supabase'
 import TX from '../../../lib/translations'
 
 const INDIGO = '#4F46E5'
@@ -12,10 +12,7 @@ const SOFT = '#EDE9FE'
 const BG = '#F5F4FF'
 const ADMIN_EMAIL = 'bawanhozhin@outlook.com'
 
-const supabase = createBrowserClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-)
+const supabase = createClient()
 
 export default function AskPage() {
   const [lang, setLang] = useState('en')

@@ -47,8 +47,7 @@ export async function GET() {
 
     await supabase
       .from('news_cache')
-      .update({ articles, fetched_at: new Date().toISOString() })
-      .eq('id', 1)
+      .upsert({ id: 1, articles, fetched_at: new Date().toISOString() })
 
     return Response.json({ success: true, count: articles.length })
 

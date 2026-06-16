@@ -1,7 +1,13 @@
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { createClient } from '@supabase/supabase-js'
 
 const SIX_HOURS_MS = 6 * 60 * 60 * 1000
+
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+  )
+}
 
 async function fetchFreshNews() {
   const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -84,16 +90,7 @@ Return ONLY a valid JSON array with no markdown, no explanation, no backticks. E
 
 export async function GET() {
   try {
-    const cookieStore = cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY,
-      {
-        cookies: {
-          get(name) { return cookieStore.get(name)?.value },
-        },
-      }
-    )
+    const supabase = getSupabase()
 
     // Check cache
     const { data: cache, error: cacheError } = await supabase
@@ -114,8 +111,7 @@ export async function GET() {
 
     await supabase
       .from('news_cache')
-      .update({ articles, fetched_at: new Date().toISOString() })
-      .eq('id', 1)
+      .upsert({ id: 1, articles, fetched_at: new Date().toISOString() })
 
     return Response.json({ articles, cached: false })
   } catch (err) {

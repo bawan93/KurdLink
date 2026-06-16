@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { createBrowserClient } from '@supabase/ssr'
+import { createClient } from '@/app/lib/supabase'
 import { useRouter } from 'next/navigation'
 import TX from '../../lib/translations'
 
@@ -16,7 +16,7 @@ const RED = '#EF4444'
 const AMBER = '#F59E0B'
 const BLUE = '#3B82F6'
 
-const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+const supabase = createClient()
 
 function getTitle(listing) {
   const d = listing.data || {}
@@ -83,15 +83,15 @@ export default function AccountPage() {
     setListingsLoading(false)
   }
 
-  async function handleLogin(e) {
-    e.preventDefault(); setAuthLoading(true); setAuthError('')
+  async function handleLogin() {
+    setAuthLoading(true); setAuthError('')
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) setAuthError(t.wrongPass)
     setAuthLoading(false)
   }
 
-  async function handleSignup(e) {
-    e.preventDefault(); setAuthLoading(true); setAuthError('')
+  async function handleSignup() {
+    setAuthLoading(true); setAuthError('')
     if (!name.trim()) { setAuthError(t.noName); setAuthLoading(false); return }
     const { error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name } } })
     if (error) { setAuthError(t.cantCreate) } else { setAuthSuccess(t.created); setMode('login') }
@@ -148,7 +148,8 @@ export default function AccountPage() {
         <div style={{ fontSize: 44, marginBottom: 12 }}>👤</div>
         <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 900, margin: '0 0 8px', textAlign: 'center' }}>{t.heroTitle}</h1>
         {mode === 'signup' && (
-<p style={{ color: INDIGO_LIGHT, fontSize: 14, fontWeight: 500, margin: 0, textAlign: 'center', padding: '0 20px' }}>{t.heroSub}</p>        )}
+          <p style={{ color: INDIGO_LIGHT, fontSize: 14, fontWeight: 500, margin: 0, textAlign: 'center', padding: '0 20px' }}>{t.heroSub}</p>
+        )}
       </div>
 
       <div style={{ maxWidth: 560, margin: '0 auto', padding: '0 16px', marginTop: -24, animation: 'fadeIn 0.4s ease' }}>
@@ -162,7 +163,10 @@ export default function AccountPage() {
                 </button>
               ))}
             </div>
-            <div style={{ background: '#fff', borderRadius: 20, padding: '24px 20px', boxShadow: '0 4px 24px rgba(79,70,229,0.10)' }}>
+            <form
+              onSubmit={e => { e.preventDefault(); mode === 'login' ? handleLogin() : handleSignup() }}
+              style={{ background: '#fff', borderRadius: 20, padding: '24px 20px', boxShadow: '0 4px 24px rgba(79,70,229,0.10)' }}
+            >
               {authError && <div style={{ background: '#FEF2F2', borderRadius: 10, padding: '12px 14px', marginBottom: 16, color: RED, fontSize: 13, fontWeight: 600, textAlign: isRTL ? 'right' : 'left' }}>{authError}</div>}
               {authSuccess && <div style={{ background: '#F0FDF4', borderRadius: 10, padding: '12px 14px', marginBottom: 16, color: GREEN, fontSize: 13, fontWeight: 600, textAlign: isRTL ? 'right' : 'left' }}>{authSuccess}</div>}
               {mode === 'signup' && (
@@ -179,11 +183,11 @@ export default function AccountPage() {
                 <label style={{ display: 'block', fontSize: 13, fontWeight: 800, color: INDIGO_DARK, marginBottom: 6, textAlign: isRTL ? 'right' : 'left' }}>{t.password}</label>
                 <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder={t.passPh} style={{ ...inpStyle, textAlign: isRTL ? 'right' : 'left' }} />
               </div>
-              <button onClick={mode === 'login' ? handleLogin : handleSignup} disabled={authLoading}
+              <button type="submit" disabled={authLoading}
                 style={{ width: '100%', padding: '14px 0', background: authLoading ? '#E5E7EB' : INDIGO, color: authLoading ? '#9CA3AF' : '#fff', borderRadius: 14, fontSize: 15, fontWeight: 800, border: 'none', cursor: authLoading ? 'not-allowed' : 'pointer', transition: 'all 0.2s', fontFamily: FONT }}>
                 {authLoading ? '...' : mode === 'login' ? t.loginBtn : t.signupBtn}
               </button>
-            </div>
+            </form>
           </div>
         ) : (
           <div>

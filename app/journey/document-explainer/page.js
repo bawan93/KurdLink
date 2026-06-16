@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { createBrowserClient } from '@supabase/ssr'
+import { createClient } from '@/app/lib/supabase'
 import { useRouter } from 'next/navigation'
 
 const INDIGO = '#4F46E5'
@@ -11,10 +11,7 @@ const MINT = '#34D399'
 const SOFT = '#EDE9FE'
 const BG = '#F5F4FF'
 
-const supabase = createBrowserClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-)
+const supabase = createClient()
 
 const translations = {
   en: {
@@ -230,10 +227,18 @@ export default function DocumentExplainerPage() {
 
       if (!uid) {
         try {
-          const res = await fetch('https://api.ipify.org?format=json')
-          const d = await res.json()
-          setUserIp(d.ip)
-          const total = await fetchAnonTotalCount(d.ip)
+          const cached = localStorage.getItem('komek_ip')
+          let ip
+          if (cached) {
+            ip = cached
+          } else {
+            const res = await fetch('https://api.ipify.org?format=json')
+            const d = await res.json()
+            ip = d.ip
+            localStorage.setItem('komek_ip', ip)
+          }
+          setUserIp(ip)
+          const total = await fetchAnonTotalCount(ip)
           setAnonTotalUsed(total)
         } catch {
           // IP fetch failed, continue without

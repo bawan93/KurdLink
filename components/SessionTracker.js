@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
-import { createBrowserClient } from '@supabase/ssr'
+import { createClient } from '@/app/lib/supabase'
 
 const HEARTBEAT_INTERVAL = 60000   // ping every 60s
 const SESSION_TIMEOUT   = 30 * 60 * 1000 // 30 min gap = new session
@@ -14,10 +14,7 @@ export default function SessionTracker() {
   const identifierType = useRef(null)
   const heartbeatRef = useRef(null)
 
-  const getSupabase = () => createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  )
+  const getSupabase = () => createClient()
 
   async function getIdentifier() {
     const supabase = getSupabase()

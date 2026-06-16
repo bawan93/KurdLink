@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { createBrowserClient } from '@supabase/ssr'
+import { createClient } from '@/app/lib/supabase'
 import { useRouter } from 'next/navigation'
 import TX from '../../lib/translations'
 
@@ -10,7 +10,7 @@ const SOFT = '#EDE9FE'
 const BG = '#F5F4FF'
 const FONT = "'Nunito', sans-serif"
 
-const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+const supabase = createClient()
 
 export default function PostPage() {
   const router = useRouter()

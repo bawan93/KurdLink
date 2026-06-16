@@ -1,7 +1,7 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { createBrowserClient } from '@supabase/ssr'
+import { createClient } from '@/app/lib/supabase'
 
 const INDIGO = '#4F46E5'
 const INDIGO_DARK = '#1C1A4F'
@@ -11,10 +11,7 @@ const SOFT = '#EDE9FE'
 const BG = '#F5F4FF'
 const FONT = "'Nunito', sans-serif"
 
-const supabase = createBrowserClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-)
+const supabase = createClient()
 
 function Badge({ text }) {
   return (
@@ -190,13 +187,13 @@ export default function HomePage() {
     window.addEventListener('langchange', handler)
     fetchAll()
     const onFocus = () => fetchAll()
+    const onVisible = () => { if (document.visibilityState === 'visible') fetchAll() }
     window.addEventListener('focus', onFocus)
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') fetchAll()
-    })
+    document.addEventListener('visibilitychange', onVisible)
     return () => {
       window.removeEventListener('langchange', handler)
       window.removeEventListener('focus', onFocus)
+      document.removeEventListener('visibilitychange', onVisible)
     }
   }, [])
 
