@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { createClient } from '@/app/lib/supabase'
+import { createClient } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
 
 const INDIGO = '#4F46E5'

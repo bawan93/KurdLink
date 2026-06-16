@@ -4,5 +4,16 @@
       "path": "/api/news/refresh",
       "schedule": "0 6 * * *"
     }
-  ]
+  ],
+  "functions": {
+    "app/api/news/route.js": {
+      "maxDuration": 60
+    },
+    "app/api/news/refresh/route.js": {
+      "maxDuration": 60
+    },
+    "app/api/explain/route.js": {
+      "maxDuration": 30
+    }
+  }
 }
