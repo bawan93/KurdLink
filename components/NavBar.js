@@ -14,7 +14,7 @@ const TABS = [
     icon: '🧭',
     label: { en: 'Guide', ku: 'ڕێنمایی', fa: 'راهنما', ar: 'الدليل' },
     route: '/reber/coming-to-uk',
-    match: (p) => p?.startsWith('/reber') && p !== '/reber/ask' && p !== '/reber/news',
+    match: (p) => p?.startsWith('/reber') && p !== '/reber/ask',
   },
   {
     id: 'letters',
@@ -36,13 +36,6 @@ const TABS = [
     label: { en: 'Search', ku: 'گەڕان', fa: 'جستجو', ar: 'بحث' },
     route: '/find',
     match: (p) => p?.startsWith('/find'),
-  },
-  {
-    id: 'news',
-    icon: '📰',
-    label: { en: 'News', ku: 'هەواڵ', fa: 'اخبار', ar: 'الأخبار' },
-    route: '/reber/news',
-    match: (p) => p === '/reber/news',
   },
 ]
 
