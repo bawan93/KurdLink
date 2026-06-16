@@ -102,7 +102,7 @@ export default function NavBar() {
       </div>
 
       {/* Tab row */}
-      <div style={{ display: 'flex', padding: '0 4px', direction: 'ltr', overflowX: 'auto' }}>
+      <div style={{ display: 'flex', padding: '0 4px', direction: 'ltr' }}>
         {TABS.map(tab => {
           const active = tab.match(pathname)
           const label = tab.label[lang] || tab.label.en
@@ -130,7 +130,7 @@ export default function NavBar() {
               }}>
                 {tab.icon}
               </span>
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 52 }}>{label}</span>
+              <span>{label}</span>
             </button>
           )
         })}
