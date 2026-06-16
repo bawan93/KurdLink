@@ -170,7 +170,7 @@ function AnimatedCounter({ value, color }) {
   }, [value])
 
   return (
-    <span style={{ fontSize: 24, fontWeight: 900, color, lineHeight: 1 }}>
+    <span style={{ fontSize: 28, fontWeight: 900, color, lineHeight: 1 }}>
       {display.toLocaleString()}
     </span>
   )
@@ -226,10 +226,10 @@ export default function HomePage() {
         <div style={{ position: 'absolute', top: -50, right: -50, width: 160, height: 160, borderRadius: '50%', background: 'rgba(52,211,153,0.07)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', bottom: -30, left: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(129,140,248,0.08)', pointerEvents: 'none' }} />
 
-        <p style={{ fontSize: 11, fontWeight: 800, color: INDIGO_LIGHT, letterSpacing: 1, textTransform: 'uppercase', margin: '0 0 10px', position: 'relative' }}>
+        <p style={{ fontSize: 13, fontWeight: 800, color: INDIGO_LIGHT, letterSpacing: 1, textTransform: 'uppercase', margin: '0 0 10px', position: 'relative' }}>
           {t.heroEyebrow}
         </p>
-        <h1 style={{ fontSize: 26, fontWeight: 900, color: '#fff', margin: '0 0 24px', lineHeight: 1.25, position: 'relative' }}>
+        <h1 style={{ fontSize: 30, fontWeight: 900, color: '#fff', margin: '0 0 24px', lineHeight: 1.25, position: 'relative' }}>
           {t.heroTitle}
         </h1>
 
@@ -247,7 +247,7 @@ export default function HomePage() {
               borderLeft: i > 0 ? '1px solid rgba(255,255,255,0.1)' : 'none',
             }}>
               <AnimatedCounter value={statValues[i]} color={s.color} />
-              <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', fontWeight: 700, textAlign: 'center', lineHeight: 1.3, padding: '0 4px' }}>
+              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 700, textAlign: 'center', lineHeight: 1.3, padding: '0 4px' }}>
                 {s.label}
               </span>
             </div>
@@ -259,7 +259,7 @@ export default function HomePage() {
 
         {/* QUICK ACTIONS */}
         <div style={{ padding: '20px 0 0' }}>
-          <p style={{ fontSize: 11, fontWeight: 800, color: INDIGO_LIGHT, letterSpacing: 1, textTransform: 'uppercase', margin: '0 0 12px', textAlign: ta }}>
+          <p style={{ fontSize: 13, fontWeight: 800, color: INDIGO_LIGHT, letterSpacing: 1, textTransform: 'uppercase', margin: '0 0 12px', textAlign: ta }}>
             {t.quickTitle}
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
@@ -270,15 +270,15 @@ export default function HomePage() {
                 cursor: 'pointer', textAlign: ta,
               }}>
                 <div style={{
-                  width: 38, height: 38, borderRadius: 12, background: QUICK_COLORS[i],
+                  width: 42, height: 42, borderRadius: 12, background: QUICK_COLORS[i],
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 19, marginBottom: 10,
+                  fontSize: 22, marginBottom: 10,
                   marginLeft: isRtl ? 'auto' : 0, marginRight: isRtl ? 0 : 'auto',
                 }}>
                   {q.icon}
                 </div>
-                <div style={{ fontSize: 13, fontWeight: 800, color: INDIGO_DARK, marginBottom: 2 }}>{q.title}</div>
-                <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 600 }}>{q.sub}</div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: INDIGO_DARK, marginBottom: 2 }}>{q.title}</div>
+                <div style={{ fontSize: 13, color: '#94A3B8', fontWeight: 600 }}>{q.sub}</div>
               </div>
             ))}
           </div>
@@ -286,7 +286,7 @@ export default function HomePage() {
 
         {/* GUIDE CARDS */}
         <div style={{ padding: '20px 0 0' }}>
-          <p style={{ fontSize: 11, fontWeight: 800, color: INDIGO_LIGHT, letterSpacing: 1, textTransform: 'uppercase', margin: '0 0 12px', textAlign: ta }}>
+          <p style={{ fontSize: 13, fontWeight: 800, color: INDIGO_LIGHT, letterSpacing: 1, textTransform: 'uppercase', margin: '0 0 12px', textAlign: ta }}>
             {t.guidesTitle}
           </p>
           <div style={{
@@ -297,22 +297,22 @@ export default function HomePage() {
           }}>
             {t.guides.map((g, i) => (
               <div key={i} onClick={() => router.push(g.route)} style={{
-                minWidth: 148, background: '#fff', borderRadius: 18,
+                minWidth: 160, background: '#fff', borderRadius: 18,
                 border: `1px solid ${SOFT}`, boxShadow: '0 2px 10px rgba(79,70,229,0.07)',
                 overflow: 'hidden', flexShrink: 0, cursor: 'pointer',
               }}>
                 <div style={{ padding: '14px 14px 10px', textAlign: ta }}>
                   <span style={{
-                    display: 'inline-block', fontSize: 9, fontWeight: 800,
+                    display: 'inline-block', fontSize: 11, fontWeight: 800,
                     padding: '3px 8px', borderRadius: 20, marginBottom: 8,
                     direction: 'ltr', ...BADGE_STYLES[g.badgeStyle],
                   }}>
                     {g.badge}
                   </span>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: INDIGO_DARK, lineHeight: 1.3 }}>{g.title}</div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: INDIGO_DARK, lineHeight: 1.3 }}>{g.title}</div>
                 </div>
                 <div style={{ padding: '8px 14px 12px', borderTop: `1px solid ${BG}`, textAlign: ta }}>
-                  <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 600 }}>{g.sub}</div>
+                  <div style={{ fontSize: 13, color: '#94A3B8', fontWeight: 600 }}>{g.sub}</div>
                 </div>
               </div>
             ))}
@@ -322,10 +322,10 @@ export default function HomePage() {
         {/* LATEST LISTINGS */}
         <div style={{ padding: '20px 0 0' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isRtl ? 'row-reverse' : 'row', marginBottom: 12 }}>
-            <p style={{ fontSize: 11, fontWeight: 800, color: INDIGO_LIGHT, letterSpacing: 1, textTransform: 'uppercase', margin: 0 }}>
+            <p style={{ fontSize: 13, fontWeight: 800, color: INDIGO_LIGHT, letterSpacing: 1, textTransform: 'uppercase', margin: 0 }}>
               {t.listingsTitle}
             </p>
-            <span onClick={() => router.push('/find')} style={{ fontSize: 12, fontWeight: 700, color: INDIGO, cursor: 'pointer' }}>
+            <span onClick={() => router.push('/find')} style={{ fontSize: 14, fontWeight: 700, color: INDIGO, cursor: 'pointer' }}>
               {t.seeAll}
             </span>
           </div>
@@ -335,7 +335,7 @@ export default function HomePage() {
               <div style={{ width: 24, height: 24, border: `2px solid ${SOFT}`, borderTopColor: INDIGO, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
             </div>
           ) : listings.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '20px 0', fontSize: 13, color: '#94A3B8', fontWeight: 600 }}>
+            <div style={{ textAlign: 'center', padding: '20px 0', fontSize: 15, color: '#94A3B8', fontWeight: 600 }}>
               {t.noListings}
             </div>
           ) : listings.map((l, i) => {
@@ -351,16 +351,16 @@ export default function HomePage() {
                 display: 'flex', gap: 12, alignItems: 'flex-start',
                 flexDirection: isRtl ? 'row-reverse' : 'row', cursor: 'pointer',
               }}>
-                <div style={{ width: 42, height: 42, borderRadius: 12, background: SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>
+                <div style={{ width: 46, height: 46, borderRadius: 12, background: SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>
                   {LISTING_ICONS[l.type]}
                 </div>
                 <div style={{ flex: 1, textAlign: ta }}>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: INDIGO_DARK, marginBottom: 3 }}>{title}</div>
-                  <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 600 }}>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: INDIGO_DARK, marginBottom: 3 }}>{title}</div>
+                  <div style={{ fontSize: 13, color: '#94A3B8', fontWeight: 600 }}>
                     {location}{location ? ' · ' : ''}{timeAgo(l.created_at)} {t.ago}
                   </div>
                   <span style={{
-                    display: 'inline-block', fontSize: 10, fontWeight: 700,
+                    display: 'inline-block', fontSize: 12, fontWeight: 700,
                     padding: '2px 8px', borderRadius: 20, marginTop: 6,
                     background: isJob ? SOFT : '#D1FAE5',
                     color: isJob ? INDIGO : '#059669',
